@@ -14,6 +14,10 @@ Currently supports: **Lancong(Nanchang), Fenni(Fenyi), and Fungcen**. More local
 
 Rime schema repositories for Lancong(Nanchang), Fenni(Fenyi), and Fungcen. Other installation options are available in the [Installation](#installation) section below.
 
+## Release 1.0.5
+
+- Fixed Android package signing.
+
 ## Release 1.0.4
 
 - fix(dict): update the Fungcen and Lancong (Nanchang) dictionaries
@@ -21,6 +25,7 @@ Rime schema repositories for Lancong(Nanchang), Fenni(Fenyi), and Fungcen. Other
 ## Contents
 
 - [GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method](#gonnyugeneralime--a-general-gongan-chinese-input-method)
+  - [Release 1.0.5](#release-105)
   - [Release 1.0.4](#release-104)
   - [Contents](#contents)
   - [Overview](#overview)

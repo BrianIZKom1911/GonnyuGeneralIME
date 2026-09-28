@@ -114,6 +114,9 @@ def test_release_notes_do_not_link_to_generated_metadata() -> None:
 
 def test_android_workflow_runs_installation_smoke_test() -> None:
     content = (ROOT / ".github/workflows" / "android.yml").read_text(encoding="utf-8")
+    assert "GANNYU_ANDROID_BUILD_VARIANT: release" in content
+    assert "--print-certs" in content
+    assert "Android Debug" in content
     assert "reactivecircus/android-emulator-runner@v2" in content
     assert "adb install build/android/GonnyuGeneralIME-" in content
     assert "--name-match=kvm" in content
