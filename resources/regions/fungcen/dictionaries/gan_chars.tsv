@@ -51,8 +51,8 @@
 严	ȵiɛn2	nien2	yan2	赣			170000		
 严	iɛn2	yen2	yan2	赣			170000		
 丧	soŋ1	song1	sang4	赣			125000		
-个	kɛi1	gei1	ge4	赣	这/的/地	zhe4/de5/di4	125017		
-个	ko4	go4	ge4	赣	这/的/地	zhe4/de5/di4	125017		
+个	kɛi1	gei1	ge4	赣	这/的/地	zhe4/de5/di4	125017	箇	
+个	ko4	go4	ge4	赣	这/的/地	zhe4/de5/di4	125017	箇	
 丫	ŋa1	nga1	ya1	赣			120000		
 中	tsuŋ1	zung1	zhong1	赣			493191		
 中	tsuŋ4	zung4	zhong1	赣			493191		
@@ -1374,7 +1374,7 @@
 崩	puŋ1	bung1	beng1	赣			220000		
 崭	tsan3	zan3	zhan3	赣			120000		
 崭	tsiɛn3	zien3	zhan3	赣			120000		
-崽	tsɛi3	zei3	zai3	赣			145000		
+崽	tsɛi3	zei3	zai3	赣	儿子	er2 zi5	145000		
 嵩	suŋ1	sung1	song1	赣			90000		
 川	tsʰon1	con1	chuan1	赣			120000		
 州	tsəu1	zeu1	zhou1	赣			245000		
@@ -1737,7 +1737,7 @@
 扒	pa1	ba1	ba1	赣			120000		
 扒	pʰa2	pa2	ba1	赣			120000		
 打	ta3	da3	da3	赣			370000		
-扔	liŋ1	ling1	reng1	赣			115300		
+扔	liŋ1	ling1	reng1	官			115300		
 托	tʰo1	to1	tuo1	赣			125000		
 托	tʰɔʔ5	tok5	tuo1	赣			125000		
 扚	tiaʔ5	diak5	diao3	赣			154620		
@@ -1863,7 +1863,7 @@
 拼	pʰin1	pin1	pin1	赣			120000		
 拾	sɨʔ6	sek6	shi2	赣			120000		
 拾	sip6	sip6	shi2	赣			120000		
-拿	taʔ5	dak5	na2	赣			370000		
+拿	taʔ5	dak5	na2	官			370000		
 持	tsʰi2	ci2	chi2	赣			125000		
 挂	kua4	gua4	gua4	赣			130000		
 指	tsɨʔ5	zek5	zhi3	赣			370000		
@@ -1914,7 +1914,7 @@
 捏	ȵiɛʔ5	niek5	nie1	赣			255000		
 捐	tɕyon1	jyuon1	juan1	赣			120000		
 捕	pu3	bu3	bu3	赣			106747		
-捞	lɑu1	lau1	lao1	赣			145000		
+捞	lɑu1	lau1	lao1	官			145000		
 损	suɛn3	sun3	sun3	赣			120000		
 损	syn3	syun3	sun3	赣			120000		
 损	ɕuɛn3	xun3	sun3	赣			120000		
@@ -1955,7 +1955,7 @@
 探	tʰon4	ton4	tan4	赣			120000		
 接	tɕiɛp5	jiep5	jie1	赣			250000		
 控	kʰuŋ3	kung3	kong4	赣			125000		
-推	tʰɛi1	tei1	tui1	赣			120000		
+推	tʰɛi1	tei1	tui1	官			120000		
 掩	ŋan3	ngan3	yan3	赣			120000		
 掩	ȵiɛn3	nien3	yan3	赣			120000		
 掩	iɛn3	yen3	yan3	赣			120000		
@@ -2832,8 +2832,8 @@
 烦	fan2	fan2	fan2	赣			120000		
 烧	sɛu1	seu1	shao1	赣			145000		
 烫	tʰoŋ4	tong4	tang4	赣			120000		
-热	lɛt5	let5	re4	赣			145000		
-热	ȵiɛt6	niet6	re4	赣			145000		
+热	lɛt5	let5	re4	官			145000		
+热	ȵiɛt6	niet6	re4	官			145000		
 焊	hon4	hon4	han4	赣			120000		
 焕	fɛn4	fen4	huan4	赣			120000		
 焖	mən4	men4	men4	赣			120000		
@@ -3361,7 +3361,7 @@
 章	tsoŋ1	zong1	zhang1	赣			150000		
 童	tʰuŋ2	tung2	tong2	赣			170000		
 竭	tɕiɛt6	jiet6	jie2	赣			120000		
-端	ton1	don1	duan1	赣			375780		
+端	ton1	don1	duan1	官			375780		
 竹	tsuʔ5	zuk5	zhu2	赣			175000		
 竿	kon1	gon1	gan1	赣			104121		
 笆	pa1	ba1	ba1	赣			90000		
@@ -3962,8 +3962,8 @@
 薯	sy2	syu2	shu3	赣			120000		
 薯	ɕu2	xu2	shu3	赣			120000		
 薰	syn1	syun1	xun1	赣			73178		
-藏	tsʰoŋ2	cong2	cang2	赣			145000		
-藏	tsoŋ4	zong4	cang2	赣			145000		
+藏	tsʰoŋ2	cong2	cang2	官			145000		
+藏	tsoŋ4	zong4	cang2	官			145000		
 藕	ŋiɛu3	ngieu3	ou3	赣			145000		
 藠	tɕʰiɛu4	qieu4	jiao4	赣			6000		
 藤	tʰɛn2	ten2	teng2	赣			120000		
@@ -4322,7 +4322,7 @@
 赴	fuʔ6	fuk6	fu4	赣			120000		
 赵	tsʰɛu4	ceu4	zhao4	赣			145000		
 赵	tsəu4	zeu4	zhao4	赣			145000		
-赶	kon3	gon3	gan3	赣			120000		
+赶	kon3	gon3	gan3	官			120000		
 起	tɕʰi3	qi3	qi3	赣			170000		
 趁	tsʰən4	cen4	chen4	赣			120000		
 趁	tsʰiŋ4	cing4	chen4	赣			120000		
@@ -4368,7 +4368,7 @@
 蹋	tʰæʔ5	taek5	ta4	赣			120000		
 蹦	puŋ4	bung4	beng4	赣			145000		
 蹬	tɛn1	den1	deng1	赣			145000		
-蹲	tuɛn1	dun1	dun1	赣			145000		
+蹲	tuɛn1	dun1	dun1	官			145000		
 躁	tsɑu1	zau1	zao4	赣			120000		
 身	sən1	sen1	shen1	赣			120000		
 身	sin1	sin1	shen1	赣			120000		
@@ -4761,7 +4761,7 @@
 难	lan1	lan1	nan2	赣			180000		
 难	lan2	lan2	nan2	赣			180000		
 难	ȵan2	nan2	nan2	赣			180000		
-雀	tɕiɔʔ6	jiok6	que4	赣			140000		
+雀	tɕiɔʔ6	jiok6	que4	赣	鸟	niao3	140000		
 雁	ŋan1	ngan1	yan4	赣			120000		
 雄	ɕiuŋ2	xiung2	xiong2	赣			120000		
 雅	ŋa3	nga3	ya3	赣			145000		
@@ -4955,9 +4955,9 @@
 鳜	kui4	gui4	gui4	赣			90000		
 鳝	sɛn4	sen4	shan4	赣			9993		
 鳞	lən2	len2	lin2	赣			120000		
-鸟	tiɛu3	dieu3	niao3	赣			120000		
-鸟	ȵiau3	niau3	niao3	赣			120000		
-鸟	ȵiɛu3	nieu3	niao3	赣			120000		
+鸟	tiɛu3	dieu3	niao3	官			120000		
+鸟	ȵiau3	niau3	niao3	官			120000		
+鸟	ȵiɛu3	nieu3	niao3	官			120000		
 鸠	tɕiu1	jiu1	jiu1	赣			90000		
 鸡	tɕi1	ji1	ji1	赣			120000		
 鸣	mən2	men2	ming2	赣			130964		
@@ -5021,3 +5021,36 @@
 𬉼	ŋiɛu4	ngieu4	ou1	赣			122300		
 𬮿	kʰai4	kai4	qi2	赣			1995		
 掇	duet7	duet6	duo1	赣	端	duan1	138593		
+光	kuɑŋ1	guang1	guang1	赣			104104		
+昼	tsiu2	ziu2	zhou4	赣			94698		
+梦	muŋ3	mung3	meng4	赣			93818		
+割	kuɛʔ5	guek5	ge1	赣			97216		
+仔	tsɛi1	zei1	zai3	赣			104236		
+崽	tsɛi2	zei2	zai3	赣			101275		
+哩	li1	li1	li1	赣			97771		
+后	hɛu3	heu3	hou4	赣			94523		
+妹	mɛi3	mei3	mei4	赣			109932		
+仔	tsɛi2	zei2	zai3	赣			104236		
+短	ton2	don2	duan3	赣			91671		
+喫	tɕʰiaʔ5	qiak5	chi1	赣	吃/喝/吸	chi1/he1/xi1	94709		
+饭	fan3	fan3	fan4	赣			97267		
+话	ua3	wa3	hua4	赣			90674		
+事	si3	si3	shi4	赣			103616		
+嘲	tsʰɛu2	ceu2	chao2	赣			103240		
+箇	kɛi2	gei2	ge4	赣	这/的	zhe4/de5	126915	个	
+箇	ko2	go2	ge4	赣	这/的	zhe4/de5	123050	个	
+说	suɛt5	suet5	shuo1	赣			126409		
+合	huɛt6	huet6	he2	赣			127444		
+农	ȵiuŋ1	niung1	nong2	赣			125309		
+鸽	kuɛp7	guep5	ge1	赣			129228		
+革	kuɛʔ5	guek5	ge2	赣			123788		
+葛	kʰuɛt6	kuet6	ge2	赣			125731		
+阁	kuɛʔ5	guek5	ge2	赣			122218		
+龙	ȵiuŋ1	niung1	long2	赣			123902		
+东	tʰuŋ1	tung1	dong1	赣			127824		
+式	siʔ5	sik5	shi4	赣			124010		
+称	tsʰiŋ2	cing2	cheng1	赣			127389		
+频	pʰin1	pin1	pin2	赣			120702		
+给	kɛi4	gei4	gei3	赣			123895		
+搦	laʔ7	lak5	nuo4	赣	拿	na2	128590		
+窒	tsit5	zit5	zhi4	赣			127232		
