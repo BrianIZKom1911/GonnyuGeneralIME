@@ -400,6 +400,7 @@ int gannyu_engine_snapshot(GannyuPipelineHandle* handle, char** out_json) {
 int gannyu_engine_set_candidate_limit(GannyuPipelineHandle* handle, size_t limit) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
+    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
     handle->candidate_limit = limit;
     return kOk;
   });
