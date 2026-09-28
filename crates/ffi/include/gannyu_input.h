@@ -38,6 +38,8 @@ typedef struct GannyuEngineConfig {
 int gannyu_engine_create(const GannyuEngineConfig *config,
                          GannyuPipelineHandle **out_handle);
 
+int gannyu_runtime_finalize(void);
+
 int gannyu_pipeline_create(const char *manifest_path,
                          const char *region_id,
                          GannyuPipelineHandle **out_handle);

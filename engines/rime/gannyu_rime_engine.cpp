@@ -142,6 +142,7 @@ std::optional<std::string> JsonStringField(const char* json, const char* field) 
 
 struct Runtime {
   std::mutex mutex;
+  bool setup = false;
   bool initialized = false;
   std::string shared_data_dir;
   std::string user_data_dir;
@@ -166,35 +167,38 @@ bool EnsureRuntime(const char* shared_data_dir, const char* prebuilt_data_dir, c
   }
   Runtime& runtime = GlobalRuntime();
   std::lock_guard<std::mutex> lock(runtime.mutex);
-  if (runtime.initialized) {
+  if (runtime.setup) {
     if (runtime.shared_data_dir != shared_data_dir ||
         runtime.prebuilt_data_dir != prebuilt_data_dir ||
         runtime.user_data_dir != user_data_dir) {
       SetError("librime is process-global; all sessions must use the same data directories");
       return false;
     }
-    return true;
+  } else {
+    runtime.shared_data_dir = shared_data_dir;
+    runtime.user_data_dir = user_data_dir;
+    runtime.prebuilt_data_dir = prebuilt_data_dir;
+    runtime.staging_dir = runtime.user_data_dir + "/build";
+    runtime.api = rime_get_api();
+    if (runtime.api == nullptr) {
+      SetError("rime_get_api returned null");
+      return false;
+    }
+    RimeTraits traits{};
+    RIME_STRUCT_INIT(RimeTraits, traits);
+    traits.shared_data_dir = runtime.shared_data_dir.c_str();
+    traits.user_data_dir = runtime.user_data_dir.c_str();
+    traits.prebuilt_data_dir = runtime.prebuilt_data_dir.c_str();
+    traits.staging_dir = runtime.staging_dir.c_str();
+    traits.app_name = "rime.gonnyu.mobile";
+    traits.log_dir = "";
+    runtime.api->setup(&traits);
+    runtime.setup = true;
   }
-  runtime.shared_data_dir = shared_data_dir;
-  runtime.user_data_dir = user_data_dir;
-  runtime.prebuilt_data_dir = prebuilt_data_dir;
-  runtime.staging_dir = runtime.user_data_dir + "/build";
-  runtime.api = rime_get_api();
-  if (runtime.api == nullptr) {
-    SetError("rime_get_api returned null");
-    return false;
+  if (!runtime.initialized) {
+    runtime.api->initialize(nullptr);
+    runtime.initialized = true;
   }
-  RimeTraits traits{};
-  RIME_STRUCT_INIT(RimeTraits, traits);
-  traits.shared_data_dir = runtime.shared_data_dir.c_str();
-  traits.user_data_dir = runtime.user_data_dir.c_str();
-  traits.prebuilt_data_dir = runtime.prebuilt_data_dir.c_str();
-  traits.staging_dir = runtime.staging_dir.c_str();
-  traits.app_name = "rime.gonnyu.mobile";
-  traits.log_dir = "";
-  runtime.api->setup(&traits);
-  runtime.api->initialize(nullptr);
-  runtime.initialized = true;
   return true;
 }
 
@@ -386,6 +390,22 @@ int gannyu_last_error(char** out_error) {
     *out_error = CopyOut(g_last_error);
     g_last_error.clear();
     return *out_error == nullptr ? kSerializeFailure : kOk;
+  });
+}
+
+int gannyu_runtime_finalize(void) {
+  return AbiStatus([&] {
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!runtime.handles.empty()) {
+      SetError("destroy all Rime pipeline handles before finalizing the runtime");
+      return kInvalidArgument;
+    }
+    if (runtime.initialized && runtime.api != nullptr) {
+      runtime.api->finalize();
+      runtime.initialized = false;
+    }
+    return kOk;
   });
 }
 

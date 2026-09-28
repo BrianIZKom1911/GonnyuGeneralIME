@@ -96,6 +96,7 @@ int main(int argc, char** argv) {
       return 14;
     }
     gannyu_pipeline_destroy(handle);
+    if (gannyu_runtime_finalize() != 0) return 15;
   }
   return 0;
 }
