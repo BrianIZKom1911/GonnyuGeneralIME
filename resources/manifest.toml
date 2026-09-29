@@ -23,3 +23,9 @@ id = "tiqien"
 name_zh = "黎川"
 status = "active"
 path = "regions/tiqien/region.toml"
+
+[[regions]]
+id = "xinyu"
+name_zh = "新余市"
+status = "active"
+path = "regions/xinyu/region.toml"
