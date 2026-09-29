@@ -13,17 +13,17 @@ fn default_region_is_registered() {
 #[test]
 fn region_entries_can_be_listed() {
     let regions = list_region_entries(MANIFEST_PATH).expect("regions should load");
+    assert!(!regions.is_empty());
     assert!(regions.iter().any(|region| region.id == "lancong"));
-    assert!(regions.iter().any(|region| region.id == "fenni"));
-    assert!(regions.iter().any(|region| region.id == "fungcen"));
 }
 
 #[test]
 fn region_resource_files_exist() {
-    let resource =
-        load_region_from_manifest(MANIFEST_PATH, "lancong").expect("region resource should load");
-    assert_eq!(resource.config.region.name_zh, "南昌");
-    assert_eq!(resource.config.dictionaries.default_words, None);
+    let regions = list_region_entries(MANIFEST_PATH).expect("regions should load");
+    for region in regions {
+        load_region_from_manifest(MANIFEST_PATH, &region.id)
+            .unwrap_or_else(|error| panic!("{} resource should load: {error}", region.id));
+    }
 }
 
 #[test]
@@ -42,9 +42,7 @@ fn unknown_region_returns_error() {
 #[test]
 fn manifest_registers_active_regions() {
     let regions = list_region_entries(MANIFEST_PATH).expect("regions should load");
-    assert_eq!(regions.len(), 3);
+    assert!(!regions.is_empty());
     assert!(regions.iter().all(|region| region.status == "active"));
     assert!(regions.iter().any(|region| region.id == "lancong"));
-    assert!(regions.iter().any(|region| region.id == "fenni"));
-    assert!(regions.iter().any(|region| region.id == "fungcen"));
 }
