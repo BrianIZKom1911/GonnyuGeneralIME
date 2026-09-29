@@ -200,11 +200,11 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | j | [tɕ] | - | — | - | - | - |  |  |
 | q | [tɕʰ] | - | — | - | - | - |  |  |
 | n | [ȵ] | - | — | [n] | [n] | - |  |  |
-| x | [ɕ] | - | — | - | [x] | [x] |  |  |
+| x | [ɕ] | - | — | - | － | － |  |  |
 | g | [k] | - | — | - | - | - |  |  |
 | k | [kʰ] | - | — | - | - | - |  |  |
 | ng | [ŋ] | - | — | - | - | - | A velar nasal; for example, 五 *ng3*. |  |
-| h | [h] | - | [x] | - | - | - | In Fungcen, IPA [x] is written with Gan-pinyin h; articulated farther back than Mandarin *h*. |  |
+| h | [h] | - | [x] | - | [x] | [x] | In Fungcen, Xinyu, and Songau, IPA [x] is written with Gan-pinyin h; articulated farther back than Mandarin *h*. |  |
 | v | - | - | - | - | - | [v] |  |  |
 
 ### Finals
@@ -260,9 +260,9 @@ With no initial consonant:
 | io | - | - | [iɔ] | [iɔ] | [io] | - | - |  |
 | ie | [iɛ] | - | - | - | [ie] | - | — |  |
 | iu | [iu] | - | - | - | [ɪu] | - | you (no initial) |  |
-| iau | - | - | [iau] | [iau] | - | - | - |  |
+| iau | - | - | [iau] | [iau] | [iau] | - | - |  |
 | iaeu | - | - | - | - | - | [iæu] |  |  |
-| ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | [iau] or [iəu] | - | - |  |
+| ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | [iəu] | - | - |  |
 | im | - | - | [im] | [im] | - | - | - |  |
 | in | [in] | - | - | - | [ɪn] | - | — |  |
 | ian | - | - | [ian] | - | [ian] | [ian] | - |  |
