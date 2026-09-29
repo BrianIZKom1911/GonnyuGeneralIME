@@ -268,6 +268,16 @@ def test_builds_fungcen_dictionary(tmp_path: Path) -> None:
     assert "schema_id: gannyu_fungcen" in schema
 
 
+def test_builds_xinyu_dictionary_with_starred_tone_markers(tmp_path: Path) -> None:
+    counts = build("xinyu", tmp_path, "apple")
+
+    dictionary = (tmp_path / "gannyu_xinyu.dict.yaml").read_text(encoding="utf-8")
+    assert counts["entries"] > 0
+    assert "七\tGqiek\t" in dictionary
+    assert "Gqiek5" not in dictionary
+    assert "Gqiek5*" not in dictionary
+
+
 def test_sentence_readings_use_highest_frequency_toned_character_entries() -> None:
     _, entries = load_entries("lancong")
     readings = build_preferred_readings(entries)

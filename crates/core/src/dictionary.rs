@@ -266,7 +266,11 @@ pub(crate) fn normalize_pinyin(value: &str) -> String {
 }
 
 pub(crate) fn strip_tone(value: &str) -> &str {
-    value.trim_end_matches(|character: char| character.is_ascii_digit())
+    let unstarred = match value.strip_suffix('*') {
+        Some(base) if base.ends_with(|character: char| character.is_ascii_digit()) => base,
+        _ => value,
+    };
+    unstarred.trim_end_matches(|character: char| character.is_ascii_digit())
 }
 
 /// e ↔ ĕ/ě 互模糊：e 与带第三声/短音符的 e 匹配。
@@ -1947,6 +1951,13 @@ mod tests {
     #[test]
     fn dictionary_entry_keeps_compact_immutable_text_headers() {
         assert!(std::mem::size_of::<DictionaryEntry>() <= 176);
+    }
+
+    #[test]
+    fn starred_tone_marker_is_stripped_from_lookup_form() {
+        assert_eq!(strip_tone("qiek5*"), "qiek");
+        assert_eq!(strip_tone("qiek5"), "qiek");
+        assert_eq!(strip_tone("qiek*"), "qiek*");
     }
 
     fn entry(headword: &str, category: &str, mandarin_word: &str) -> DictionaryEntry {

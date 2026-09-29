@@ -29,7 +29,7 @@ pub struct RegionConfig {
     #[serde(default)]
     pub language: LanguageFiles,
     #[serde(default, deserialize_with = "deserialize_tone_classes")]
-    pub tone_classes: BTreeMap<u8, ToneClass>,
+    pub tone_classes: BTreeMap<String, ToneClass>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
@@ -72,19 +72,46 @@ pub struct ToneClass {
     pub value: String,
 }
 
-fn deserialize_tone_classes<'de, D>(deserializer: D) -> Result<BTreeMap<u8, ToneClass>, D::Error>
+fn deserialize_tone_classes<'de, D>(
+    deserializer: D,
+) -> Result<BTreeMap<String, ToneClass>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let raw: BTreeMap<String, ToneClass> = BTreeMap::deserialize(deserializer)?;
-    raw.into_iter()
-        .map(|(key, value)| {
-            let parsed = key.parse::<u8>().map_err(|error| {
-                serde::de::Error::custom(format!("tone class key {key}: {error}"))
-            })?;
-            Ok((parsed, value))
-        })
-        .collect()
+    let tone_classes = BTreeMap::<String, ToneClass>::deserialize(deserializer)?;
+    for marker in tone_classes.keys() {
+        let digits = marker.strip_suffix('*').unwrap_or(marker);
+        if digits.is_empty() || !digits.chars().all(|character| character.is_ascii_digit()) {
+            return Err(serde::de::Error::custom(format!(
+                "invalid tone class marker {marker}"
+            )));
+        }
+    }
+    Ok(tone_classes)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::RegionConfig;
+
+    fn config_with_tone_marker(marker: &str) -> String {
+        format!(
+            "[region]\nid = \"test\"\nname_zh = \"测试\"\nstatus = \"active\"\n\n[tone_classes]\n\"{marker}\" = {{ name = \"测试\", value = \"1\" }}\n"
+        )
+    }
+
+    #[test]
+    fn tone_class_markers_accept_digits_with_optional_star() {
+        assert!(toml::from_str::<RegionConfig>(&config_with_tone_marker("1")).is_ok());
+        assert!(toml::from_str::<RegionConfig>(&config_with_tone_marker("5*")).is_ok());
+    }
+
+    #[test]
+    fn tone_class_markers_reject_other_forms() {
+        for marker in ["*", "1**", "1a", "a1"] {
+            assert!(toml::from_str::<RegionConfig>(&config_with_tone_marker(marker)).is_err());
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

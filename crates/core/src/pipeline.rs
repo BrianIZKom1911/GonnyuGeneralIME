@@ -899,10 +899,12 @@ const EIGHT_TONE_NAMES: [(&str, &[&str]); 8] = [
 /// Map an 八调 (traditional eight-tone) digit to the region's tone class
 /// by matching tone-class names. Mergers (e.g. 阴上/阳上 collapsing into
 /// 上声) are resolved through the fallback names.
-fn eight_tone_class_map(tone_classes: &BTreeMap<u8, ToneClass>) -> HashMap<String, u8> {
+fn eight_tone_class_map(tone_classes: &BTreeMap<String, ToneClass>) -> HashMap<String, u8> {
     let mut by_name: HashMap<&str, u8> = HashMap::new();
-    for (class, info) in tone_classes {
-        by_name.insert(info.name.as_str(), *class);
+    for (marker, info) in tone_classes {
+        if let Ok(class) = marker.parse::<u8>() {
+            by_name.insert(info.name.as_str(), class);
+        }
     }
     let mut map = HashMap::new();
     for (digit, candidates) in EIGHT_TONE_NAMES {

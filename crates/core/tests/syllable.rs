@@ -99,7 +99,17 @@ fn tone_digit_is_stripped_and_reattached_via_metadata() {
     let outputs = map.normalize("guon3", SyllableScheme::GonPin);
     assert!(outputs
         .iter()
-        .all(|item| item.tone == Some(3) && !item.text.ends_with('3')));
+        .all(|item| item.tone == Some(3) && !item.tone_starred && !item.text.ends_with('3')));
+}
+
+#[test]
+fn starred_tone_marker_is_stripped_and_reattached_via_metadata() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
+    let outputs = map.normalize("qiek5*", SyllableScheme::GonPin);
+    assert!(outputs
+        .iter()
+        .all(|item| item.tone == Some(5) && item.tone_starred && item.text != "qiek5*"));
+    assert!(outputs.iter().any(|item| item.text == "qiek"));
 }
 
 #[test]

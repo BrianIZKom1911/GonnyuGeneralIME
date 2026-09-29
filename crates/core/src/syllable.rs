@@ -266,6 +266,7 @@ impl FuzzyMap {
             NormalizedSyllable {
                 text: stripped.body.clone(),
                 tone: stripped.tone,
+                tone_starred: stripped.tone_starred,
                 tier: PriorityTier::Primary,
                 applied: Vec::new(),
             },
@@ -315,6 +316,7 @@ impl FuzzyMap {
                         NormalizedSyllable {
                             text: candidate,
                             tone: stripped.tone,
+                            tone_starred: stripped.tone_starred,
                             tier,
                             applied,
                         },
@@ -337,6 +339,7 @@ impl FuzzyMap {
 pub struct NormalizedSyllable {
     pub text: String,
     pub tone: Option<u8>,
+    pub tone_starred: bool,
     pub tier: PriorityTier,
     pub applied: Vec<String>,
 }
@@ -344,6 +347,7 @@ pub struct NormalizedSyllable {
 struct StrippedSyllable {
     body: String,
     tone: Option<u8>,
+    tone_starred: bool,
 }
 
 fn parse_csv_list(value: Option<String>) -> Vec<String> {
@@ -358,13 +362,18 @@ fn parse_csv_list(value: Option<String>) -> Vec<String> {
 
 fn strip_tone(input: &str) -> StrippedSyllable {
     let trimmed = input.trim();
-    if let Some(last) = trimmed.chars().last() {
+    let (unstarred, tone_starred) = match trimmed.strip_suffix('*') {
+        Some(base) if base.ends_with(|character: char| character.is_ascii_digit()) => (base, true),
+        _ => (trimmed, false),
+    };
+    if let Some(last) = unstarred.chars().last() {
         if let Some(digit) = last.to_digit(10) {
             if (1..=7).contains(&digit) {
-                let body = trimmed[..trimmed.len() - last.len_utf8()].to_string();
+                let body = unstarred[..unstarred.len() - last.len_utf8()].to_string();
                 return StrippedSyllable {
                     body,
                     tone: Some(digit as u8),
+                    tone_starred,
                 };
             }
         }
@@ -372,6 +381,7 @@ fn strip_tone(input: &str) -> StrippedSyllable {
     StrippedSyllable {
         body: trimmed.to_string(),
         tone: None,
+        tone_starred: false,
     }
 }
 

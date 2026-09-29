@@ -11,7 +11,9 @@ fn frequency_factor(frequency: Option<u64>) -> f64 {
 }
 
 fn trailing_tone_value(syllable: &str) -> Option<String> {
-    let digits: String = syllable
+    let starred = syllable.ends_with('*');
+    let unstarred = syllable.strip_suffix('*').unwrap_or(syllable);
+    let digits: String = unstarred
         .chars()
         .rev()
         .take_while(|character| character.is_ascii_digit())
@@ -21,6 +23,8 @@ fn trailing_tone_value(syllable: &str) -> Option<String> {
         .collect();
     if digits.is_empty() {
         None
+    } else if starred {
+        Some(format!("{digits}*"))
     } else {
         Some(digits)
     }

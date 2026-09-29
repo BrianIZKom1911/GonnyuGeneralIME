@@ -36,6 +36,8 @@ def test_tutorial_resource_contains_the_requested_content() -> None:
     assert tutorial.index("（4）新余市（Xinyu）词典中") < tutorial.index("<tr><td>1</td><td>阴平甲</td><td>45</td></tr>")
     assert "<tr><td>3</td><td>上声</td><td>31</td></tr>" in tutorial
     assert "<tr><td>4</td><td>去声</td><td>11</td></tr>" in tutorial
+    assert "<tr><td>2</td><td>阳平</td><td>33</td></tr>" in tutorial
+    assert "阳平阴去" not in tutorial
 
 
 def test_android_and_windows_package_the_same_tutorial_resource() -> None:

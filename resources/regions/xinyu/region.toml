@@ -6,9 +6,9 @@ status = "active"
 [tone_classes]
 1 = { name = "阴平甲", value = "45" }
 "1*" = { name = "阴平乙", value = "24" }
-2 = { name = "阳平阴去", value = "33" }
-3 = { name = "上", value = "31" }
-4 = { name = "去", value = "11" }
+2 = { name = "阳平", value = "33" }
+3 = { name = "上声", value = "31" }
+4 = { name = "去声", value = "11" }
 5 = { name = "入声甲", value = "5" }
 "5*" = { name = "入声乙", value = "24" }
 

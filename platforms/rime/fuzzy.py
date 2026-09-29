@@ -25,7 +25,7 @@ class FuzzyRule:
 
 
 def strip_tone(value: str) -> str:
-    return re.sub(r"\d+$", "", value)
+    return re.sub(r"\d+\*?$", "", value)
 
 
 def load_rules(path: Path, region: str | None = None) -> list[FuzzyRule]:

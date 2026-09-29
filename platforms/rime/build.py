@@ -92,7 +92,7 @@ def syllables(value: str) -> list[str]:
 
 
 def strip_tone(value: str) -> str:
-    return re.sub(r"\d+$", "", value)
+    return re.sub(r"\d+\*?$", "", value)
 
 
 def lua_quote(value: str) -> str:
@@ -301,7 +301,7 @@ def strip_prefix_labels(display: str) -> str:
 
 
 def trailing_tone(value: str) -> str:
-    match = re.search(r"\d+$", value)
+    match = re.search(r"\d+\*?$", value)
     return match.group(0) if match else ""
 
 

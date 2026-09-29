@@ -34,6 +34,17 @@ fn fungcen_validation_resources_load() {
 }
 
 #[test]
+fn xinyu_starred_tone_classes_load() {
+    let resource =
+        load_region_from_manifest(MANIFEST_PATH, "xinyu").expect("xinyu resource should load");
+    assert_eq!(resource.config.tone_classes["1*"].name, "阴平乙");
+    assert_eq!(resource.config.tone_classes["5*"].name, "入声乙");
+    assert_eq!(resource.config.tone_classes["2"].name, "阳平");
+    assert_eq!(resource.config.tone_classes["3"].name, "上声");
+    assert_eq!(resource.config.tone_classes["4"].name, "去声");
+}
+
+#[test]
 fn unknown_region_returns_error() {
     let error = load_region_from_manifest(MANIFEST_PATH, "unknown").unwrap_err();
     assert!(matches!(error, ResourceError::UnknownRegion(region) if region == "unknown"));

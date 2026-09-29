@@ -1,4 +1,4 @@
-use crate::dictionary::Dictionary;
+use crate::dictionary::{strip_tone, Dictionary};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
@@ -66,7 +66,7 @@ impl Reading {
             return Some(self.syllable.clone());
         }
         // Strip trailing tone digit before checking for coda suffix
-        let syllable_notone = self.syllable.trim_end_matches(|c: char| c.is_ascii_digit());
+        let syllable_notone = strip_tone(&self.syllable);
         if let Some(stripped) = syllable_notone.strip_suffix(coda) {
             return Some(stripped.to_string());
         }
@@ -378,7 +378,7 @@ fn infer_coda(syllable: &str) -> Option<String> {
     let segment = syllable
         .split(|character: char| character == '\'' || character.is_ascii_whitespace())
         .rfind(|item| !item.is_empty())?;
-    let segment = segment.trim_end_matches(|character: char| character.is_ascii_digit());
+    let segment = strip_tone(segment);
     match segment.chars().last()? {
         't' => Some("t".to_string()),
         'k' => Some("k".to_string()),
@@ -388,7 +388,7 @@ fn infer_coda(syllable: &str) -> Option<String> {
 }
 
 fn checked_lookup_key(syllable: &str) -> String {
-    let stripped = syllable.trim_end_matches(|character: char| character.is_ascii_digit());
+    let stripped = strip_tone(syllable);
     if let Some(base) = stripped.strip_suffix(['t', 'k']) {
         return base.to_string();
     }

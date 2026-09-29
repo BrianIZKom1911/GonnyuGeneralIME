@@ -123,6 +123,20 @@ fn gan_pinyin_annotation_carries_tone_class() {
 }
 
 #[test]
+fn starred_tone_marker_is_preserved_in_candidate_annotation() {
+    let body = format!(
+        "{DICT_HEADER}\n\
+         七\ttɕʰiɛʔ5*\tqiek5*\tqi1\t赣\t七\tqi1\t1000\n"
+    );
+    let path = write_fixture("dict-starred-tone.tsv", &body);
+    let dictionary = Dictionary::load_tsv(&path).expect("load dictionary");
+    let result = retrieve(&dictionary, &sample_fuzzy(), &tone_values(), "qiek5*");
+    let candidate = result.iter().find(|item| item.text == "七").unwrap();
+    assert_eq!(candidate.layer, RetrievalLayer::GannyuExact);
+    assert_eq!(candidate.annotation.as_deref(), Some("qiek5*"));
+}
+
+#[test]
 fn mandarin_only_entry_is_tagged() {
     let dictionary = sample_dictionary();
     let fuzzy = sample_fuzzy();
