@@ -284,7 +284,7 @@ With no initial consonant:
 | ip | - | - | [ip] | [ip] | - | - |  |
 | iap | - | - | [iap] | [iap] | - | - |  |
 | iep | - | - | [iɛp] | - | - | — |  |
-| ik | - | [iʔ] or [ɪʔ] | [iʔ] | [iʔ] | [ɿʔ] |  |  |
+| ik | [iʔ] | [ɪʔ] | - | - | [ɿʔ] | — |  |
 | iak | [iaʔ] | - | - | - | - | - |  |
 | iaik | - | - | - | - | [iaiʔ] |  |  |
 | iok | [iɔʔ] | - | - | - | [ioʔ] | - |  |
@@ -418,8 +418,8 @@ The Xinyu (Xinyu City) dictionary uses the following tone markers:
 | 1 | 阴平甲 | 45 |
 | 1* | 阴平乙 | 24 |
 | 2 | 阳平阴去 | 33 |
-| 3 | 上 | 31 |
-| 4 | 去 | 11 |
+| 3 | 上声 | 31 |
+| 4 | 去声 | 11 |
 | 5 | 入声甲 | 5 |
 | 5* | 入声乙 | 24 |
 
