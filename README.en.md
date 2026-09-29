@@ -438,6 +438,7 @@ In addition to participants’ own field observations, the project draws on acad
 7. Wikipedia. *Gon(Gan) Chinese*. <https://zh.wikipedia.org/zh-hans/%E8%B4%9B%E8%AA%9E>.
 8. *Character-use standards for Chinese dialects, Language Resources Protection Project of China*. <http://www.moe.gov.cn/s78/A19/tongzhi/201704/W020170405307025943395.pdf>. Accessed 2026-08-04.
 9. Bilibili. *New Concept Lancong(Nanchang) Dialect* series. <https://www.bilibili.com/video/BV1Us4y1C7fp/?share_source=copy_web&vd_source=5078721afbb2afc4394ca2602bb990de>.
+10. Li Rong, ed., and Yan Sen, comp. *Dictionary of the Lichuan Dialect*. Nanjing: Jiangsu Education Press, 1995. ISBN 7534326265.
 
 ### Dependency declarations
 

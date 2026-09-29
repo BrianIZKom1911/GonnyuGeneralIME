@@ -430,6 +430,7 @@ Windows 小狼毫将压缩包内容复制到 `%APPDATA%\Rime`，在输入法菜�
 8. 《中国语言资源保护工程汉语方言用字规范》 http://www.moe.gov.cn/s78/A19/tongzhi/201704/W020170405307025943395.pdf. 访问日期2026-08-04.
 9. Bilibili 新概念南昌话系列.  https://www.bilibili.com/video/BV1Us4y1C7fp/?share_source=copy_web&vd_source=5078721afbb2afc4394ca2602bb990de
 10. 肖萍、肖介汉. 《江西吴城方言词典》[M]. 北京：商务印书馆，2017. 书目信息可参见 [语言学书目汇编](https://geolinguistics.sakura.ne.jp/Monograph/SIG-Mono7-LAAA-3-ebook.pdf).
+11. 李荣主编，颜森编纂. 《黎川方言词典》[M]. 南京：江苏教育出版社，1995. ISBN 7534326265.
 
 ### 依赖声明
 
