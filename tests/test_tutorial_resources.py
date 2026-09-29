@@ -14,6 +14,8 @@ def test_tutorial_resource_contains_the_requested_content() -> None:
         "韵母yu统一采用yu拼写。",
         "（1）南昌词典中，数字1-7为南昌话七个声调，具体调值见下。",
         "（2）丰城词典中，数字1-6为丰城话六个声调，具体调值见下。",
+        "（3）黎川（Tiqien）词典中，数字1-7为黎川话七个声调，具体调值见下。",
+        "（4）新余市（Xinyu）词典中，标号1、1*、2、3、4、5、5*为新余市话声调标记，具体调值见下。",
         "拼音说明",
         "词语标记说明",
         "A词语后面接“[义]B词语”时，B为A在普通话中的对应义。",
@@ -30,6 +32,8 @@ def test_tutorial_resource_contains_the_requested_content() -> None:
     assert tutorial.index("（1）南昌词典中") < tutorial.index("<tr><td>1</td><td>阴平</td><td>42</td></tr>")
     assert tutorial.index("<tr><td>1</td><td>阴平</td><td>42</td></tr>") < tutorial.index("（2）丰城词典中")
     assert tutorial.index("（2）丰城词典中") < tutorial.index("<tr><td>1</td><td>阴平</td><td>33</td></tr>")
+    assert tutorial.index("（3）黎川（Tiqien）词典中") < tutorial.index("<tr><td>1</td><td>阴平</td><td>22</td></tr>")
+    assert tutorial.index("（4）新余市（Xinyu）词典中") < tutorial.index("<tr><td>1</td><td>阴平甲</td><td>45</td></tr>")
 
 
 def test_android_and_windows_package_the_same_tutorial_resource() -> None:
