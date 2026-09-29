@@ -2,7 +2,7 @@
 
 > A digital writing system rooted in the Gon(Gan)–Poyang region.
 
-Currently supports: **Lancong(Nanchang), Fenni(Fenyi), and Fungcen**. More localities are welcome.
+Currently supports: **Lancong(Nanchang), Fenni(Fenyi), Fungcen(Fengcheng), and Tiqien (Lichuan)**. More localities are welcome.
 
 **An easy-to-use Gon(Gan) input method: users who know Pinyin can type immediately, with both local and Mandarin Pinyin input supported.**
 
@@ -18,15 +18,10 @@ Rime schema repositories for Lancong(Nanchang), Fenni(Fenyi), and Fungcen. Other
 
 - Fixed Android package signing.
 
-## Release 1.0.4
-
-- fix(dict): update the Fungcen and Lancong (Nanchang) dictionaries
-
 ## Contents
 
 - [GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method](#gonnyugeneralime--a-general-gongan-chinese-input-method)
   - [Release 1.0.5](#release-105)
-  - [Release 1.0.4](#release-104)
   - [Contents](#contents)
   - [Overview](#overview)
     - [What it provides](#what-it-provides)
@@ -82,7 +77,7 @@ Beyond the dictionaries themselves, the input method currently provides:
 - Cross-references between common Mandarin words and local Gon(Gan) vocabulary. When either side is found, the corresponding expression is also offered as a candidate.
 - Compatible input and clear annotation for literary and colloquial readings, newer and older readings, and other alternate pronunciations.
 
-The project currently maintains three regional dictionaries: urban Lancong (Nanchang), Fenni (Fenyi County in Xinyu), and Fungcen. We hope to expand substantially to other localities as well. Contributions to add and correct dictionary entries are welcome.
+The project currently maintains four regional dictionaries: urban Lancong (Nanchang), Fenni (Fenyi County in Xinyu), Fungcen, and Tiqien (Lichuan). We hope to expand substantially to other localities as well. Contributions to add and correct dictionary entries are welcome.
 
 ## See Gan in action
 
@@ -190,26 +185,26 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 
 ### Initials
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Accepted alternative input | Notes |
-| --- | --- | --- | --- | --- | --- |
-| b | [p] | - | — | |
-| p | [pʰ] | - | — | |
-| m | [m] | - | — | |
-| f | [f] | - | — | May differ from Mandarin *f*; some descriptions use [ɸ]. |
-| d | [t] | - | — | |
-| t | [tʰ] | - | — | |
-| l | [l] | - | — | |
-| z | [ts] | - | — | |
-| c | [tsʰ] | - | — | |
-| s | [s] | - | — | |
-| j | [tɕ] | - | — | |
-| q | [tɕʰ] | - | — | |
-| n | [ȵ] | - | — | |
-| x | [ɕ] | - | — | |
-| g | [k] | - | — | |
-| k | [kʰ] | - | — | |
-| ng | [ŋ] | - | — | A velar nasal; for example, 五 *ng3*. |
-| h | [h] | - | [x] | In Fungcen, IPA [x] is written with Gan-pinyin h; articulated farther back than Mandarin *h*. |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Accepted alternative input | Notes |
+| --- | --- | --- | --- | ------- | --- | --- |
+| b | [p] | - | — | - |  |  |
+| p | [pʰ] | - | — | - |  |  |
+| m | [m] | - | — | - |  |  |
+| f | [f] | - | — | - | May differ from Mandarin *f*; some descriptions use [ɸ]. |  |
+| d | [t] | - | — | - |  |  |
+| t | [tʰ] | - | — | - |  |  |
+| l | [l] | - | — | - |  |  |
+| z | [ts] | - | — | - |  |  |
+| c | [tsʰ] | - | — | - |  |  |
+| s | [s] | - | — | - |  |  |
+| j | [tɕ] | - | — | - |  |  |
+| q | [tɕʰ] | - | — | - |  |  |
+| n | [ȵ] | - | — | [n] |  |  |
+| x | [ɕ] | - | — | - |  |  |
+| g | [k] | - | — | - |  |  |
+| k | [kʰ] | - | — | - |  |  |
+| ng | [ŋ] | - | — | - | A velar nasal; for example, 五 *ng3*. |  |
+| h | [h] | - | [x] | - | In Fungcen, IPA [x] is written with Gan-pinyin h; articulated farther back than Mandarin *h*. |  |
 
 ### Finals
 
@@ -217,35 +212,35 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 
 #### Open finals
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Accepted alternative input | Notes |
-| --- | --- | --- | --- | --- | --- |
-| a | [a] | - | - | — | |
-| ae | - | - | [æ] | — | |
-| o | [o] or [ɵ] | - | - | — | |
-| e | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | — | |
-| ai | [ai] | - | - | — | |
-| oi | [oi] | - | - | — | |
-| ei | [ei] or [ɨi] | - | [ɛi] | — | [ei] is only a contracted vowel. |
-| au | [au] | - | [ɑu] | ao | |
-| eu | [ɛu] or [ɨu] | - | [əu] | ou (after some initials) | |
-| an | [an] | - | - | — | |
-| am | - | - | [am] | — | |
-| en | [ɛn] or [ɨn] | - | [ən] | — | |
-| on | [on] | - | - | — | |
-| ang | [ɑŋ] | - | - | — | |
-| ong | [ɔŋ] | - | [oŋ] | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | [ən] | - | en (Yikyan) | Most speakers no longer distinguish en and eng. |
-| at | [at] | - | - | — | |
-| ap | - | - | [ap] | — | |
-| ot | [ot] | - | [ɵt] | — | |
-| op | - | - | [ɵp] | — | |
-| et | [ɛt] or [ɨt] | - | - | — | |
-| ak | [aʔ] | - | - | — | |
-| aek | - | - | [æʔ] | — | |
-| aet | - | - | [æt] | — | |
-| aep | - | - | [æp] | — | |
-| ok | [ɔʔ] | - | [oʔ] or [ɵʔ] | — | |
-| ek | - | [ɛʔ] or [ɤʔ] | [ɛʔ] or [ɨʔ] | — | [ɤʔ] can be written ek or uk. |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Accepted alternative input | Notes |
+| --- | --- | --- | --- | ------- | --- | --- |
+| a | [a] | - | - | - | — |  |
+| ae | - | - | [æ] | - | — |  |
+| o | [o] or [ɵ] | - | - | [ɔ、ɵ] | — |  |
+| e | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | [ɛ] | — |  |
+| ai | [ai] | - | - | - | — |  |
+| oi | [oi] | - | - | [ɔi] | — |  |
+| ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | — | [ei] is only a contracted vowel. |
+| au | [au] | - | [ɑu] | - | ao |  |
+| eu | [ɛu] or [ɨu] | - | [əu] | [ɛu] | ou (after some initials) |  |
+| an | [an] | - | - | - | — |  |
+| am | - | - | [am] | [am] | — |  |
+| en | [ɛn] or [ɨn] | - | [ən] | [ən、ɛn] | — |  |
+| on | [on] | - | - | [ɔn] | — |  |
+| ang | [ɑŋ] | - | - | - | — |  |
+| ong | [ɔŋ] | - | [oŋ] | - | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
+| eng | - | [ən] | - | [ɛŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng. |
+| at | [at] | - | - | - | — |  |
+| ap | - | - | [ap] | [ap] | — |  |
+| ot | [ot] | - | [ɵt] | - | — |  |
+| op | - | - | [ɵp] | [ɔp] | — |  |
+| et | [ɛt] or [ɨt] | - | - | - | — |  |
+| ak | [aʔ] | - | - | - | — |  |
+| aek | - | - | [æʔ] | - | — |  |
+| aet | - | - | [æt] | - | — |  |
+| aep | - | - | [æp] | - | — |  |
+| ok | [ɔʔ] | - | [oʔ] or [ɵʔ] | - | — |  |
+| ek | - | [ɛʔ] or [ɤʔ] | [ɛʔ] or [ɨʔ] | [ɛʔ] | — | [ɤʔ] can be written ek or uk. |
 
 #### Front-vowel finals
 
@@ -254,34 +249,34 @@ With no initial consonant:
 - Before `-a`, `-o`, or `-e`, initial `i` is written `y`.
 - In other positions, it is written `yi`.
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Accepted alternative input | Notes |
-| --- | --- | --- | --- | --- | --- |
-| i | [i] or [ɿ] | - | - | — | |
-| ia | [ia] | - | - | — | |
-| iat | - | - | [iat] | - | |
-| ie | [iɛ] | - | - | — | |
-| iep | - | - | [iɛp] | — | |
-| iu | [iu] | - | - | you (no initial) | |
-| io | - | - | [iɔ] | - | |
-| ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | |
-| in | [in] | - | - | — | |
-| ien | [iɛn] | - | - | - | |
-| ian | - | - | [ian] | - | |
-| iang | [iɑŋ] | - | - | - | |
-| iau | - | - | [iau] | - | |
-| im | - | - | [im] | - | |
-| ing | - | - | [iŋ] | - | |
-| iong | [iɔŋ] | - | [ioŋ] | - | |
-| iung | [iuŋ] | - | - | - | |
-| it | [it] | - | - | it | |
-| ip | - | - | [ip] | - | |
-| iap | - | - | [iap] | - | |
-| iet | [iet] | - | - | - | |
-| ik | - | [iʔ] or [ɪʔ] | [iʔ] |  | |
-| iak | [iaʔ] | - | - | - | |
-| iok | [iɔʔ] | - | - | - | |
-| iek | - | [iɛʔ] | [iɛʔ] |  | |
-| iuk | [iuʔ] | - | - | - | |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Accepted alternative input | Notes |
+| --- | --- | --- | --- | ------- | --- | --- |
+| i | [i] or [ɿ] | - | - | [i、ɿ] | — |  |
+| ia | [ia] | - | - | - | — |  |
+| iat | - | - | [iat] | - | - |  |
+| ie | [iɛ] | - | - | - | — |  |
+| iep | - | - | [iɛp] | - | — |  |
+| iu | [iu] | - | - | - | you (no initial) |  |
+| io | - | - | [iɔ] | [iɔ] | - |  |
+| ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | - |  |
+| in | [in] | - | - | - | — |  |
+| ien | [iɛn] | - | - | - | - |  |
+| ian | - | - | [ian] | - | - |  |
+| iang | [iɑŋ] | - | - | - | - |  |
+| iau | - | - | [iau] | [iau] | - |  |
+| im | - | - | [im] | [im] | - |  |
+| ing | - | - | [iŋ] | [iŋ] | - |  |
+| iong | [iɔŋ] | - | [ioŋ] | - | - |  |
+| iung | [iuŋ] | - | - | - | - |  |
+| it | [it] | - | - | - | it |  |
+| ip | - | - | [ip] | [ip] | - |  |
+| iap | - | - | [iap] | [iap] | - |  |
+| iet | [iet] | - | - | - | - |  |
+| ik | - | [iʔ] or [ɪʔ] | [iʔ] | [iʔ] |  |  |
+| iak | [iaʔ] | - | - | - | - |  |
+| iok | [iɔʔ] | - | - | - | - |  |
+| iek | - | [iɛʔ] | [iɛʔ] | [iɛʔ] |  |  |
+| iuk | [iuʔ] | - | - | - | - |  |
 
 #### Rounded finals
 
@@ -290,63 +285,63 @@ With no initial consonant:
 - Before `-a`, `-o`, or `-e`, initial `u` is written `w`.
 - In other positions, it is written `wu`.
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Accepted alternative input | Notes |
-| --- | --- | --- | --- | --- | --- |
-| u | [u] | - | - | - | |
-| ua | [ua] | - | - | - | |
-| uo | [uo] | - | - | - | |
-| ue | [ue] | - | [uɛ] | - | |
-| ui | [uei] | - | [uɛi] or [ui] | uei, wei (no initial), wi | |
-| uie | - | - | [uiɛ] | - | |
-| uin | - | - | [uin] | - | |
-| uai | [uai] | - | - | - | |
-| uoi | - | [uoi] | - | oi | |
-| un | [un] or [uen] | - | [uɛn] | uen | |
-| uan | [uan] | - | - | - | |
-| uon | [uon] | - | - | uen, wen (no initial) | |
-| ung | [uŋ] | - | - | — | |
-| uang | [uɑŋ] | - | - | - | |
-| uong | [uɔŋ] | - | [uoŋ] | uon (Yikyan) | |
-| ut | [ut] | - | - | - | |
-| uat | [uat] | - | - | - | |
-| uot | [uot] | - | - | - | |
-| uet | [uɛt] | - | [uɨt] | - | |
-| uk | [uʔ] | [uʔ] or [ɤʔ] | - | - | |
-| uak | [uaʔ] | - | - | - | |
-| uaek | - | - | [uæʔ] | - | |
-| uaet | - | - | [uæt] | - | |
-| uok | [uoʔ] | - | [uɔʔ] | - | |
-| uik | - | - | [uɛiʔ] | uek | |
-| uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | uik | |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Accepted alternative input | Notes |
+| --- | --- | --- | --- | ------- | --- | --- |
+| u | [u] | - | - | - | - |  |
+| ua | [ua] | - | - | - | - |  |
+| uo | [uo] | - | - | [uɔ] | - |  |
+| ue | [ue] | - | [uɛ] | [uɛ] | - |  |
+| ui | [uei] | - | [uɛi] or [ui] | [ui] | uei, wei (no initial), wi |  |
+| uie | - | - | [uiɛ] | - | - |  |
+| uin | - | - | [uin] | - | - |  |
+| uai | [uai] | - | - | - | - |  |
+| uoi | - | [uoi] | - | [uɔi] | oi |  |
+| un | [un] or [uen] | - | [uɛn] | [un] | uen |  |
+| uan | [uan] | - | - | - | - |  |
+| uon | [uon] | - | - | [uɔn] | uen, wen (no initial) |  |
+| ung | [uŋ] | - | - | - | — |  |
+| uang | [uɑŋ] | - | - | - | - |  |
+| uong | [uɔŋ] | - | [uoŋ] | - | uon (Yikyan) |  |
+| ut | [ut] | - | - | - | - |  |
+| uat | [uat] | - | - | - | - |  |
+| uot | [uot] | - | - | - | - |  |
+| uet | [uɛt] | - | [uɨt] | - | - |  |
+| uk | [uʔ] | [uʔ] or [ɤʔ] | - | - | - |  |
+| uak | [uaʔ] | - | - | - | - |  |
+| uaek | - | - | [uæʔ] | - | - |  |
+| uaet | - | - | [uæt] | - | - |  |
+| uok | [uoʔ] | - | [uɔʔ] | [uɔʔ] | - |  |
+| uik | - | - | [uɛiʔ] | [uiʔ] | uek |  |
+| uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | [uɛʔ] | uik |  |
 
 #### Rounded front-vowel finals
 
 `yu` is provisionally used throughout for [y].
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Accepted alternative input | Notes |
-| --- | --- | --- | --- | --- | --- |
-| yu | [y] | - | - | y, v, u | |
-| yuo | - | - | [yɵ] | - | |
-| yue | [ye] | - | - | - | |
-| yun | [yn] | - | - | — | |
-| yuon | [yon] | - | - | yuen, yoin | |
-| yuen | - | [yɛn] or [yɛŋ] | - | yueng | |
-| yung | - | [yn] | [yŋ] or [iuŋ] | yun | |
-| yut | [yt] | - | - | - | |
-| yuk | - | - | [yʔ] or [iuʔ] | - | |
-| yuot | [yot] | - | - | yue, yuet | |
-| yuet | - | - | [yet] | yuot | |
-| yuak | - | [yaʔ] | - | - | |
-| yuok | - | [yɔʔ] | [yɵʔ] | - | |
-| yuek | - | [yɛʔ] or [yɪʔ] | - | yuik | |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Accepted alternative input | Notes |
+| --- | --- | --- | --- | ------- | --- | --- |
+| yu | [y] | - | - | - | y, v, u |  |
+| yuo | - | - | [yɵ] | - | - |  |
+| yue | [ye] | - | - | - | - |  |
+| yun | [yn] | - | - | - | — |  |
+| yuon | [yon] | - | - | - | yuen, yoin |  |
+| yuen | - | [yɛn] or [yɛŋ] | - | - | yueng |  |
+| yung | - | [yn] | [yŋ] or [iuŋ] | - | yun |  |
+| yut | [yt] | - | - | - | - |  |
+| yuk | - | - | [yʔ] or [iuʔ] | [yʔ] | - |  |
+| yuot | [yot] | - | - | - | yue, yuet |  |
+| yuet | - | - | [yet] | - | yuot |  |
+| yuak | - | [yaʔ] | - | - | - |  |
+| yuok | - | [yɔʔ] | [yɵʔ] | - | - |  |
+| yuek | - | [yɛʔ] or [yɪʔ] | - | - | yuik |  |
 
 #### Syllabic nasals
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Notes |
-| --- | --- | --- | --- |
-| m | [m̩] | - | - | |
-| n | [n̩] | - | - | |
-| ng | [ŋ̩] | - | - | |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Notes |
+| --- | --- | --- | --- | ------- |
+| m | [m̩] | - | - | - |  |
+| n | [n̩] | - | - | - |  |
+| ng | [ŋ̩] | - | - | [ŋ̍] |  |
 
 #### Other segments
 
@@ -378,6 +373,20 @@ The Fungcen dictionary uses six tone markers:
 | 4 | departing | 31 |
 | 5 | yin checked | 1 |
 | 6 | yang checked | 5 |
+
+### Tiqien (Lichuan) tones
+
+The Tiqien (Lichuan) dictionary uses the following tone markers:
+
+| Marker | Traditional tone category | Pitch value |
+| --- | --- | --- |
+| 1 | 阴平 | 22 |
+| 2 | 阳平 | 35 |
+| 3 | 上声 | 44 |
+| 4 | 阴去 | 53 |
+| 5 | 阳去 | 13 |
+| 6 | 阴入 | 3 |
+| 7 | 阳入 | 5 |
 
 ## References
 
