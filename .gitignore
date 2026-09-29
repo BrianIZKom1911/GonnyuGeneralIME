@@ -7,22 +7,22 @@ __pycache__/
 *.swo
 *~
 
-# Large local resource files are required at runtime but are not committed.
+# Runtime resources
 resources/regions/*/phonology/pronunciations.jsonl
 resources/regions/*/dictionaries/candidates.jsonl
 
-# Local prompts
+# Local files
 agents/prompts/
 agents/log/
 resources/phonological/
 
-# Build artifacts and local installer diagnostics
+# Build outputs
 target/
 build/
 build/downloaded-windows-installer-latest/
 build/windows/logs/
 
-# Native shell build outputs
+# Platform outputs
 platforms/macos/.build/
 platforms/macos/GannyuExplorer/.build/
 platforms/windows/build/
@@ -33,25 +33,24 @@ platforms/android/.gradle/
 platforms/android/local.properties
 **/xcuserdata/
 
-# 测试模块本地配置（含本机路径等敏感信息），仅提交 .example 模板
 platforms/**/test_local.env
 platforms/ios/
 
-# edit_char_reading.py 会话文件（本地配置、输入历史）
+# Tool state
 tools/.edit_config.json
 tools/.edit_history
 tools/.manage_dict_history/
 
-# 原始输入文件（大型资料，本地补齐，不入库）
+# Source data
 resources/regions/**/raw/
 
-# 运行时缓存与索引（构建产物，不入库）
+# Caches and indexes
 resources/regions/**/dictionaries/dictionary_runtime_cache.*
 resources/regions/**/indexes/*.bin
 
 platforms/android/app/src/main/jniLibs/
 
-# doc
+# Documentation
 docs/
 
 docs/impl/
