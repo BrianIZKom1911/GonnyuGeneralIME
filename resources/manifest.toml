@@ -17,3 +17,9 @@ id = "fungcen"
 name_zh = "丰城"
 status = "active"
 path = "regions/fungcen/region.toml"
+
+[[regions]]
+id = "tiqien"
+name_zh = "黎川"
+status = "active"
+path = "regions/tiqien/region.toml"

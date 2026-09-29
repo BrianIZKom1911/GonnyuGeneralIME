@@ -216,20 +216,20 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | --- | --- | --- | --- | ------- | --- | --- |
 | a | [a] | - | - | - | — |  |
 | ae | - | - | [æ] | - | — |  |
-| o | [o] or [ɵ] | - | - | [ɔ、ɵ] | — |  |
+| o | [o] or [ɵ] | - | - | [ɔ] | — |  |
 | e | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | [ɛ] | — |  |
 | ai | [ai] | - | - | - | — |  |
 | oi | [oi] | - | - | [ɔi] | — |  |
 | ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | — | [ei] is only a contracted vowel. |
 | au | [au] | - | [ɑu] | - | ao |  |
-| eu | [ɛu] or [ɨu] | - | [əu] | [ɛu] | ou (after some initials) |  |
+| eu | [ɛu] or [ɨu] | - | [əu] | - | ou (after some initials) |  |
 | an | [an] | - | - | - | — |  |
 | am | - | - | [am] | [am] | — |  |
-| en | [ɛn] or [ɨn] | - | [ən] | [ən、ɛn] | — |  |
+| en | [ɛn] or [ɨn] | - | [ən] | [ən] | — |  |
 | on | [on] | - | - | [ɔn] | — |  |
 | ang | [ɑŋ] | - | - | - | — |  |
 | ong | [ɔŋ] | - | [oŋ] | - | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | [ən] | - | [ɛŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng. |
+| eng | - | [ən] | - | [ɛŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | at | [at] | - | - | - | — |  |
 | ap | - | - | [ap] | [ap] | — |  |
 | ot | [ot] | - | [ɵt] | - | — |  |
@@ -251,7 +251,7 @@ With no initial consonant:
 
 | gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | --- | --- |
-| i | [i] or [ɿ] | - | - | [i、ɿ] | — |  |
+| i | [i] or [ɿ] | - | - | - | — |  |
 | ia | [ia] | - | - | - | — |  |
 | iat | - | - | [iat] | - | - |  |
 | ie | [iɛ] | - | - | - | — |  |
@@ -296,7 +296,7 @@ With no initial consonant:
 | uin | - | - | [uin] | - | - |  |
 | uai | [uai] | - | - | - | - |  |
 | uoi | - | [uoi] | - | [uɔi] | oi |  |
-| un | [un] or [uen] | - | [uɛn] | [un] | uen |  |
+| un | [un] or [uen] | - | [uɛn] | - | uen |  |
 | uan | [uan] | - | - | - | - |  |
 | uon | [uon] | - | - | [uɔn] | uen, wen (no initial) |  |
 | ung | [uŋ] | - | - | - | — |  |
