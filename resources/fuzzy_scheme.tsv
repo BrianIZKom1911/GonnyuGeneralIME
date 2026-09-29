@@ -1,13 +1,3 @@
-# 模糊音方案总表
-# 用户兼容写法（gon_fuzzy 列）到存储规范写法（gon_pin 列）的折叠规则。
-# 应用层据此构建模糊音检索函数库：检索时把输入音节展开为一批可模糊音节。
-# 入声韵尾 t/k 存储形式保留原样；输入不带韵尾时可模糊展开到带尾形式（单向）。
-# 带 chainable=false 的规则只做“一次替换”，避免 ion→yon→yuon 这类二次连锁改写。
-# 字段：region 适用地区（common 为通用）；category 部位；gon_fuzzy 用户兼容写法；gon_pin 存储规范写法；
-#       ipa 国际音标；example 例字；
-#       applies 作用位置(syllable-initial/syllable-final/anywhere)；bidirectional 是否双向；
-#       chainable 是否允许继续参与后续替换；priority_tier 档位(primary/secondary/fallback)；
-#       starts_with 起首限制，逗号分隔；note 备注。
 region	category	gon_fuzzy	gon_pin	ipa	example	applies	bidirectional	chainable	priority_tier	starts_with	note
 common	onset	i	y	i	也	syllable-initial	false	false	primary	ia,ie,io	零声母 i 系旧写兼容；ia→ya、ieu→yeu、ion→yon、iou→you
 common	onset	u	w	u	乌	syllable-initial	false	false	primary	ua,ue,uo	零声母 u 系旧写兼容；ua→wa、uen→wen、uon→won
@@ -27,7 +17,9 @@ common	rime	uei	ui	uei	为	syllable-final	false	false	primary		uei 输入兼容�
 common	rime	ung	wung	uŋ	翁	syllable-final	false	false	primary	ung	仅零声母 ung→wung；当前词表无此项，仅保留规则
 common	rime	ve	yue	ye	月	anywhere	false	true	primary	ve,jve,lve,nve,qve,xve	ve 系专用桥接，须先于通用 v→yu
 common	rime	ue	yue	ye	月	anywhere	false	true	primary	ue,jue,lue,nue,que,xue	ue 系专用桥接，须先于通用 u→yu
-common	rime	v	yu	y	与	anywhere	false	false	primary		yu 可从 v 输入，涵盖 von→yuon、vot→yuot 等
+common	rime	v	yu	y	与	anywhere	false	false	primary	b,p,m,f,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh,w	仅已有声母后的 v→yu
+common	rime	w	v			anywhere	false	false	primary	w	w 可单向兼容 v
+common	rime	wu	v			anywhere	false	false	primary	wu	wu 可单向兼容 v
 common	rime	you	yiu	iu	有	syllable-final	false	false	primary	you	yiu 可从 you 模糊输入
 common	rime	wei	wui	uei	为	syllable-final	false	false	primary	wei	wui 可从 wei 模糊输入
 common	rime	wi	wui	uei	为	syllable-final	false	false	secondary	wi	wui 可从 wi 模糊输入

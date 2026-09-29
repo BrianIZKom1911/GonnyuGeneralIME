@@ -140,16 +140,36 @@ fn yu_normalizes_to_yu() {
 }
 
 #[test]
-fn yu_accepts_u_and_v_as_fuzzy_inputs() {
+fn yu_v_w_fuzzy_rules_are_one_way_and_onset_scoped() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     assert!(map
         .normalize("u", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "yu"));
-    assert!(map
+    assert!(!map
         .normalize("v", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "yu"));
+    assert!(map
+        .normalize("jv", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "jyu"));
+    assert!(map
+        .normalize("w", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "v"));
+    assert!(map
+        .normalize("wu", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "v"));
+    assert!(!map
+        .normalize("yu", SyllableScheme::GonFuzzy)
+        .iter()
+        .any(|item| matches!(item.text.as_str(), "v" | "w" | "wu")));
+    assert!(!map
+        .normalize("v", SyllableScheme::GonFuzzy)
+        .iter()
+        .any(|item| matches!(item.text.as_str(), "w" | "wu")));
     assert!(!map
         .normalize("yu", SyllableScheme::GonPin)
         .iter()
