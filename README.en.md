@@ -215,39 +215,39 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 
 | gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | --- | --- |
-| a | [a] | - | - | - | - | — |  |
 | ae | - | - | [æ] | - | - | — |  |
+| a | [a] | - | - | - | - | — |  |
 | o | [o] or [ɵ] | - | - | [ɔ] | - | — |  |
 | e | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | [ɛ] | [ə] or [ɛ] | — |  |
 | ai | [ai] | - | - | - | - | — |  |
 | oi | [oi] | - | - | [ɔi] | [ɔi] | — |  |
 | ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | [əi] | — | [ei] is only a contracted vowel. |
 | au | [au] | - | [ɑu] | - | - | ao |  |
+| ou | - | - | - | [ɔu] | - |  |  |
 | eu | [ɛu] or [ɨu] | - | [əu] | - | [əu] | ou (after some initials) |  |
-| an | [an] | - | - | - | - | — |  |
 | am | - | - | [am] | [am] | - | — |  |
-| en | [ɛn] or [ɨn] | - | [ən] | [ən] | [en] | — |  |
+| om | - | - | - | [ɔm] | - |  |  |
+| em | - | - | - | [ɛm] | - |  |  |
+| an | [an] | - | - | - | - | — |  |
 | on | [on] | - | - | [ɔn] | [ɔn] | — |  |
+| en | [ɛn] or [ɨn] | - | [ən] | [ən] | [en] | — |  |
 | ang | [ɑŋ] | - | - | - | - | — |  |
 | ong | [ɔŋ] | - | [oŋ] | - | [oŋ] | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
 | eng | - | [ən] | - | [ɛŋ] | - | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
-| at | [at] | - | - | - | - | — |  |
-| ap | - | - | [ap] | [ap] | - | — |  |
-| ot | [ot] | - | [ɵt] | - | - | — |  |
-| op | - | - | [ɵp] | [ɔp] | - | — |  |
-| et | [ɛt] or [ɨt] | - | - | - | - | — |  |
-| ak | [aʔ] | - | - | - | - | — |  |
-| aek | - | - | [æʔ] | - | - | — |  |
 | aet | - | - | [æt] | - | - | — |  |
+| at | [at] | - | - | - | - | — |  |
+| ot | [ot] | - | [ɵt] | - | - | — |  |
+| et | [ɛt] or [ɨt] | - | - | - | - | — |  |
 | aep | - | - | [æp] | - | - | — |  |
-| ok | [ɔʔ] | - | [oʔ] or [ɵʔ] | - | [oʔ] | — |  |
-| ek | - | [ɛʔ] or [ɤʔ] | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | — | [ɤʔ] can be written ek or uk. |
-| aik | - | - | - | [aiʔ] | [aiʔ] |  |  |
-| em | - | - | - | [ɛm] | - |  |  |
+| ap | - | - | [ap] | [ap] | - | — |  |
+| op | - | - | [ɵp] | [ɔp] | - | — |  |
 | ep | - | - | - | [ɛp] | - |  |  |
+| aek | - | - | [æʔ] | - | - | — |  |
+| ak | [aʔ] | - | - | - | - | — |  |
+| aik | - | - | - | [aiʔ] | [aiʔ] |  |  |
+| ok | [ɔʔ] | - | [oʔ] or [ɵʔ] | - | [oʔ] | — |  |
 | oik | - | - | - | [ɔiʔ] | - |  |  |
-| om | - | - | - | [ɔm] | - |  |  |
-| ou | - | - | - | [ɔu] | - |  |  |
+| ek | - | [ɛʔ] or [ɤʔ] | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | — | [ɤʔ] can be written ek or uk. |
 
 #### Front-vowel finals
 
@@ -260,38 +260,38 @@ With no initial consonant:
 | --- | --- | --- | --- | ------- | ------- | --- | --- |
 | i | [i] or [ɿ] | - | - | - | - | — |  |
 | ia | [ia] | - | - | - | - | — |  |
-| iat | - | - | [iat] | - | - | - |  |
-| ie | [iɛ] | - | - | - | [ie] | — |  |
-| iep | - | - | [iɛp] | - | - | — |  |
-| iu | [iu] | - | - | - | [ɪu] | you (no initial) |  |
 | io | - | - | [iɔ] | [iɔ] | [io] | - |  |
-| ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | [iau] or [iəu] | - |  |
-| in | [in] | - | - | - | [ɪn] | — |  |
-| ien | [iɛn] | - | - | - | [ien] | - |  |
-| ian | - | - | [ian] | - | [ian] | - |  |
-| iang | [iɑŋ] | - | - | - | - | - |  |
+| ie | [iɛ] | - | - | - | [ie] | — |  |
+| iai | - | - | - | - | [iai] |  |  |
+| ioi | - | - | - | - | [ioi] or [iɔi] |  |  |
+| iu | [iu] | - | - | - | [ɪu] | you (no initial) |  |
 | iau | - | - | [iau] | [iau] | - | - |  |
+| ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | [iau] or [iəu] | - |  |
 | im | - | - | [im] | [im] | - | - |  |
+| iam | - | - | - | [iam] | - |  |  |
+| in | [in] | - | - | - | [ɪn] | — |  |
+| ian | - | - | [ian] | - | [ian] | - |  |
+| ion | - | - | - | - | [ion] or [iɔn] |  |  |
+| ien | [iɛn] | - | - | - | [ien] | - |  |
+| iun | - | - | - | - | [iun] |  |  |
 | ing | - | - | [iŋ] | [iŋ] | - | - |  |
+| iang | [iɑŋ] | - | - | - | - | - |  |
 | iong | [iɔŋ] | - | [ioŋ] | - | [ioŋ] | - |  |
 | iung | [iuŋ] | - | - | - | - | - |  |
 | it | [it] | - | - | - | - | it |  |
+| iat | - | - | [iat] | - | - | - |  |
+| iet | [iet] | - | - | - | - | - |  |
 | ip | - | - | [ip] | [ip] | - | - |  |
 | iap | - | - | [iap] | [iap] | - | - |  |
-| iet | [iet] | - | - | - | - | - |  |
+| iep | - | - | [iɛp] | - | - | — |  |
 | ik | - | [iʔ] or [ɪʔ] | [iʔ] | [iʔ] | [ɿʔ] |  |  |
 | iak | [iaʔ] | - | - | - | - | - |  |
+| iaik | - | - | - | - | [iaiʔ] |  |  |
 | iok | [iɔʔ] | - | - | - | [ioʔ] | - |  |
 | iek | - | [iɛʔ] | [iɛʔ] | [iɛʔ] | [iəʔ] or [iɛʔ] |  |  |
 | iuk | [iuʔ] | - | - | - | [ɪuʔ] | - |  |
-| iam | - | - | - | [iam] | - |  |  |
-| iai | - | - | - | - | [iai] |  |  |
-| iaik | - | - | - | - | [iaiʔ] |  |  |
-| ioi | - | - | - | - | [ioi] or [iɔi] |  |  |
-| ion | - | - | - | - | [ion] or [iɔn] |  |  |
-| iuek | - | - | - | - | [iuəʔ] |  |  |
-| iun | - | - | - | - | [iun] |  |  |
 | iuok | - | - | - | - | [iuɔʔ] |  |  |
+| iuek | - | - | - | - | [iuəʔ] |  |  |
 
 #### Rounded finals
 
@@ -306,34 +306,34 @@ With no initial consonant:
 | ua | [ua] | - | - | - | - | - |  |
 | uo | [uo] | - | - | [uɔ] | - | - |  |
 | ue | [ue] | - | [uɛ] | [uɛ] | - | - |  |
-| ui | [uei] | - | [uɛi] or [ui] | [ui] | [ui] | uei, wei (no initial), wi |  |
 | uie | - | - | [uiɛ] | - | - | - |  |
-| uin | - | - | [uin] | - | - | - |  |
+| ui | [uei] | - | [uɛi] or [ui] | [ui] | [ui] | uei, wei (no initial), wi |  |
 | uai | [uai] | - | - | - | - | - |  |
 | uoi | - | [uoi] | - | [uɔi] | [uoi] or [uɔi] | oi |  |
+| uei | - | - | - | - | [uəi] |  |  |
+| ueu | - | - | - | - | [uəu] |  |  |
 | un | [un] or [uen] | - | [uɛn] | - | - | uen |  |
 | uan | [uan] | - | - | - | - | - |  |
 | uon | [uon] | - | - | [uɔn] | [uɔn] | uen, wen (no initial) |  |
+| uen | - | - | - | [uɛn] | - |  |  |
+| uin | - | - | [uin] | - | - | - |  |
 | ung | [uŋ] | - | - | - | - | — |  |
 | uang | [uɑŋ] | - | - | - | - | - |  |
 | uong | [uɔŋ] | - | [uoŋ] | - | [uoŋ] | uon (Yikyan) |  |
 | ut | [ut] | - | - | - | - | - |  |
 | uat | [uat] | - | - | - | - | - |  |
+| uaet | - | - | [uæt] | - | - | - |  |
 | uot | [uot] | - | - | - | - | - |  |
 | uet | [uɛt] | - | [uɨt] | - | - | - |  |
 | uk | [uʔ] | [uʔ] or [ɤʔ] | - | - | - | - |  |
 | uak | [uaʔ] | - | - | - | - | - |  |
 | uaek | - | - | [uæʔ] | - | - | - |  |
-| uaet | - | - | [uæt] | - | - | - |  |
-| uok | [uoʔ] | - | [uɔʔ] | [uɔʔ] | [uɔʔ] | - |  |
-| uik | - | - | [uɛiʔ] | [uiʔ] | - | uek |  |
-| uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | uik |  |
 | uaik | - | - | - | [uaiʔ] | - |  |  |
-| uen | - | - | - | [uɛn] | - |  |  |
+| uok | [uoʔ] | - | [uɔʔ] | [uɔʔ] | [uɔʔ] | - |  |
 | uoik | - | - | - | [uɔiʔ] | - |  |  |
-| uei | - | - | - | - | [uəi] |  |  |
+| uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | uik |  |
 | ueik | - | - | - | - | [uəiʔ] |  |  |
-| ueu | - | - | - | - | [uəu] |  |  |
+| uik | - | - | [uɛiʔ] | [uiʔ] | - | uek |  |
 
 #### Rounded front-vowel finals
 
@@ -349,9 +349,9 @@ With no initial consonant:
 | yuen | - | [yɛn] or [yɛŋ] | - | - | - | yueng |  |
 | yung | - | [yn] | [yŋ] or [iuŋ] | - | - | yun |  |
 | yut | [yt] | - | - | - | - | - |  |
-| yuk | - | - | [yʔ] or [iuʔ] | [yʔ] | - | - |  |
 | yuot | [yot] | - | - | - | - | yue, yuet |  |
 | yuet | - | - | [yet] | - | - | yuot |  |
+| yuk | - | - | [yʔ] or [iuʔ] | [yʔ] | - | - |  |
 | yuak | - | [yaʔ] | - | - | - | - |  |
 | yuok | - | [yɔʔ] | [yɵʔ] | - | - | - |  |
 | yuek | - | [yɛʔ] or [yɪʔ] | - | - | - | yuik |  |
