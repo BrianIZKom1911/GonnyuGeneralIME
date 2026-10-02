@@ -61,6 +61,45 @@ def test_entering_tone_rules_are_scoped_to_lancong_and_fungcen() -> None:
     assert not {"baet", "baep", "baek"}.intersection(normalize("bae", fenni))
 
 
+def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
+    rules = load_rules(RULES_PATH)
+    for spelling in ("ui", "uei", "wei", "wui"):
+        assert "wi" in normalize(spelling, rules)
+    assert "wui" not in normalize("wi", rules)
+    assert "gui" in normalize("guei", rules)
+    assert "gwi" not in normalize("gui", rules)
+    algebra = compile_algebra({"wi", "gui"}, rules)
+    for spelling in ("ui", "uei", "wei", "wui"):
+        assert f"    - derive/^Gwi$/F{spelling}/" in algebra
+    assert "    - derive/^Ggui$/Fguei/" in algebra
+
+
+def test_open_e_input_matches_circumflex_one_way() -> None:
+    rules = load_rules(RULES_PATH)
+    for plain, circumflex in (("e", "ê"), ("en", "ên"), ("gek", "gêk")):
+        assert plain in normalize(plain, rules)
+        assert circumflex in normalize(plain, rules)
+        assert plain not in normalize(circumflex, rules)
+        assert plain not in normalize(circumflex, rules, reverse=True)
+    algebra = compile_algebra({"e", "ê", "gêk"}, rules)
+    assert "    - derive/^Gê$/Fe/" in algebra
+    assert "    - derive/^Ggêk$/Fgek/" in algebra
+    assert "    - derive/^Ge$/Fê/" not in algebra
+
+
+def test_zero_initial_iu_input_keeps_yiu_distinct_from_yu() -> None:
+    rules = load_rules(RULES_PATH)
+    for spelling in ("iu", "you", "yiu"):
+        forms = normalize(spelling, rules)
+        assert "yiu" in forms
+        assert "yu" not in forms
+    assert "yiu" not in normalize("yu", rules)
+    algebra = compile_algebra({"yiu", "yu"}, rules)
+    assert "    - derive/^Gyiu$/Fiu/" in algebra
+    assert "    - derive/^Gyiu$/Fyou/" in algebra
+    assert not any("^Gyu$/Fyiu/" in line or "^Gyiu$/Fyu/" in line for line in algebra)
+
+
 def test_builds_rime_dictionary_annotations_and_relations(tmp_path: Path) -> None:
     counts = build("lancong", tmp_path)
 
@@ -273,9 +312,11 @@ def test_builds_xinyu_dictionary_with_starred_tone_markers(tmp_path: Path) -> No
 
     dictionary = (tmp_path / "gannyu_xinyu.dict.yaml").read_text(encoding="utf-8")
     assert counts["entries"] > 0
-    assert "七\tGqiek\t" in dictionary
-    assert "Gqiek5" not in dictionary
-    assert "Gqiek5*" not in dictionary
+    assert "七\tGqiêk\t" in dictionary
+    assert "Gqiêk5" not in dictionary
+    assert "Gqiêk5*" not in dictionary
+    schema = (tmp_path / "gannyu_xinyu.schema.yaml").read_text(encoding="utf-8")
+    assert "derive/^Gqiêk$/Fqiek/" in schema
 
 
 def test_sentence_readings_use_highest_frequency_toned_character_entries() -> None:

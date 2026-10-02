@@ -17,6 +17,59 @@ fn fuzzy_map_loads() {
 }
 
 #[test]
+fn zero_initial_ui_compatibility_preserves_onset_ui() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    for spelling in ["ui4", "uei4", "wei4", "wui4"] {
+        let outputs = map.normalize(spelling, SyllableScheme::GonPin);
+        assert!(outputs
+            .iter()
+            .any(|item| item.text == "wi" && item.tone == Some(4)));
+    }
+    assert!(!map
+        .normalize("wi", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "wui"));
+    assert!(map
+        .normalize("guei", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "gui"));
+    assert!(!map
+        .normalize("gui", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "gwi"));
+}
+
+#[test]
+fn open_e_input_matches_circumflex_one_way() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    for (plain, circumflex) in [("e", "ê"), ("en", "ên"), ("gek", "gêk")] {
+        let outputs = map.normalize(plain, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == plain));
+        assert!(outputs.iter().any(|item| item.text == circumflex));
+        for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+            assert!(!map
+                .normalize(circumflex, scheme)
+                .iter()
+                .any(|item| item.text == plain));
+        }
+    }
+}
+
+#[test]
+fn zero_initial_iu_input_keeps_yiu_distinct_from_yu() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    for spelling in ["iu", "you", "yiu"] {
+        let outputs = map.normalize(spelling, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == "yiu"));
+        assert!(!outputs.iter().any(|item| item.text == "yu"));
+    }
+    assert!(!map
+        .normalize("yu", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "yiu"));
+}
+
+#[test]
 fn fuzzy_map_scopes_regional_rules() {
     let mut file = NamedTempFile::new().expect("temporary fuzzy map");
     writeln!(

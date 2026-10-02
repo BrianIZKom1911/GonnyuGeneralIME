@@ -218,7 +218,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | ae | - | - | [æ] | - | - | [æ] | — |  |
 | a | [a] | - | - | - | - | - | — |  |
 | o | [o] or [ɵ] | - | - | [ɔ] | - | - | — |  |
-| e | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | — |  |
+| e* | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | — |  |
 | ai | [ai] | - | - | - | - | - | — |  |
 | oi | [oi] | - | - | [ɔi] | [ɔi] | [ɔi] | — |  |
 | ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | [əi] | - | — | [ei] is only a contracted vowel. |
@@ -245,6 +245,8 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | ok | [ɔʔ] | - | [oʔ] or [ɵʔ] | - | [oʔ] | - | — |  |
 | ek | - | [ɛʔ] or [ɤʔ] | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | — | [ɤʔ] can be written ek or uk. |
 
+\* Some regions use `ê` for [ɛ]; input uses `e`. The same input spelling applies to `ê` in other finals and to ordinary `e`. Input `e` can match `ê` through one-way fuzzy matching.
+
 #### Front-vowel finals
 
 With no initial consonant:
@@ -259,7 +261,7 @@ With no initial consonant:
 | iae | - | - | - | - | - | [iæ] |  |  |
 | io | - | - | [iɔ] | [iɔ] | [io] | - | - |  |
 | ie | [iɛ] | - | - | - | [ie] | - | — |  |
-| iu | [iu] | - | - | - | [ɪu] | - | you (no initial) |  |
+| iu* | [iu] | - | - | - | [ɪu] | - | iu, you (no initial) |  |
 | iau | - | - | [iau] | [iau] | [iau] | - | - |  |
 | iaeu | - | - | - | - | - | [iæu] |  |  |
 | ieu | [iɛu] | [iəu] or [iɛu] | [iɛu] or [iəu] | - | [iəu] | - | - |  |
@@ -286,11 +288,13 @@ With no initial consonant:
 | iek | - | [iɛʔ] | [iɛʔ] | [iɛʔ] | [iəʔ] or [iɛʔ] | [iɛʔ] |  |  |
 | iuk | [iuʔ] | - | - | - | [ɪuʔ] | - | - |  |
 
+\* When `iu` forms a syllable without an initial consonant, it is written `yiu`, distinct from `yu` for [y]. Input `iu` and `you` can match zero-initial `yiu`.
+
 #### Rounded finals
 
 With no initial consonant:
 
-- Before `-a`, `-o`, or `-e`, initial `u` is written `w`.
+- Before `-a`, `-o`, `-e`, or `-i`, initial `u` is written `w`.
 - In other positions, it is written `wu`.
 
 | gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Accepted alternative input | Notes |
@@ -300,7 +304,7 @@ With no initial consonant:
 | uo | [uo] | - | - | [uɔ] | - | - | - |  |
 | ue | [ue] | - | [uɛ] | [uɛ] | - | - | - |  |
 | uie | - | - | [uiɛ] | - | - | - | - |  |
-| ui | [uei] | - | [uɛi] or [ui] | [ui] | [ui] | - | uei, wei (no initial), wi |  |
+| ui | [uei] | - | [uɛi] or [ui] | [ui] | [ui] | - | uei; ui, wei, wui (no initial) |  |
 | uai | [uai] | - | - | - | - | - | - |  |
 | uoi | - | [uoi] | - | [uɔi] | [uoi] or [uɔi] | - | oi |  |
 | un | [un] or [uen] | - | [uɛn] | - | - | - | uen |  |

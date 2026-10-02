@@ -12,7 +12,8 @@ common	rime	in	yin	ɪŋ	因	syllable-final	false	false	primary	in	单写 in→yi
 common	rime	iu	yiu	iu	有	syllable-final	false	false	primary	iu	单写 iu→yiu
 common	rime	iong	yong	iuŋ	用	syllable-final	false	false	primary	iong	iong→yong
 common	rime	u	wu	u	乌	syllable-final	false	false	primary	u	单写 u→wu
-common	rime	ui	wui	uei	为	syllable-final	false	false	primary	ui	单写 ui→wui
+common	rime	ui	wi	uei	为	syllable-final	false	false	primary	ui	单写 ui→wi
+common	rime	uei	wi	uei	为	syllable-final	false	false	primary	uei	零声母 uei 输入兼容 ui 的转写形式
 common	rime	uei	ui	uei	为	syllable-final	false	false	primary		uei 输入兼容规范 ui
 common	rime	ung	wung	uŋ	翁	syllable-final	false	false	primary	ung	仅零声母 ung→wung；当前词表无此项，仅保留规则
 common	rime	ve	yue	ye	月	anywhere	false	true	primary	ve,jve,lve,nve,qve,xve	ve 系专用桥接，须先于通用 v→yu
@@ -21,8 +22,8 @@ common	rime	v	yu	y	与	anywhere	false	false	primary	b,p,m,f,d,t,n,l,g,k,h,j,q,x,
 common	rime	w	v			anywhere	false	false	primary	w	w 可单向兼容 v
 common	rime	wu	v			anywhere	false	false	primary	wu	wu 可单向兼容 v
 common	rime	you	yiu	iu	有	syllable-final	false	false	primary	you	yiu 可从 you 模糊输入
-common	rime	wei	wui	uei	为	syllable-final	false	false	primary	wei	wui 可从 wei 模糊输入
-common	rime	wi	wui	uei	为	syllable-final	false	false	secondary	wi	wui 可从 wi 模糊输入
+common	rime	wei	wi	uei	为	syllable-final	false	false	primary	wei	零声母 wei 输入兼容 ui 的转写形式
+common	rime	wui	wi	uei	为	syllable-final	false	false	primary	wui	零声母 wui 旧写兼容 ui 的转写形式
 common	rime	wen	won	uon	碗	syllable-final	false	false	primary	wen	won 可从 wen 模糊输入
 common	rime	uen	won	uon	碗	syllable-final	false	false	primary	uen	零声母 won 可从 uen 模糊输入
 common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon 可从 uen 模糊输入
