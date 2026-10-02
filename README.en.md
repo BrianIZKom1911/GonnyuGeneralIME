@@ -195,8 +195,8 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | g | [k] | - | — | - | - | - | - |  |  |
 | k | [kʰ] | - | — | - | - | - | - |  |  |
 | ng | [ŋ] | - | — | - | - | - | - | — | A velar nasal; for example, 五 *ng3*. |
-| h | [h] | - | [x] | - | [x] | [x] | [x] | — | In Fungcen, Sinyi, and Songau, IPA [x] is written as h in Gon-pin. The default [h] is articulated farther back than Mandarin h. |
-| v | - | - | - | - | - | [v] | - |  |  |
+| h | [h] | - | [x] or [h] | - | [x] | [x] | [x] | — | In Fungcen, Sinyi, and Songau, IPA [x] is written as h in Gon-pin. The default [h] is articulated farther back than Mandarin h. |
+| v | - | - | [v] | - | - | [v] | - |  |  |
 | ch | - | - | - | - | - | - | [tʂʰ] |  |  |
 | r | - | - | - | - | - | - | [ʐ] |  |  |
 | sh | - | - | - | - | - | - | [ʂ] |  |  |
@@ -223,25 +223,25 @@ Checked-tone codas follow these spelling and input rules.
 | ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | [əi] | - | - | — | In Nanchang, [ei] occurs only in contracted pronunciations. |
 | aeu | - | - | - | - | - | [æu] | - |  |  |
 | au | [au] | - | [ɑu] | - | - | - | - | ao |  |
-| eu | [ɛu] or [ɨu] | - | [əu] | - | [əu] | - | [əu] | ou (after some initials) |  |
+| eu | [ɛu] or [ɨu] | - | [əu] or [ɛu] | - | [əu] | - | [əu] | ou (after some initials) |  |
 | am | - | - | [am] | [am] | - | - | - | — |  |
 | aen | - | - | - | - | - | [æn] | - |  |  |
 | an | [an] | - | - | - | - | - | - | — |  |
 | on | [on] | - | - | [ɔn] | [ɔn] | [ɔn] | - | — |  |
-| en | [ɛn] or [ɨn] | - | [ən] | [ən] | [en] | [ən] | [ən] | — |  |
+| en | [ɛn] or [ɨn] | - | [ən] or [ɛn] | [ən] | [en] | [ən] | [ən] | — |  |
 | ang | [ɑŋ] | - | - | - | - | - | - | — |  |
 | ong | [ɔŋ] | - | [oŋ] | - | [oŋ] | - | [oŋ] | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | [ən] | - | [ɛŋ] | - | - | - | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
+| eng | - | [ən] | [əŋ] | [ɛŋ] | - | - | - | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | - | [æt] | - | - | [æt] | - | — |  |
 | at | [at] | - | - | - | - | - | - | — |  |
-| ot | [ot] | - | [ɵt] | - | - | [ɔt] | - | — |  |
+| ot | [ot] | - | [ɵt] or [ot] | - | - | [ɔt] | - | — |  |
 | et | [ɛt] or [ɨt] | - | - | - | - | - | - | — |  |
 | aep | - | - | [æp] | - | - | - | - | — |  |
 | ap | - | - | [ap] | [ap] | - | - | - | — |  |
 | op | - | - | [ɵp] | [ɔp] | - | - | - | — |  |
-| aek | - | - | [æʔ] | - | - | [æʔ] | - | — |  |
+| aek | - | - | [æʔ] or [æk] | - | - | [æʔ] | - | — |  |
 | ak | [aʔ] | - | - | - | - | - | - | — |  |
-| ok | [ɔʔ] | - | [oʔ] or [ɵʔ] | - | [oʔ] | - | - | — |  |
+| ok | [ɔʔ] | - | [oʔ] or [ɵʔ] or [ɔʔ] | - | [oʔ] | - | - | — |  |
 | ek | - | [ɛʔ] or [ɤʔ] | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | - | — | [ɤʔ] can be written ek or uk. |
 
 
@@ -278,7 +278,7 @@ With no initial consonant:
 | iung | [iuŋ] | - | - | - | - | - | - | - |  |
 | it | [it] | - | - | - | - | - | - | — |  |
 | iat | - | - | [iat] | - | - | - | - | - |  |
-| iet | [iet] | - | - | - | - | [iɛt] | - | - |  |
+| iet | [iet] | - | [iɛt] | - | - | [iɛt] | - | - |  |
 | ip | - | - | [ip] | [ip] | - | - | - | - |  |
 | iap | - | - | [iap] | [iap] | - | - | - | - |  |
 | iep | - | - | [iɛp] | - | - | - | - | — |  |
@@ -289,7 +289,7 @@ With no initial consonant:
 | iek | - | [iɛʔ] | [iɛʔ] | [iɛʔ] | [iəʔ] or [iɛʔ] | [iɛʔ] | - |  |  |
 | iuk | [iuʔ] | - | - | - | [ɪuʔ] | - | - | - |  |
 
-\* When `iu` forms a syllable without an initial consonant, it is written `yiu`, distinct from `yu` for [y].
+\* `iu` forms a syllable without an initial consonant as `yiu`, distinct from `yu` for [y].
 
 #### Rounded finals
 
@@ -297,8 +297,6 @@ With no initial consonant:
 
 - Before `-a`, `-o`, `-e`, or `-i`, initial `u` is written `w`.
 - In other positions, it is written `wu`.
-
-With no initial consonant, `ung` is written `wung`, while `ueng` is written `weng`. IPA [uŋ] corresponds to `ung`; the two spellings follow their respective IPA values.
 
 | gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
@@ -312,11 +310,11 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 | uai | [uai] | - | - | - | - | - | [ʯai] | - |  |
 | uoi | - | [uoi] | - | [uɔi] | [uoi] or [uɔi] | - | - | oi |  |
 | uei | [uei] | - | [uɛi] | - | - | - | [ʯei] | uei, wei (no initial) |  |
-| un | [un] or [uen] | - | [uɛn] | - | - | - | [uən] or [ʯən] | uen |  |
-| uên | - | - | - | - | - | - | [ʯɛn] |  |  |
+| un* | [un] or [uen] | - | [uɛn] or [un] | - | - | - | [uən] or [ʯən] or [ʯɛn] | uen |  |
 | uan | [uan] | - | - | - | - | - | - | - |  |
 | uon | [uon] | - | - | [uɔn] | [uɔn] | - | - | uen, wen (no initial) |  |
 | uin | - | - | [uin] | - | - | - | - | - |  |
+| uien | - | - | [uiɛn] | - | - | - | - | - |  |
 | ung | [uŋ] | - | - | - | - | - | - | — |  |
 | uang | [uɑŋ] | - | - | - | - | - | - | - |  |
 | uong | [uɔŋ] | - | [uoŋ] | - | [uoŋ] | - | - | uon (Yikyan) |  |
@@ -324,16 +322,19 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 | uat | [uat] | - | - | - | - | - | - | - |  |
 | uaet | - | - | [uæt] | - | - | - | - | - |  |
 | uot | [uot] | - | - | - | - | - | - | - |  |
-| uet | [uɛt] | - | [uɨt] | - | - | - | - | - |  |
+| uet | [uɛt] | - | [uɨt] or [uɛt] | - | - | - | - | - |  |
+| uep | - | - | [uɛp] | - | - | - | - | - |  |
 | uk | [uʔ] | [uʔ] or [ɤʔ] | - | - | - | - | - | - |  |
 | uak | [uaʔ] | - | - | - | - | - | - | - |  |
 | uaek | - | - | [uæʔ] | - | - | - | - | - |  |
-| uok | [uoʔ] | - | [uɔʔ] | [uɔʔ] | [uɔʔ] | - | - | - |  |
+| uok | [uoʔ] | - | [uɔʔ] or [uoʔ] | [uɔʔ] | [uɔʔ] | - | - | - |  |
 | uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | - | - | uik |  |
 | ueik | - | - | [uɛiʔ] | - | - | - | - | ueik, weik (no initial) |  |
 | uik | - | - | - | [uiʔ] | - | - | - | uek |  |
 
-\* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling. The asterisk is not part of the input.
+\* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling.
+
+\* `uen`: `uen` is shortened to `un` after an initial consonant; this table groups `uen` under `un`.
 
 
 #### Rounded front-vowel finals
