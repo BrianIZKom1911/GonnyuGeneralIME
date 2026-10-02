@@ -2,7 +2,7 @@
 
 > A digital writing system rooted in the Gon(Gan)–Poyang region.
 
-Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Tiqien (Lichuan), Xinyu (Xinyu City), Songau (Shanggao), and Seusong (Susong)**. More localities are welcome.
+Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Tiqien (Lichuan), Sinyi (Xinyu City), Songau (Shanggao), and Seusong (Susong)**. More localities are welcome.
 
 **An easy-to-install Gon(Gan) input method for everyday use. Users familiar with Pinyin can get started with compatible support for local romanisation and Mandarin Pinyin. Even users who do not speak Gon(Gan) can explore it, and Gon(Gan) expressions can also be used to write extended passages in Mandarin, including text like this document.**
 
@@ -52,7 +52,7 @@ Rime schema repositories for Lancong (Nanchang), Fenni (Fenyi), and Fungcen. Oth
       - [Lancong (Nanchang)](#lancong-nanchang)
       - [Fungcen (Fengcheng)](#fungcen-fengcheng)
       - [Tiqien (Lichuan)](#tiqien-lichuan)
-      - [Xinyu (Xinyu City)](#xinyu-xinyu-city)
+      - [Sinyi (Xinyu City)](#sinyi-xinyu-city)
       - [Songau (Shanggao)](#songau-shanggao)
       - [Seusong (Susong)](#seusong-susong)
   - [References](#references)
@@ -80,7 +80,7 @@ Beyond the dictionaries themselves, the input method currently provides:
 - Cross-references between common Mandarin words and local Gon(Gan) vocabulary. When either side is found, the corresponding expression is also offered as a candidate.
 - Compatible input and clear annotation for literary and colloquial readings, newer and older readings, and other alternate pronunciations.
 
-The project currently maintains seven regional dictionaries: urban Lancong (Nanchang), Fenni (Fenyi County in Xinyu), Fungcen, Tiqien (Lichuan), Xinyu (Xinyu City), Songau (Shanggao), and Seusong (Susong). We hope to expand substantially to other localities as well. Contributions to add and correct dictionary entries are welcome.
+The project currently maintains seven regional dictionaries: urban Lancong (Nanchang), Fenni (Fenyi County in Xinyu), Fungcen, Tiqien (Lichuan), Sinyi (Xinyu City), Songau (Shanggao), and Seusong (Susong). We hope to expand substantially to other localities as well. Contributions to add and correct dictionary entries are welcome.
 
 ## See Gan in action
 
@@ -176,7 +176,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 
 ### Initials
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
 | b | [p] | - | — | - | - | - | - |  |  |
 | p | [pʰ] | - | — | - | - | - | - |  |  |
@@ -195,7 +195,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | g | [k] | - | — | - | - | - | - |  |  |
 | k | [kʰ] | - | — | - | - | - | - |  |  |
 | ng | [ŋ] | - | — | - | - | - | - | — | A velar nasal; for example, 五 *ng3*. |
-| h | [h] | - | [x] | - | [x] | [x] | [x] | — | In Fungcen, Xinyu, and Songau, IPA [x] is written as h in Gon-pin. The default [h] is articulated farther back than Mandarin h. |
+| h | [h] | - | [x] | - | [x] | [x] | [x] | — | In Fungcen, Sinyi, and Songau, IPA [x] is written as h in Gon-pin. The default [h] is articulated farther back than Mandarin h. |
 | v | - | - | - | - | - | [v] | - |  |  |
 | ch | - | - | - | - | - | - | [tʂʰ] |  |  |
 | r | - | - | - | - | - | - | [ʐ] |  |  |
@@ -212,7 +212,7 @@ Checked-tone codas follow these spelling and input rules.
 
 #### Open finals
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
 | ae | - | - | [æ] | - | - | [æ] | [æ] | — |  |
 | a | [a] | - | - | - | - | - | - | — |  |
@@ -255,7 +255,7 @@ With no initial consonant:
 - Before `-a`, `-o`, or `-e`, initial `i` is written `y`.
 - In other positions, it is written `yi`.
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
 | i | [i] or [ɿ] | - | - | - | - | - | [ʅ] | — |  |
 | ia | [ia] | - | - | - | - | - | - | — |  |
@@ -300,7 +300,7 @@ With no initial consonant:
 
 With no initial consonant, `ung` is written `wung`, while `ueng` is written `weng`. IPA [uŋ] corresponds to `ung`; the two spellings follow their respective IPA values.
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
 | u | [u] | - | - | - | - | - | [ʯ]* | - |  |
 | ua | [ua] | - | - | - | - | - | - | - |  |
@@ -340,7 +340,7 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 
 `yu` is provisionally used throughout for [y].
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
 | yu | [y] | - | - | - | - | - | - | y, v, u |  |
 | yuo | - | - | [yɵ] | - | - | - | - | - |  |
@@ -359,7 +359,7 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 
 #### Syllabic laterals and nasals
 
-| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Notes |
+| gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | m | [m̩] | - | - | - | - | - | - |  |
 | n | [n̩] | - | - | - | - | - | - |  |
@@ -413,9 +413,9 @@ The Tiqien (Lichuan) dictionary uses the following tone markers:
 | 6 | yin checked | 3 |
 | 7 | yang checked | 5 |
 
-#### Xinyu (Xinyu City)
+#### Sinyi (Xinyu City)
 
-The Xinyu (Xinyu City) dictionary uses the following tone markers:
+The Sinyi (Xinyu City) dictionary uses the following tone markers:
 
 | Marker | Tone category | Pitch value |
 | --- | --- | --- |

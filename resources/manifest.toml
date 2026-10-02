@@ -25,10 +25,10 @@ status = "active"
 path = "regions/tiqien/region.toml"
 
 [[regions]]
-id = "xinyu"
+id = "sinyi"
 name_zh = "新余市"
 status = "active"
-path = "regions/xinyu/region.toml"
+path = "regions/sinyi/region.toml"
 
 [[regions]]
 id = "songau"

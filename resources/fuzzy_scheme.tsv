@@ -68,7 +68,7 @@ common	rime	u	yu	y	与	anywhere	false	false	secondary		yu 可从 u 输入，涵�
 tiqien	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 tiqien	coda		p			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 tiqien	coda	k	p			syllable-final	true	false	secondary		自动生成：完整音系检测到两种入声韵尾，允许互相模糊
-xinyu	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
+sinyi	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 songau	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 songau	coda		t			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 songau	coda	k	t			syllable-final	true	false	secondary		自动生成：完整音系检测到两种入声韵尾，允许互相模糊

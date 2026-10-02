@@ -34,9 +34,9 @@ fn fungcen_validation_resources_load() {
 }
 
 #[test]
-fn xinyu_starred_tone_classes_load() {
+fn sinyi_starred_tone_classes_load() {
     let resource =
-        load_region_from_manifest(MANIFEST_PATH, "xinyu").expect("xinyu resource should load");
+        load_region_from_manifest(MANIFEST_PATH, "sinyi").expect("sinyi resource should load");
     assert_eq!(resource.config.tone_classes["1*"].name, "阴平乙");
     assert_eq!(resource.config.tone_classes["5*"].name, "入声乙");
     assert_eq!(resource.config.tone_classes["2"].name, "阳平");

@@ -307,15 +307,15 @@ def test_builds_fungcen_dictionary(tmp_path: Path) -> None:
     assert "schema_id: gannyu_fungcen" in schema
 
 
-def test_builds_xinyu_dictionary_with_starred_tone_markers(tmp_path: Path) -> None:
-    counts = build("xinyu", tmp_path, "apple")
+def test_builds_sinyi_dictionary_with_starred_tone_markers(tmp_path: Path) -> None:
+    counts = build("sinyi", tmp_path, "apple")
 
-    dictionary = (tmp_path / "gannyu_xinyu.dict.yaml").read_text(encoding="utf-8")
+    dictionary = (tmp_path / "gannyu_sinyi.dict.yaml").read_text(encoding="utf-8")
     assert counts["entries"] > 0
     assert "七\tGqiêk\t" in dictionary
     assert "Gqiêk5" not in dictionary
     assert "Gqiêk5*" not in dictionary
-    schema = (tmp_path / "gannyu_xinyu.schema.yaml").read_text(encoding="utf-8")
+    schema = (tmp_path / "gannyu_sinyi.schema.yaml").read_text(encoding="utf-8")
     assert "derive/^Gqiêk$/Fqiek/" in schema
 
 
