@@ -298,6 +298,20 @@ fn zero_onset_ion_stops_at_yon() {
 }
 
 #[test]
+fn zero_onset_ung_and_ueng_remain_distinct() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
+    for input in ["ung", "wng"] {
+        assert!(map
+            .normalize(input, SyllableScheme::GonPin)
+            .iter()
+            .any(|item| item.text == "wung"));
+    }
+    let outputs = map.normalize("ueng", SyllableScheme::GonPin);
+    assert!(outputs.iter().any(|item| item.text == "weng"));
+    assert!(!outputs.iter().any(|item| item.text == "wung"));
+}
+
+#[test]
 fn gkng_eu_rule_is_prefix_scoped() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     assert!(map

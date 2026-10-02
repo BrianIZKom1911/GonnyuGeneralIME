@@ -303,6 +303,8 @@ With no initial consonant:
 - Before `-a`, `-o`, `-e`, or `-i`, initial `u` is written `w`.
 - In other positions, it is written `wu`.
 
+With no initial consonant, `ung` is written `wung`, while `ueng` is written `weng`. IPA [uŋ] corresponds to `ung`; the two spellings follow their respective IPA values.
+
 | gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Accepted alternative input | Notes |
 | --- | --- | --- | --- | ------- | ------- | ------- | ------- | --- | --- |
 | u | [u] | - | - | - | - | - | [ʯ]* | - |  |
