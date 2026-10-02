@@ -35,3 +35,9 @@ id = "songau"
 name_zh = "上高"
 status = "active"
 path = "regions/songau/region.toml"
+
+[[regions]]
+id = "seusong"
+name_zh = "宿松"
+status = "active"
+path = "regions/seusong/region.toml"
