@@ -2,9 +2,9 @@
 
 > A digital writing system rooted in the Gon(Gan)–Poyang region.
 
-Currently supports: **Lancong(Nanchang), Fenni(Fenyi), Fungcen(Fengcheng), Tiqien (Lichuan), Xinyu (Xinyu City), Songau (Shanggao), and Seusong (Susong)**. More localities are welcome.
+Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Tiqien (Lichuan), Xinyu (Xinyu City), Songau (Shanggao), and Seusong (Susong)**. More localities are welcome.
 
-**An easy-to-use Gon(Gan) input method: users who know Pinyin can type immediately, with both local and Mandarin Pinyin input supported.**
+**An easy-to-install Gon(Gan) input method for everyday use. Users familiar with Pinyin can get started with compatible support for local romanisation and Mandarin Pinyin. Even users who do not speak Gon(Gan) can explore it, and Gon(Gan) expressions can also be used to write extended passages in Mandarin, including text like this document.**
 
 **Native installation is available on macOS, Android, Windows, and Linux, alongside Rime resource packages.**
 
@@ -12,7 +12,7 @@ Currently supports: **Lancong(Nanchang), Fenni(Fenyi), Fungcen(Fengcheng), Tiqie
 [![Rime Fenni (Fenyi)](https://img.shields.io/badge/Rime-Fenni%20%28Fenyi%29-8250df?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Fenni)
 [![Rime Fungcen](https://img.shields.io/badge/Rime-Fungcen-e16a3d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Fungcen)
 
-Rime schema repositories for Lancong(Nanchang), Fenni(Fenyi), and Fungcen. Other installation options are available in the [Installation](#installation) section below.
+Rime schema repositories for Lancong (Nanchang), Fenni (Fenyi), and Fungcen. Other installation options are available in the [Installation](#installation) section below.
 
 ## Release 1.0.5
 
@@ -37,8 +37,7 @@ Rime schema repositories for Lancong(Nanchang), Fenni(Fenyi), and Fungcen. Other
     - [iOS](#ios)
     - [Android](#android)
     - [Windows](#windows)
-    - [Linux: Fcitx5](#linux-fcitx5)
-    - [Linux: IBus](#linux-ibus)
+    - [Linux Fcitx5](#linux-fcitx5)
     - [Rime](#rime)
   - [The Gon-pin Romanisation](#the-gon-pin-romanisation)
     - [Initials](#initials)
@@ -49,24 +48,28 @@ Rime schema repositories for Lancong(Nanchang), Fenni(Fenyi), and Fungcen. Other
       - [Rounded front-vowel finals](#rounded-front-vowel-finals)
       - [Syllabic laterals and nasals](#syllabic-laterals-and-nasals)
       - [Other segments](#other-segments)
-    - [Lancong(Nanchang) tones](#lancongnanchang-tones)
+    - [Tones](#tones)
+      - [Lancong (Nanchang)](#lancong-nanchang)
+      - [Fungcen (Fengcheng)](#fungcen-fengcheng)
+      - [Tiqien (Lichuan)](#tiqien-lichuan)
+      - [Xinyu (Xinyu City)](#xinyu-xinyu-city)
+      - [Songau (Shanggao)](#songau-shanggao)
+      - [Seusong (Susong)](#seusong-susong)
   - [References](#references)
     - [Literature](#literature)
     - [Dependency declarations](#dependency-declarations)
     - [Licensing and rights reservation](#licensing-and-rights-reservation)
     - [Acknowledgements](#acknowledgements)
-  - [Why Gon(Gan) Chinese Matters](#why-gongan-chinese-matters)
+  - [Origins: the loss of Gon(Gan)](#origins-the-loss-of-gongan)
   - [Contributors and contact](#contributors-and-contact)
 
 ## Overview
 
-The idea for GonnyuGeneralIME emerged in the second half of 2025. We began by assembling a basic dictionary from published descriptions of the relationship between Gon(Gan) pronunciation and Chinese characters. It soon became clear that a simple character-to-sound mapping would not be enough. The project is intended as a more systematic, durable record of language materials from different Gon(Gan)-speaking localities.
+In the second half of 2025, we began thinking about creating a general Gon(Gan) input method, after observing input methods for other Sinitic languages. We initially assembled a basic dictionary by drawing on several sources to organise the correspondences between Gon(Gan) pronunciation and Chinese characters. We soon felt that simple sound-to-character mappings were insufficient for our needs. We wanted a more systematic way to organise and preserve language materials from different Gon(Gan)-speaking localities. The resulting project supports typing characters by their Gon(Gan) pronunciation, writing Mandarin through Gon(Gan) expressions, and producing idiomatic Gon(Gan) text even for younger people who have heard the language but are not proficient in it, or enthusiasts interested in Gon(Gan).
 
-It is therefore designed not only for writing Chinese characters from Gon(Gan) pronunciation, but also for moving naturally between Gon(Gan) and Mandarin in writing. It is for fluent speakers, younger people who have heard Gon(Gan) but do not yet command it, and anyone interested in producing idiomatic Gon(Gan) Chinese text.
+“General” has three meanings: use across Gon(Gan) localities, use across Gon(Gan) and Mandarin, and technical support across platforms.
 
-“General” has three meanings here: usable across Gon(Gan) localities; usable in both Gon(Gan) and Mandarin contexts; and available across major computing platforms.
-
-The project favours established character forms while accommodating common vernacular spellings. Its aim is a practical, readable written Gon(Gan) that reflects everyday life in the region as well as its historical Chinese roots.
+Our project favours etymologically supported and standard character forms while accommodating common vernacular spellings, helping users write local Chinese that combines standard usage with familiar forms.
 
 ### What it provides
 
@@ -125,9 +128,9 @@ Alternate Gan pronunciations, including older and newer patterns, are all ready 
 
 ## Installation
 
-The native input method is available for macOS, Linux, Android, and Windows. iOS uses the universal Rime resource package; see the Rime section for installation.
+The native input method is available for Linux, Android, Windows, and macOS. Installation of the universal Rime resource packages is described in the Rime section.
 
-Download the file for your operating system or locality from [Releases](https://github.com/Doohaey/GonnyuGeneralIME/releases).
+Packages for each operating system or locality are available from [Releases](https://github.com/Doohaey/GonnyuGeneralIME/releases).
 
 ### macOS
 
@@ -135,9 +138,11 @@ Download `GonnyuGeneralIME-version-macos.pkg` from [Releases](https://github.com
 
 If it does not appear automatically, open **System Settings → Keyboard → Text Input → Edit…**, click **+**, search for and add **Gonnyu**, then select it from the input menu. Upgrades preserve the user dictionary.
 
+If the input method is absent from the list in System Settings or cannot be selected after being added, signing out and back in may resolve the issue.
+
 ### iOS
 
-For input on iOS, see the Rime section.
+iOS users can download **赣语输入法** from the App Store, except in the France storefront.
 
 ### Android
 
@@ -147,7 +152,7 @@ Download `GonnyuGeneralIME-version-android.apk` and open it on Android to instal
 
 Download and run `GonnyuGeneralIME-version-windows-installer.exe`. After the installer finishes, open **Settings → Time & language → Language & region → Chinese (Simplified) → Keyboards** and add **Gannyu**.
 
-### Linux: Fcitx5
+### Linux Fcitx5
 
 Download `GonnyuGeneralIME-version-fcitx5.tar.gz`, extract it, and run the installer included in the archive:
 
@@ -157,19 +162,7 @@ cd GonnyuGeneralIME-version-fcitx5
 ./install.sh
 ```
 
-Restart Fcitx5 with `fcitx5 -r`, or sign out and back in. Then add **Gannyu Gon(Gan) / 赣语** in `fcitx5-configtool`.
-
-### Linux: IBus
-
-Download `GonnyuGeneralIME-version-ibus.tar.gz`, extract it, and run the installer included in the archive:
-
-```sh
-tar -xzf GonnyuGeneralIME-version-ibus.tar.gz
-cd GonnyuGeneralIME-version-ibus
-./install.sh
-```
-
-Run `ibus-daemon -drx` (or restart IBus), then add **Gannyu Gon(Gan)** in the input-method list in `ibus-setup`.
+Restart Fcitx5 with `fcitx5 -r`, or sign out and back in. Then add **Gannyu Gan / 赣语** in `fcitx5-configtool`.
 
 ### Rime
 
@@ -178,8 +171,6 @@ Download `GonnyuGeneralIME-version-rime-region.zip` for the required locality. T
 For Windows Weasel, copy the archive contents into `%APPDATA%\Rime` and redeploy from the input-method menu. For Linux Fcitx5 Rime, copy the contents into `~/.local/share/fcitx5/rime/`, redeploy, then select the locality from the schema menu. For iOS and Android, import or deploy the ZIP in the installed Rime front end.
 
 ## The Gon-pin Romanisation
-
-**Data note:** We focus on maintaining the accuracy of the romanisation in the dictionary files, but cannot yet guarantee the consistency or accuracy of the IPA data, because it is only imported as an aid during dictionary construction and is unrelated to user-visible input.
 
 The spelling system is intended to represent Gon(Gan) pronunciation while remaining as close as practical to the conventions of Hanyu Pinyin. To make typing easier and to accommodate mergers in newer varieties, some spellings deliberately accept more than one phoneme in a strict phonological sense.
 
@@ -190,7 +181,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | b | [p] | - | — | - | - | - | - |  |  |
 | p | [pʰ] | - | — | - | - | - | - |  |  |
 | m | [m] | - | — | - | - | - | - |  |  |
-| f | [f] | - | — | - | - | - | - | May differ from Mandarin *f*; some descriptions use [ɸ]. |  |
+| f | [f] | - | — | - | - | - | - | — | May differ from Mandarin *f*; some descriptions use [ɸ]. |
 | d | [t] | - | — | - | - | - | - |  |  |
 | t | [tʰ] | - | — | - | - | - | - |  |  |
 | l | [l] | - | — | - | - | - | - |  |  |
@@ -203,8 +194,8 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | x | [ɕ] | - | — | - | － | － | - |  |  |
 | g | [k] | - | — | - | - | - | - |  |  |
 | k | [kʰ] | - | — | - | - | - | - |  |  |
-| ng | [ŋ] | - | — | - | - | - | - | A velar nasal; for example, 五 *ng3*. |  |
-| h | [h] | - | [x] | - | [x] | [x] | [x] | In Fungcen, Xinyu, and Songau, IPA [x] is written with Gan-pinyin h; articulated farther back than Mandarin *h*. |  |
+| ng | [ŋ] | - | — | - | - | - | - | — | A velar nasal; for example, 五 *ng3*. |
+| h | [h] | - | [x] | - | [x] | [x] | [x] | — | In Fungcen, Xinyu, and Songau, IPA [x] is written as h in Gon-pin. The default [h] is articulated farther back than Mandarin h. |
 | v | - | - | - | - | - | [v] | - |  |  |
 | ch | - | - | - | - | - | - | [tʂʰ] |  |  |
 | r | - | - | - | - | - | - | [ʐ] |  |  |
@@ -213,7 +204,11 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 
 ### Finals
 
-**Compatibility for checked-tone syllables.** Final apical stops `-t` [t] and glottal stops `-k` [ʔ] may be omitted. The two are also accepted interchangeably, so the input method can still recognise a checked-tone syllable when its coda is entered differently. This reflects the weakening and ambiguity of checked tones in Gon(Gan): some are difficult to distinguish from neutral tone, and some localities no longer retain them.
+Checked-tone codas follow these spelling and input rules.
+
+- The IPA coda [ʔ] is written as `-k` in Gon-pin.
+- Checked-tone codas may be omitted during input while still matching the corresponding readings.
+- Each locality independently specifies a combination of `-t`, `-p`, and `-k`, or no checked-tone codas. The codas enabled for a locality are accepted interchangeably within that locality.
 
 #### Open finals
 
@@ -225,7 +220,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | e* | [e] | [ɛ] or [ə] or [ɯ] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | - | — |  |
 | ai | [ai] | - | - | - | - | - | - | — |  |
 | oi | [oi] | - | - | [ɔi] | [ɔi] | [ɔi] | - | — |  |
-| ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | [əi] | - | - | — | [ei] is only a contracted vowel. |
+| ei | [ei] or [ɨi] | - | [ɛi] | [ɛi] | [əi] | - | - | — | In Nanchang, [ei] occurs only in contracted pronunciations. |
 | aeu | - | - | - | - | - | [æu] | - |  |  |
 | au | [au] | - | [ɑu] | - | - | - | - | ao |  |
 | eu | [ɛu] or [ɨu] | - | [əu] | - | [əu] | - | [əu] | ou (after some initials) |  |
@@ -281,7 +276,7 @@ With no initial consonant:
 | iang | [iɑŋ] | - | - | - | - | - | - | - |  |
 | iong | [iɔŋ] | - | [ioŋ] | - | [ioŋ] | - | [ioŋ] | - |  |
 | iung | [iuŋ] | - | - | - | - | - | - | - |  |
-| it | [it] | - | - | - | - | - | - | it |  |
+| it | [it] | - | - | - | - | - | - | — |  |
 | iat | - | - | [iat] | - | - | - | - | - |  |
 | iet | [iet] | - | - | - | - | [iɛt] | - | - |  |
 | ip | - | - | [ip] | [ip] | - | - | - | - |  |
@@ -294,7 +289,7 @@ With no initial consonant:
 | iek | - | [iɛʔ] | [iɛʔ] | [iɛʔ] | [iəʔ] or [iɛʔ] | [iɛʔ] | - |  |  |
 | iuk | [iuʔ] | - | - | - | [ɪuʔ] | - | - | - |  |
 
-\* When `iu` forms a syllable without an initial consonant, it is written `yiu`, distinct from `yu` for [y]. Input `iu` and `you` can match zero-initial `yiu`.
+\* When `iu` forms a syllable without an initial consonant, it is written `yiu`, distinct from `yu` for [y].
 
 #### Rounded finals
 
@@ -312,10 +307,11 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 | uae | - | - | - | - | - | - | [uæ] or [ʯæ] |  |  |
 | uo | [uo] | - | - | [uɔ] | - | - | - | - |  |
 | ue | [ue] | - | [uɛ] | [uɛ] | - | - | - | - |  |
-| uie | - | - | [uiɛ] | - | - | - | - | - |  |
-| ui | [uei] | - | [uɛi] or [ui] | [ui] | [ui] | - | [ʯei] | uei; ui, wei, wui (no initial) |  |
+| uie | - | - | [uiɛ] | - | - | - | - | wie (no initial) |  |
+| ui | [ui] | - | - | - | - | - | - | ui, wui (no initial) |  |
 | uai | [uai] | - | - | - | - | - | [ʯai] | - |  |
 | uoi | - | [uoi] | - | [uɔi] | [uoi] or [uɔi] | - | - | oi |  |
+| uei | [uei] | - | [uɛi] | - | - | - | [ʯei] | uei, wei (no initial) |  |
 | un | [un] or [uen] | - | [uɛn] | - | - | - | [uən] or [ʯən] | uen |  |
 | uên | - | - | - | - | - | - | [ʯɛn] |  |  |
 | uan | [uan] | - | - | - | - | - | - | - |  |
@@ -334,7 +330,8 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 | uaek | - | - | [uæʔ] | - | - | - | - | - |  |
 | uok | [uoʔ] | - | [uɔʔ] | [uɔʔ] | [uɔʔ] | - | - | - |  |
 | uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | - | - | uik |  |
-| uik | - | - | [uɛiʔ] | [uiʔ] | - | - | - | uek |  |
+| ueik | - | - | [uɛiʔ] | - | - | - | - | ueik, weik (no initial) |  |
+| uik | - | - | - | [uiʔ] | - | - | - | uek |  |
 
 \* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling. The asterisk is not part of the input.
 
@@ -363,7 +360,7 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 #### Syllabic laterals and nasals
 
 | gon-pin | Default IPA | Yikyan IPA | Fungcen IPA | Tiqien IPA | Xinyu IPA | Songau IPA | Seusong IPA | Notes |
-| --- | --- | --- | --- | ------- | ------- | ------- | ------- |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | m | [m̩] | - | - | - | - | - | - |  |
 | n | [n̩] | - | - | - | - | - | - |  |
 | ng | [ŋ̩] | - | - | [ŋ̍] | [ŋ̍] | [ŋ̍] | - |  |
@@ -373,12 +370,14 @@ With no initial consonant, `ung` is written `wung`, while `ueng` is written `wen
 
 The system also records a number of extensions based on published descriptions and observed sound changes, including pronunciations recorded in a 1935 language survey and selected alternations involving `-n` and `-ng` codas.
 
-### Lancong(Nanchang) tones
+### Tones
 
-The Lancong(Nanchang) dictionary uses seven tone markers:
+#### Lancong (Nanchang)
 
-| Marker | Traditional tone category | Example Lancong(Nanchang) pitch |
-| --- | --- | --- | --- |
+The Lancong (Nanchang) dictionary uses seven tone markers:
+
+| Marker | Tone category | Pitch value |
+| --- | --- | --- |
 | 1 | yin level | 42 |
 | 2 | yang level | 24 |
 | 3 | rising | 213 |
@@ -387,11 +386,11 @@ The Lancong(Nanchang) dictionary uses seven tone markers:
 | 6 | yin checked | 5 |
 | 7 | yang checked | 1 or 2 |
 
-### Fungcen(Fengcheng) tones
+#### Fungcen (Fengcheng)
 
-The Fungcen(Fengcheng) dictionary uses six tone markers:
+The Fungcen (Fengcheng) dictionary uses six tone markers:
 
-| Marker | Traditional tone category | Fungcen pitch | 
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
 | 1 | yin level | 33 |
 | 2 | yang level | 35 |
@@ -400,74 +399,75 @@ The Fungcen(Fengcheng) dictionary uses six tone markers:
 | 5 | yin checked | 1 |
 | 6 | yang checked | 5 |
 
-### Tiqien (Lichuan) tones
+#### Tiqien (Lichuan)
 
 The Tiqien (Lichuan) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平 | 22 |
-| 2 | 阳平 | 35 |
-| 3 | 上声 | 44 |
-| 4 | 阴去 | 53 |
-| 5 | 阳去 | 13 |
-| 6 | 阴入 | 3 |
-| 7 | 阳入 | 5 |
+| 1 | yin level | 22 |
+| 2 | yang level | 35 |
+| 3 | rising | 44 |
+| 4 | yin departing | 53 |
+| 5 | yang departing | 13 |
+| 6 | yin checked | 3 |
+| 7 | yang checked | 5 |
 
-### Xinyu (Xinyu City) tones
+#### Xinyu (Xinyu City)
 
 The Xinyu (Xinyu City) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平甲 | 45 |
-| 1* | 阴平乙 | 24 |
-| 2 | 阳平阴去 | 33 |
-| 3 | 上 | 31 |
-| 4 | 去 | 11 |
-| 5 | 入声甲 | 5 |
-| 5* | 入声乙 | 24 |
+| 1 | yin level A | 45 |
+| 1* | yin level B | 24 |
+| 2 | yang level | 33 |
+| 3 | rising | 31 |
+| 4 | departing | 11 |
+| 5 | checked A | 5 |
+| 5* | checked B | 24 |
 
-### Songau (Shanggao) tones
+#### Songau (Shanggao)
 
 The Songau (Shanggao) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平 | 31 |
-| 2 | 阳平 | 24 |
-| 3 | 上声 | 213 |
-| 4 | 去声 | 51 |
-| 5 | 入声 | 4 |
+| 1 | yin level | 31 |
+| 2 | yang level | 24 |
+| 3 | rising | 213 |
+| 4 | departing | 51 |
+| 5 | checked | 4 |
 
-### Seusong (Susong) tones
+#### Seusong (Susong)
 
 The Seusong (Susong) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 陰平 | 22 |
-| 2 | 陽平 | 35 |
-| 3 | 上 | 51 |
-| 4 | 陰去 | 21 |
-| 5 | 陽去 | 314 |
-| 6 | 入 | 55 |
+| 1 | yin level | 22 |
+| 2 | yang level | 35 |
+| 3 | rising | 51 |
+| 4 | yin departing | 21 |
+| 5 | yang departing | 314 |
+| 6 | checked | 55 |
 
 ## References
 
-In addition to participants’ own field observations, the project draws on academic work and dialect-enthusiast communities. A project of this kind necessarily synthesises many sources. The reference material and dictionary data used here have been made public as far as possible. Please raise any copyright concerns through the project repository.
+The project compiles its regional dictionaries from participants’ everyday language observations, academic publications, and dialect-enthusiast communities. Dictionary data and reference materials are made public as far as possible. Copyright enquiries can be sent to the contacts listed at the end of this document.
 
 ### Literature
 
 1. osfans. **MCPDict** [CP/OL]. GitHub. <https://github.com/osfans/MCPDict>.
-2. Xiong Zhenghui. *Literary and colloquial readings in the Lancong(Nanchang) dialect* [EB/OL]. <http://ling.cass.cn/keyan/xueshuchengguo/cgtj/202112/W020211223381176680381.pdf>. Accessed 2026-06-01.
-3. Xiong Zhenghui. *Difficult characters in the Lancong(Nanchang) dialect* [EB/OL]. <http://ling.cass.cn/keyan/xueshuchengguo/cgtj/202112/W020211223381177519680.pdf>. Accessed 2026-06-04.
-4. Xiong Zhenghui. *Dictionary of the Lancong(Nanchang) Dialect*.
+2. Xiong Zhenghui. *Literary and colloquial readings in the Lancong (Nanchang) dialect* [EB/OL]. <http://ling.cass.cn/keyan/xueshuchengguo/cgtj/202112/W020211223381176680381.pdf>. Accessed 2026-06-01.
+3. Xiong Zhenghui. *Difficult characters in the Lancong (Nanchang) dialect* [EB/OL]. <http://ling.cass.cn/keyan/xueshuchengguo/cgtj/202112/W020211223381177519680.pdf>. Accessed 2026-06-04.
+4. Xiong Zhenghui. *Dictionary of the Lancong (Nanchang) Dialect*.
 5. Zhihu. “What vocabulary is distinctive enough to identify Gon(Gan) Chinese at once?” <https://www.zhihu.com/question/24262923/>.
 6. Wikipedia. *Gon(Gan) Chinese original characters*. <https://gan.wikipedia.org/wiki/>.
 7. Wikipedia. *Gon(Gan) Chinese*. <https://zh.wikipedia.org/zh-hans/%E8%B4%9B%E8%AA%9E>.
 8. *Character-use standards for Chinese dialects, Language Resources Protection Project of China*. <http://www.moe.gov.cn/s78/A19/tongzhi/201704/W020170405307025943395.pdf>. Accessed 2026-08-04.
-9. Bilibili. *New Concept Lancong(Nanchang) Dialect* series. <https://www.bilibili.com/video/BV1Us4y1C7fp/?share_source=copy_web&vd_source=5078721afbb2afc4394ca2602bb990de>.
+9. Bilibili. *New Concept Lancong (Nanchang) Dialect* series. <https://www.bilibili.com/video/BV1Us4y1C7fp/?share_source=copy_web&vd_source=5078721afbb2afc4394ca2602bb990de>.
+10. Xiao Ping and Xiao Jiehan. *Dictionary of the Wucheng Dialect of Jiangxi* [M]. Beijing: The Commercial Press, 2017. Bibliographic information is listed in the [linguistic bibliography](https://geolinguistics.sakura.ne.jp/Monograph/SIG-Mono7-LAAA-3-ebook.pdf).
 
 ### Dependency declarations
 
@@ -478,32 +478,39 @@ The mobile input engine directly uses the following open-source projects. Exact 
 
 ### Licensing and rights reservation
 
-The main body of this project is licensed under the GNU GPLv3; see `LICENSE` for details.
+The main project code is licensed under the GNU GPLv3; see `LICENSE` for details.
 The name and branding “赣语通用输入法” (abbreviated as “赣语输入法”), together with the image at
 `resources/icon.png`, are not covered by the GPLv3. All related copyrights, trademark rights,
 and other rights are reserved by their respective rights holder. Use of the name or image in
 derivative projects, redistributions, or commercial promotion requires permission.
 
+Copyright in the project documentation belongs to the rights holder, with all rights reserved. Verbatim republication is permitted with attribution to the author and project.
+
 ### Acknowledgements
 
 Special thanks to @豫章鸿也 for extensive advice on the project’s romanisation and character and word choices.
 
-Given the scale of the dictionaries and the author's limited expertise and time, errors may remain. The author takes responsibility for them. Thank you to everyone who contributes additions and corrections.
+Given the scale of the dictionaries and the author's limited expertise and time, errors may remain. The author takes responsibility for them. Contributions of additions and corrections are appreciated.
 
-## Why Gon(Gan) Chinese Matters
+## Origins: the loss of Gon(Gan)
 
-The Gon(Gan)–Poyang plain has long been a major cultural and economic centre in southern China. Since the late Qing period, however, Jiangxi and neighbouring areas have experienced serious economic and demographic decline. When the material basis of a cultural tradition erodes, its public standing tends to erode with it. Among the Sinitic languages, Gon(Gan) now has one of the weakest public profiles.
+> After three months of work, I wanted to add an essay introducing the project.
 
-Gon(Gan)-speaking areas do not have a single, clearly recognised standard pronunciation. They lack the commercial reach often associated with Cantonese, the economic base of Wu varieties, the familiar cultural symbols and overseas presence of Southern Min, or the dense urban networks of Sichuan. Many people who speak Gon(Gan), or grew up in a Gon(Gan)-speaking area, have only a hazy sense of it as a language: it may be called “Jiangxi speech”, or treated as one of many indistinct local ways of speaking. The commonplace observation that speech changes from village to village has too often become an excuse to see only fragmentation.
+The Gon(Gan)–Poyang plain has long been an important economic and cultural hub in southern China, a densely populated land of rice and fish. Since the late Qing period, Jiangxi and neighbouring areas have experienced severe economic and demographic decline for various reasons. When the economic foundations of a flourishing culture collapse, its standing declines as well. Among southern Sinitic languages, Gon(Gan) now seems to have the weakest cultural presence. Gon(Gan)-speaking areas lack the clearly recognised standard pronunciation associated with Cantonese, the economic resources of Wu-speaking areas, the familiar cultural symbols and overseas influence of Southern Min, or the firm social foundations of Southwestern Mandarin and Sichuan speech in the densely settled Sichuan Basin. People who speak Gon(Gan) or grew up in Gon(Gan)-speaking areas often lack a clear understanding of their language. Their understanding tends to be a vague one shaped by administrative boundaries: Jiangxi speech, or one of the local varieties of Hunan, Hubei, Anhui, and so on. The familiar notion that pronunciation changes every ten li encourages a view of the region as a collection of disconnected local dialects.
 
-Across the region, language shift has been rapid. Local speech has frequently been treated as rustic, backward, or improper, and Mandarin has displaced it in family life and education. Yet replacement is never so clean. People educated first in Mandarin may still carry deep Gon(Gan) patterns into pronunciation, everyday vocabulary, and writing; what emerges can be neither a secure command of Mandarin nor an unbroken command of the language of home.
+Many local cities are now trying to develop cultural tourism, but culture needs distinctive features to sustain it. In common perceptions of its culture and social life, the Gon(Gan)–Poyang plain has become one of the least distinctive inland Han Chinese regions. The Jiangxi merchant networks and the saying “half the court's civil and military officials came from Jiangxi” are relics of the past. Jiangxi once had a flourishing scholarly tradition. The mindset of the imperial examinations remains deeply rooted, but there are too few strong universities and too little to attract talent from elsewhere. The former pursuit of culture now finds expression in fierce competition over the national college entrance examination. Successful students leave in large numbers instead of staying in hometowns they regard as ordinary and provincial.
 
-The examples matter. A Gon(Gan) expression such as `好 X` (literally “good X”, used as an intensifier) may be “corrected” in school to Mandarin `很 X` (“very X”). A speaker may write `紧` (*jǐn*) for “always”, reflecting the `尽` in `尽管`—a word that in standard Mandarin means “although”—or use `嘎` (*gà*) as a sentence-initial particle. These are not errors to be replaced by convenient English equivalents: they are traces of how Gon(Gan) structures thought and expression inside Chinese writing. Some younger people of Lancong(Nanchang) background now struggle even to understand Lancong(Nanchang) Gon(Gan) or distinguish it from neighbouring varieties; that degree of language loss is itself unusual and consequential.
+At the same time, residents who see their region as lacking distinctive features have been particularly quick to abandon those they do have. Around the time I was born, Gon(Gan)-speaking areas were already abandoning their home language on a large scale, despite its history stretching back thousands of years, and treating it as rustic, backward, and nonstandard. In primary school, I showed my writing to classmates; when it came back, every instance of `好 X` had been changed, with good intentions, to `很 X`. Yet some people like me, who were taught Mandarin first, did not become proficient Mandarin speakers. Gon(Gan) left deep traces in our vowels and consonants, everyday speech, and vocabulary in school compositions. Our command could even be weaker than that of the previous generation's bilingual speakers, who had studied Mandarin systematically. In school essays, for example, I repeatedly used `紧` to mean “always”, actually corresponding to the `尽` in `尽管`, and frequently used `嘎` as a sentence-initial element. My Mandarin was, in effect, a “creole within the Sinitic family”. Some of my classmates from Nanchang, whose social lives were tightly controlled by parents focused on academic success, could no longer understand Nanchang Gon(Gan) at all, or even distinguish it from neighbouring languages. This degree of loss may be relatively rare among Sinitic-speaking communities.
 
-When reports warn that much of the world’s linguistic diversity may disappear this century, Chinese-speaking communities may assume that the warning concerns someone else. But the languages spoken at home and in one’s hometown can disappear as well. With them go social memory, local ways of speaking, and the texture of past life. Preserving and extending the written life of Gon(Gan) is one small part of protecting that diversity.
+Reports that most of the world's languages could disappear before the end of this century may leave most Sinitic-speaking communities unmoved. They may not realise that, if current trends continue, **their own languages**, the local Chinese spoken at home or in their hometowns, could also join the list of disappearing languages. Older patterns of social life and local social memory are being forgotten along with them. Later generations looking back at those communities may unconsciously assume that life in their streets and villages was conducted in Mandarin. Local ways of using language will be forgotten. For Sinitic-speaking communities, this would be a severe and profound cultural loss.
 
+We believe our work is an important part of protecting Sinitic linguistic diversity.
 
 ## Contributors and contact
 
-1. Dongche Xiye Editorial Department. Project planning and the Fenni(Fenyi) dictionary. <https://github.com/ComeRainOrComeShine>
-2. Doohaey. Input-method framework and the Lancong(Nanchang) dictionary. Email: doohaey@gmail.com
+1. Dongche Xiye Editorial Department. Project planning and the Fenni (Fenyi) dictionary. <https://github.com/ComeRainOrComeShine>
+2. Doohaey. Input-method framework and the Lancong (Nanchang) dictionary. Email: doohaey@gmail.com
+3. Hialex. App icon design.
+4. AstroChung. Yikyan (Yiyang) romanisation.
+5. 江南西道客. Fungcen (Fengcheng) dictionary resources. Email: yunmoqingchen@qq.com.
+6. 剑邑 Jason. Fungcen (Fengcheng) testing and feedback.
