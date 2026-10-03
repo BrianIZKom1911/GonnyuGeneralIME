@@ -47,6 +47,11 @@ status = "active"
 "ʃ" = "x"
 
 [ipa_final_map]
+"ɯ" = "e"
+"ən" = "eng"
+"ɤʔ" = "ek"
+"uɤʔ" = "uek"
+"yɛŋ" = "yuên"
 "a" = "a"
 "ai" = "ai"
 "an" = "an"
