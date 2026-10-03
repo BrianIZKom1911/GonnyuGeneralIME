@@ -2,7 +2,7 @@
 
 > A digital writing system rooted in the Gon(Gan)–Poyang region.
 
-Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Tiqien (Lichuan), Sinyi (Xinyu City), Songau (Shanggao), Seusong (Susong), Jingon (Jian City), and Yikyan-Henfeng (Yiyang-Hengfeng)**. More localities are welcome.
+Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Tiqien (Lichuan), Sinyi (Xinyu City), Songau (Shanggao), Seusong (Susong), Jingon (Ji'an), and Yikyan-Henfeng (Yiyang and Hengfeng)**. More localities are welcome.
 
 **An easy-to-install Gon(Gan) input method for everyday use. Users familiar with Pinyin can get started with compatible support for local romanisation and Mandarin Pinyin. Even users who do not speak Gon(Gan) can explore it, and Gon(Gan) expressions can also be used to write extended passages in Mandarin, including text like this document.**
 
@@ -254,10 +254,6 @@ Checked-tone codas follow these spelling and input rules.
 | oik | - | - | [ɔiʔ] | - | - | - | - | - | - |  |
 | ek | - | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | - | - | [ɛʔ] or [ɤʔ] or [ɪʔ] | — | [ɤʔ] can be written ek or uk. |
 | euk | - | - | - | [ɪuʔ] | - | - | - | - | — |  |
-
-
-
-IPA [ɪ] corresponds to Gan Pinyin `e`, including within compound finals.
 
 \* Some regions use `ê` for [ɛ]; input uses `e`. The same input spelling applies to `ê` in other finals and to ordinary `e`. Input `e` can match `ê` through one-way fuzzy matching.
 
