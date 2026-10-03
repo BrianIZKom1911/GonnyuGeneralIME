@@ -41,3 +41,9 @@ id = "seusong"
 name_zh = "宿松"
 status = "active"
 path = "regions/seusong/region.toml"
+
+[[regions]]
+id = "jingon"
+name_zh = "吉安市"
+status = "active"
+path = "regions/jingon/region.toml"
