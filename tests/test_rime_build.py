@@ -63,15 +63,20 @@ def test_entering_tone_rules_are_scoped_to_lancong_and_fungcen() -> None:
 
 def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     rules = load_rules(RULES_PATH)
-    for spelling in ("ui", "uei", "wei", "wui"):
+    for spelling in ("ui", "wui"):
         assert "wi" in normalize(spelling, rules)
     assert "wui" not in normalize("wi", rules)
     assert "gui" in normalize("guei", rules)
+    assert "guêi" in normalize("guei", rules)
+    for spelling in ("uei", "wei", "uêi", "wêi"):
+        assert "wêi" in normalize(spelling, rules)
+        assert "wi" not in normalize(spelling, rules)
     assert "gwi" not in normalize("gui", rules)
-    algebra = compile_algebra({"wi", "gui"}, rules)
-    for spelling in ("ui", "uei", "wei", "wui"):
+    algebra = compile_algebra({"wi", "gui", "wêi"}, rules)
+    for spelling in ("ui", "wui"):
         assert f"    - derive/^Gwi$/F{spelling}/" in algebra
     assert "    - derive/^Ggui$/Fguei/" in algebra
+    assert "    - derive/^Ggui$/Fguêi/" in algebra
 
 
 def test_open_e_input_matches_circumflex_one_way() -> None:
@@ -455,3 +460,13 @@ def test_rime_installers_discover_regions_from_build_output() -> None:
         assert 'build.py" --list-regions' in content
         assert "gannyu_lancong" not in content
         assert "gannyu_fenni" not in content
+
+
+def test_onset_contractions_preserve_zero_initial_circumflex_forms() -> None:
+    rules = load_rules(RULES_PATH)
+    for source, target in (("guei", "gui"), ("guêi", "gui"), ("guen", "gun"), ("guên", "gun"), ("vuei", "vui")):
+        assert target in normalize(source, rules)
+    for source in ("uen", "uên", "wen", "wên"):
+        assert "wên" in normalize(source, rules)
+    for source, forbidden in (("uei", "wi"), ("uêi", "wi"), ("uen", "un"), ("uên", "un")):
+        assert forbidden not in normalize(source, rules)

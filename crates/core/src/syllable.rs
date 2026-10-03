@@ -368,7 +368,7 @@ fn strip_tone(input: &str) -> StrippedSyllable {
     };
     if let Some(last) = unstarred.chars().last() {
         if let Some(digit) = last.to_digit(10) {
-            if (1..=7).contains(&digit) {
+            if (0..=7).contains(&digit) {
                 let body = unstarred[..unstarred.len() - last.len_utf8()].to_string();
                 return StrippedSyllable {
                     body,

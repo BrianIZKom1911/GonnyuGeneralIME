@@ -19,7 +19,7 @@ fn fuzzy_map_loads() {
 #[test]
 fn zero_initial_ui_compatibility_preserves_onset_ui() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    for spelling in ["ui4", "uei4", "wei4", "wui4"] {
+    for spelling in ["ui4", "wui4"] {
         let outputs = map.normalize(spelling, SyllableScheme::GonPin);
         assert!(outputs
             .iter()
@@ -33,6 +33,15 @@ fn zero_initial_ui_compatibility_preserves_onset_ui() {
         .normalize("guei", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "gui"));
+    for spelling in ["uei4", "wei4", "uêi4", "wêi4"] {
+        let outputs = map.normalize(spelling, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == "wêi"));
+        assert!(!outputs.iter().any(|item| item.text == "wi"));
+    }
+    assert!(map
+        .normalize("guei", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "guêi"));
     assert!(!map
         .normalize("gui", SyllableScheme::GonPin)
         .iter()
@@ -418,4 +427,13 @@ fn mandarin_ao_and_ou_inputs_normalize_to_au_and_eu() {
         .normalize("chou", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "cheu"));
+}
+
+#[test]
+fn neutral_tone_marker_is_preserved() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    let outputs = map.normalize("go0", SyllableScheme::GonPin);
+    assert!(outputs
+        .iter()
+        .any(|item| item.text == "go" && item.tone == Some(0)));
 }

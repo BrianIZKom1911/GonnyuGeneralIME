@@ -306,10 +306,9 @@ With no initial consonant:
 | uo | [uo] | - | - | [uɔ] | - | - | - | - |  |
 | ue | [ue] | - | [uɛ] | [uɛ] | - | - | - | - |  |
 | uie | - | - | [uiɛ] | - | - | - | - | wie (no initial) |  |
-| ui | [ui] | - | - | - | - | - | - | ui, wui (no initial) |  |
+| ui* | [ui] or [uei] | - | [uɛi] | - | [uəi] | - | [uei] or [ʯei] | uei, ui, wui (no initial), wei (no initial) |  |
 | uai | [uai] | - | - | - | - | - | [ʯai] | - |  |
 | uoi | - | [uoi] | - | [uɔi] | [uoi] or [uɔi] | - | - | oi |  |
-| uei | [uei] | - | [uɛi] | - | - | - | [ʯei] | uei, wei (no initial) |  |
 | un* | [un] or [uen] | - | [uɛn] or [un] | - | - | - | [uən] or [ʯən] or [ʯɛn] | uen |  |
 | uan | [uan] | - | - | - | - | - | - | - |  |
 | uon | [uon] | - | - | [uɔn] | [uɔn] | - | - | uen, wen (no initial) |  |
@@ -329,12 +328,13 @@ With no initial consonant:
 | uaek | - | - | [uæʔ] | - | - | - | - | - |  |
 | uok | [uoʔ] | - | [uɔʔ] or [uoʔ] | [uɔʔ] | [uɔʔ] | - | - | - |  |
 | uek | — | [uɛʔ] or [uɤʔ] or [uɪʔ] | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | - | - | uik |  |
-| ueik | - | - | [uɛiʔ] | - | - | - | - | ueik, weik (no initial) |  |
-| uik | - | - | - | [uiʔ] | - | - | - | uek |  |
+| uik | - | - | [uɛiʔ] | [uiʔ] | [uəiʔ] | - | - | uek, ueik, weik (no initial) |  |
 
 \* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling.
 
-\* `uen`: `uen` is shortened to `un` after an initial consonant; this table groups `uen` under `un`.
+\* `uei`: `uei` and `uêi` are shortened to `ui` after an initial consonant and grouped under `ui` in this table. With no initial, the forms are `wei` and `wêi`; [ui] has the form `wi`. Some varieties use `ê` to distinguish [ɛ]; `ê` is entered as `e`, which matches `ê` through a one-way fuzzy rule. The same input rule applies to other spellings containing `ê`.
+
+\* `uen`: `uen` and `uên` are shortened to `un` after an initial consonant and grouped under `un` in this table. With no initial, the forms are `wen` and `wên`. Some varieties use `ê` to distinguish [ɛ]; `ê` is entered as `e`, which matches `ê` through a one-way fuzzy rule.
 
 
 #### Rounded front-vowel finals
@@ -372,6 +372,8 @@ With no initial consonant:
 The system also records a number of extensions based on published descriptions and observed sound changes, including pronunciations recorded in a 1935 language survey and selected alternations involving `-n` and `-ng` codas.
 
 ### Tones
+
+`0` denotes the neutral tone.
 
 #### Lancong (Nanchang)
 

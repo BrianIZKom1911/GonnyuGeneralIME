@@ -12,19 +12,21 @@ common	rime	in	yin	ɪŋ	因	syllable-final	false	false	primary	in	单写 in→yi
 common	rime	iu	yiu	iu	有	syllable-final	false	false	primary	iu	单写 iu→yiu
 common	rime	iong	yong	iuŋ	用	syllable-final	false	false	primary	iong	iong→yong
 common	rime	u	wu	u	乌	syllable-final	false	false	primary	u	单写 u→wu
-common	rime	ui	wi	uei	为	syllable-final	false	false	primary	ui	单写 ui→wi
-common	rime	uei	wi	uei	为	syllable-final	false	false	primary	uei	零声母 uei 输入兼容 ui 的转写形式
-common	rime	uei	ui	uei	为	syllable-final	false	false	primary		uei 输入兼容规范 ui
+common	rime	ui	wi	ui	为	syllable-final	false	false	primary	ui	单写 ui→wi
 common	rime	ung	wung	uŋ	翁	syllable-final	false	false	primary	ung	零声母 ung→wung，与 ueng→weng 区分
 common	rime	wng	wung	uŋ	翁	syllable-final	false	false	primary	wng	零声母 wng 旧写兼容 wung
+common	rime	uei	wei	uei	为	syllable-final	false	false	primary	uei	零声母 uei→wei；e 可单向匹配 ê，覆盖 wêi
+common	rime	uei	wêi	uɛi	为	syllable-final	false	false	primary	uei	零声母 uei 输入单向兼容 wêi；独立于 ui→wi
+common	rime	uêi	wêi	uɛi	为	syllable-final	false	true	primary	uêi	零声母 uêi→wêi，独立于 ui→wi
+common	rime	uêik	wêik	uɛiʔ	为	syllable-final	false	true	primary	uêik	零声母 uei 的 k 尾输入兼容独立 wêik
+common	rime	ueik	wêik	uɛiʔ	为	syllable-final	false	true	primary	ueik	零声母 uei 的 k 尾输入兼容独立 wêik
 common	rime	ve	yue	ye	月	anywhere	false	true	primary	ve,jve,lve,nve,qve,xve	ve 系专用桥接，须先于通用 v→yu
 common	rime	ue	yue	ye	月	anywhere	false	true	primary	ue,jue,lue,nue,que,xue	ue 系专用桥接，须先于通用 u→yu
 common	rime	v	yu	y	与	anywhere	false	false	primary	b,p,m,f,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh,w	仅已有声母后的 v→yu
 common	rime	w	v			anywhere	false	false	primary	w	w 可单向兼容 v
 common	rime	wu	v			anywhere	false	false	primary	wu	wu 可单向兼容 v
 common	rime	you	yiu	iu	有	syllable-final	false	false	primary	you	yiu 可从 you 模糊输入
-common	rime	wei	wi	uei	为	syllable-final	false	false	primary	wei	零声母 wei 输入兼容 ui 的转写形式
-common	rime	wui	wi	uei	为	syllable-final	false	false	primary	wui	零声母 wui 旧写兼容 ui 的转写形式
+common	rime	wui	wi	ui	为	syllable-final	false	false	primary	wui	零声母 wui 旧写兼容 ui 的转写形式
 common	rime	wen	won	uon	碗	syllable-final	false	false	primary	wen	won 可从 wen 模糊输入
 common	rime	uen	won	uon	碗	syllable-final	false	false	primary	uen	零声母 won 可从 uen 模糊输入
 common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon 可从 uen 模糊输入
@@ -35,7 +37,6 @@ common	rime	iau	yeu	iɛu	妖	syllable-final	false	false	primary	iau	零声母 ia
 common	rime	yao	yeu	iɛu	妖	syllable-final	false	false	primary	yao	普通话拼音习惯输入
 common	rime	ao	au	au	抱	syllable-final	true	true	primary		旧 ao 写法兼容
 common	rime	ou	eu	ɛu	后	syllable-final	false	false	primary	cou,dou,fou,gou,hou,jou,kou,lou,mou,ngou,pou,sou,tou,you,zou	普通话 ou 输入兼容规范 eu
-common	rime	uen	un	uən	文	syllable-final	false	true	primary		有声母时省写
 common	rime	ion	on	on	专	syllable-final	false	false	secondary		旧 i 介音兼容写法
 common	rime	ioin	on	on	专	syllable-final	false	false	secondary		旧写法向后兼容
 common	rime	nyoin	on	on	袁	syllable-final	false	false	secondary		允许 nyoin / ioin 相混
@@ -72,3 +73,13 @@ sinyi	coda		k			syllable-final	false	false	fallback		自动生成：完整音系
 songau	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 songau	coda		t			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 songau	coda	k	t			syllable-final	true	false	secondary		自动生成：完整音系检测到两种入声韵尾，允许互相模糊
+common	rime	uei	ui	uei		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后省写；零声母保留 w 系拼写
+common	rime	uêi	ui	uɛi		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后省写；零声母保留 w 系拼写
+common	rime	uen	un	uən		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后省写；零声母保留 w 系拼写
+common	rime	uên	un	uɛn		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后省写；零声母保留 w 系拼写
+common	rime	ueik	uik	ueiʔ		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后省写；零声母保留 w 系拼写
+common	rime	uêik	uik	uɛiʔ		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后省写；零声母保留 w 系拼写
+common	rime	uen	wen	uen	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽子 e 使用 e 输入
+common	rime	uen	wên	uɛn	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽子 e 使用 e 输入
+common	rime	uên	wên	uɛn	文	syllable-final	false	true	primary	uên	零声母 un/uen 同组；带帽子 e 使用 e 输入
+common	rime	un	wen	un	文	syllable-final	false	true	primary	un	零声母 un/uen 同组；带帽子 e 使用 e 输入
