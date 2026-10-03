@@ -437,3 +437,17 @@ fn neutral_tone_marker_is_preserved() {
         .iter()
         .any(|item| item.text == "go" && item.tone == Some(0)));
 }
+
+#[test]
+fn zero_initial_iung_keeps_yiung_distinct_from_yung() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    let outputs = map.normalize("iung1", SyllableScheme::GonPin);
+    assert!(outputs
+        .iter()
+        .any(|item| item.text == "yiung" && item.tone == Some(1)));
+    assert!(!outputs.iter().any(|item| item.text == "yung"));
+    assert!(!map
+        .normalize("yung1", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "yiung"));
+}

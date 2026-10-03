@@ -83,3 +83,4 @@ common	rime	uen	wen	uen	文	syllable-final	false	true	primary	uen	零声母 un/u
 common	rime	uen	wên	uɛn	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽子 e 使用 e 输入
 common	rime	uên	wên	uɛn	文	syllable-final	false	true	primary	uên	零声母 un/uen 同组；带帽子 e 使用 e 输入
 common	rime	un	wen	un	文	syllable-final	false	true	primary	un	零声母 un/uen 同组；带帽子 e 使用 e 输入
+common	rime	iung	yiung	iuŋ	用	syllable-final	false	false	primary	iung	零声母 iung→yiung，与表示 [yŋ] 的 yung 区分

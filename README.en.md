@@ -275,7 +275,7 @@ With no initial consonant:
 | ing | - | - | [iŋ] | [iŋ] | - | - | - | - |  |
 | iang | [iɑŋ] | - | - | - | - | - | - | - |  |
 | iong | [iɔŋ] | - | [ioŋ] | - | [ioŋ] | - | [ioŋ] | - |  |
-| iung | [iuŋ] | - | - | - | - | - | - | - |  |
+| iung* | [iuŋ] | - | - | - | - | - | - | - |  |
 | it | [it] | - | - | - | - | - | - | — |  |
 | iat | - | - | [iat] | - | - | - | - | - |  |
 | iet | [iet] | - | [iɛt] | - | - | [iɛt] | - | - |  |
@@ -290,6 +290,8 @@ With no initial consonant:
 | iuk | [iuʔ] | - | - | - | [ɪuʔ] | - | - | - |  |
 
 \* `iu` forms a syllable without an initial consonant as `yiu`, distinct from `yu` for [y].
+
+\* `iung` forms a syllable without an initial consonant as `yiung`, distinct from `yung` for [yŋ].
 
 #### Rounded finals
 
@@ -349,7 +351,7 @@ With no initial consonant:
 | yun | [yn] | - | - | - | - | - | - | — |  |
 | yuon | [yon] | - | - | - | - | - | - | yuen, yoin |  |
 | yuen | - | [yɛn] or [yɛŋ] | - | - | - | - | - | yueng |  |
-| yung | - | [yn] | [yŋ] or [iuŋ] | - | - | - | - | yun |  |
+| yung | - | [yn] | [yŋ] | - | - | - | - | yun |  |
 | yut | [yt] | - | - | - | - | - | - | - |  |
 | yuot | [yot] | - | - | - | - | - | - | yue, yuet |  |
 | yuet | - | - | [yet] | - | - | - | - | yuot |  |

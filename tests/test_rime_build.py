@@ -470,3 +470,14 @@ def test_onset_contractions_preserve_zero_initial_circumflex_forms() -> None:
         assert "wên" in normalize(source, rules)
     for source, forbidden in (("uei", "wi"), ("uêi", "wi"), ("uen", "un"), ("uên", "un")):
         assert forbidden not in normalize(source, rules)
+
+
+def test_zero_initial_iung_keeps_yiung_distinct_from_yung() -> None:
+    rules = load_rules(RULES_PATH)
+    assert "yiung" in normalize("iung", rules)
+    assert "yung" not in normalize("iung", rules)
+    assert "yiung" not in normalize("yung", rules)
+    assert "yung" not in normalize("yiung", rules)
+    algebra = compile_algebra({"yiung", "yung"}, rules)
+    assert "    - derive/^Gyiung$/Fiung/" in algebra
+    assert "    - derive/^Gyung$/Fiung/" not in algebra
