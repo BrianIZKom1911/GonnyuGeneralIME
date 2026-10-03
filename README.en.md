@@ -14,14 +14,18 @@ Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Ti
 
 Rime schema repositories for Lancong (Nanchang), Fenni (Fenyi), and Fungcen. Other installation options are available in the [Installation](#installation) section below.
 
-## Release 1.0.5
+## Release 1.1.0
 
-- Fixed Android package signing.
+- feat: Initialise the Tiqien, Songau, Seusong, Jingon, and Yikyan-Henfeng dialect dictionaries, and expand the Sinyi dictionary.
+- feat: Add an entry to the Lancong dictionary and support typing locality names across dialect dictionaries.
+- fix: Correct Fungcen readings and align regional dictionary spellings with their IPA transcriptions.
+- fix: Correct regional transcription, tone, and checked-tone handling, and update the related romanisation guidance.
+- feat: Merge reviewed Yikyan-Henfeng and Sinyi entries and complete the corresponding character readings.
 
 ## Contents
 
 - [GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method](#gonnyugeneralime--a-general-gongan-chinese-input-method)
-  - [Release 1.0.5](#release-105)
+  - [Release 1.1.0](#release-110)
   - [Contents](#contents)
   - [Overview](#overview)
     - [What it provides](#what-it-provides)
