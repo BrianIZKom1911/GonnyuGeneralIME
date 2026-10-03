@@ -61,6 +61,21 @@ def test_entering_tone_rules_are_scoped_to_lancong_and_fungcen() -> None:
     assert not {"baet", "baep", "baek"}.intersection(normalize("bae", fenni))
 
 
+def test_all_regional_entering_codas_preserve_omission_and_interchange() -> None:
+    for region, codas in (("lancong", "tk"), ("fungcen", "tpk"), ("tiqien", "pk"),
+                          ("sinyi", "k"), ("songau", "tk"), ("seusong", ""), ("fenni", "")):
+        rules = load_rules(RULES_PATH, region)
+        expected = {"bae" + coda for coda in codas}
+        assert {"baet", "baep", "baek"}.intersection(normalize("bae", rules)) == expected
+        algebra = compile_algebra(expected, rules)
+        for coda in codas:
+            spelling = "bae" + coda
+            forms = set(normalize(spelling, rules)) | set(normalize(spelling, rules, reverse=True))
+            assert expected.issubset(forms)
+            assert not {spelling + tail for tail in "ptk"}.intersection(forms)
+            assert any(line.endswith(f"/^G{spelling}$/Fbae/") for line in algebra)
+
+
 def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     rules = load_rules(RULES_PATH)
     for spelling in ("ui", "wui"):
@@ -472,12 +487,13 @@ def test_onset_contractions_preserve_zero_initial_circumflex_forms() -> None:
         assert forbidden not in normalize(source, rules)
 
 
-def test_zero_initial_iung_keeps_yiung_distinct_from_yung() -> None:
+def test_zero_initial_iu_suffixes_share_yu_spellings() -> None:
     rules = load_rules(RULES_PATH)
-    assert "yiung" in normalize("iung", rules)
-    assert "yung" not in normalize("iung", rules)
-    assert "yiung" not in normalize("yung", rules)
-    assert "yung" not in normalize("yiung", rules)
-    algebra = compile_algebra({"yiung", "yung"}, rules)
-    assert "    - derive/^Gyiung$/Fiung/" in algebra
-    assert "    - derive/^Gyung$/Fiung/" not in algebra
+    for source, legacy, target in (("iung", "yiung", "yung"), ("iun", "yiun", "yun"), ("iuk", "yiuk", "yuk"), ("iuek", "yiuek", "yuek"), ("iuok", "yiuok", "yuok")):
+        assert target in normalize(source, rules)
+        assert target in normalize(legacy, rules)
+    assert "yiu" in normalize("iu", rules)
+    assert "yu" not in normalize("iu", rules)
+    algebra = compile_algebra({"yung", "yiu", "yu"}, rules)
+    assert "    - derive/^Gyung$/Fiung/" in algebra
+    assert "    - derive/^Gyung$/Fyiung/" in algebra

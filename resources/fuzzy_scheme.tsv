@@ -83,4 +83,13 @@ common	rime	uen	wen	uen	文	syllable-final	false	true	primary	uen	零声母 un/u
 common	rime	uen	wên	uɛn	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽子 e 使用 e 输入
 common	rime	uên	wên	uɛn	文	syllable-final	false	true	primary	uên	零声母 un/uen 同组；带帽子 e 使用 e 输入
 common	rime	un	wen	un	文	syllable-final	false	true	primary	un	零声母 un/uen 同组；带帽子 e 使用 e 输入
-common	rime	iung	yiung	iuŋ	用	syllable-final	false	false	primary	iung	零声母 iung→yiung，与表示 [yŋ] 的 yung 区分
+common	rime	iung	yung	iuŋ	用	syllable-final	false	false	primary	iung	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
+common	rime	iun	yun	iun		syllable-final	false	false	primary	iun	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
+common	rime	iuk	yuk	iuʔ		syllable-final	false	false	primary	iuk	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
+common	rime	iuek	yuek	iuəʔ		syllable-final	false	false	primary	iuek	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
+common	rime	iuok	yuok	iuɔʔ		syllable-final	false	false	primary	iuok	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
+common	rime	yiung	yung			syllable-final	false	false	primary	yiung	兼容带韵尾的旧 yiu 系拼写
+common	rime	yiun	yun			syllable-final	false	false	primary	yiun	兼容带韵尾的旧 yiu 系拼写
+common	rime	yiuk	yuk			syllable-final	false	false	primary	yiuk	兼容带韵尾的旧 yiu 系拼写
+common	rime	yiuek	yuek			syllable-final	false	false	primary	yiuek	兼容带韵尾的旧 yiu 系拼写
+common	rime	yiuok	yuok			syllable-final	false	false	primary	yiuok	兼容带韵尾的旧 yiu 系拼写

@@ -299,6 +299,49 @@ fn entering_tone_rules_are_scoped_by_region() {
 }
 
 #[test]
+fn all_regional_entering_codas_preserve_omission_and_interchange() {
+    for (region, codas) in [
+        ("lancong", "tk"),
+        ("fungcen", "tpk"),
+        ("tiqien", "pk"),
+        ("sinyi", "k"),
+        ("songau", "tk"),
+        ("seusong", ""),
+        ("fenni", ""),
+    ] {
+        let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), region).expect("load regional rules");
+        let bare = map.normalize("bae", SyllableScheme::GonPin);
+        for coda in ['p', 't', 'k'] {
+            let spelling = format!("bae{coda}");
+            assert_eq!(
+                bare.iter().any(|item| item.text == spelling),
+                codas.contains(coda),
+                "{region}"
+            );
+        }
+        for coda in codas.chars() {
+            let spelling = format!("bae{coda}");
+            let mut forms = map.normalize(&spelling, SyllableScheme::GonPin);
+            forms.extend(map.normalize(&spelling, SyllableScheme::GonFuzzy));
+            for other in codas.chars() {
+                assert!(
+                    forms.iter().any(|item| item.text == format!("bae{other}")),
+                    "{region}"
+                );
+            }
+            for other in ['p', 't', 'k'] {
+                assert!(
+                    !forms
+                        .iter()
+                        .any(|item| item.text == format!("{spelling}{other}")),
+                    "{region}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn zero_onset_ion_stops_at_yon() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     let outputs = map.normalize("ion", SyllableScheme::GonPin);
@@ -439,15 +482,23 @@ fn neutral_tone_marker_is_preserved() {
 }
 
 #[test]
-fn zero_initial_iung_keeps_yiung_distinct_from_yung() {
+fn zero_initial_iu_suffixes_share_yu_spellings() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    let outputs = map.normalize("iung1", SyllableScheme::GonPin);
-    assert!(outputs
-        .iter()
-        .any(|item| item.text == "yiung" && item.tone == Some(1)));
-    assert!(!outputs.iter().any(|item| item.text == "yung"));
+    for (source, target) in [
+        ("iung1", "yung"),
+        ("yiung1", "yung"),
+        ("iun1", "yun"),
+        ("iuk1", "yuk"),
+        ("iuek1", "yuek"),
+        ("iuok1", "yuok"),
+    ] {
+        let outputs = map.normalize(source, SyllableScheme::GonPin);
+        assert!(outputs
+            .iter()
+            .any(|item| item.text == target && item.tone == Some(1)));
+    }
     assert!(!map
-        .normalize("yung1", SyllableScheme::GonPin)
+        .normalize("iu1", SyllableScheme::GonPin)
         .iter()
-        .any(|item| item.text == "yiung"));
+        .any(|item| item.text == "yu"));
 }

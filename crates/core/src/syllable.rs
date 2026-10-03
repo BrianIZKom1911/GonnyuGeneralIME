@@ -423,7 +423,7 @@ fn substitute_initial(text: &str, from: &str, to: &str) -> Vec<String> {
 fn substitute_final(text: &str, from: &str, to: &str) -> Vec<String> {
     if from.is_empty() {
         // Append coda only if text doesn't already end with any stop coda
-        if to.is_empty() || text.ends_with('t') || text.ends_with('k') {
+        if to.is_empty() || text.ends_with(['p', 't', 'k']) {
             return Vec::new();
         }
         return vec![format!("{}{}", text, to)];

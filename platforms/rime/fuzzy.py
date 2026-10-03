@@ -62,7 +62,7 @@ def substitute(text: str, source: str, target: str, applies: str) -> list[str]:
         return [target + text[len(source) :]] if text.startswith(source) else []
     if applies == "syllable-final":
         if not source:
-            if not target or text.endswith(("t", "k")):
+            if not target or text.endswith(("p", "t", "k")):
                 return []
             return [text + target]
         if source == "u" and target == "yu":
