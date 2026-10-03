@@ -47,3 +47,9 @@ id = "jingon"
 name_zh = "吉安市"
 status = "active"
 path = "regions/jingon/region.toml"
+
+[[regions]]
+id = "yikyan-henfeng"
+name_zh = "弋阳-横峰"
+status = "active"
+path = "regions/yikyan-henfeng/region.toml"

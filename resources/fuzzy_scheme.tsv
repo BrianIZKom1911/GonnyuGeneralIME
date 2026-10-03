@@ -93,3 +93,4 @@ common	rime	yiun	yun			syllable-final	false	false	primary	yiun	兼容带韵尾�
 common	rime	yiuk	yuk			syllable-final	false	false	primary	yiuk	兼容带韵尾的旧 yiu 系拼写
 common	rime	yiuek	yuek			syllable-final	false	false	primary	yiuek	兼容带韵尾的旧 yiu 系拼写
 common	rime	yiuok	yuok			syllable-final	false	false	primary	yiuok	兼容带韵尾的旧 yiu 系拼写
+yikyan-henfeng	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
