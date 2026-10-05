@@ -231,12 +231,12 @@ fn lancong_entering_tone_coda_is_expanded_from_bare() {
 }
 
 #[test]
-fn updated_on_family_rules_normalize_to_short_forms() {
+fn removed_on_family_aliases_do_not_match_short_forms() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     let outputs = map.normalize("ioin", SyllableScheme::GonPin);
-    assert!(outputs.iter().any(|item| item.text == "on"));
+    assert!(!outputs.iter().any(|item| item.text == "on"));
     let outputs = map.normalize("uoin", SyllableScheme::GonPin);
-    assert!(outputs.iter().any(|item| item.text == "won"));
+    assert!(!outputs.iter().any(|item| item.text == "won"));
     let outputs = map.normalize("uen", SyllableScheme::GonPin);
     assert!(outputs.iter().any(|item| item.text == "won"));
 }
@@ -343,7 +343,7 @@ fn all_regional_entering_codas_preserve_omission_and_interchange() {
         ("lancong", "tk"),
         ("fungcen", "tpk"),
         ("tiqien", "pk"),
-        ("sinyi", "k"),
+        ("sinyi", "tk"),
         ("songau", "tk"),
         ("seusong", ""),
         ("fenni", ""),
@@ -391,12 +391,16 @@ fn zero_onset_ion_stops_at_yon() {
 #[test]
 fn zero_onset_ung_and_ueng_remain_distinct() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
-    for input in ["ung", "wng"] {
+    for input in ["ung", "wung"] {
         assert!(map
             .normalize(input, SyllableScheme::GonPin)
             .iter()
             .any(|item| item.text == "wung"));
     }
+    assert!(!map
+        .normalize("wng", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "wung"));
     let outputs = map.normalize("ueng", SyllableScheme::GonPin);
     assert!(outputs.iter().any(|item| item.text == "weng"));
     assert!(!outputs.iter().any(|item| item.text == "wung"));
@@ -525,7 +529,6 @@ fn zero_initial_iu_suffixes_share_yu_spellings() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     for (source, target) in [
         ("iung1", "yung"),
-        ("yiung1", "yung"),
         ("iun1", "yun"),
         ("iuk1", "yuk"),
         ("iuek1", "yuek"),
@@ -536,8 +539,39 @@ fn zero_initial_iu_suffixes_share_yu_spellings() {
             .iter()
             .any(|item| item.text == target && item.tone == Some(1)));
     }
+    for (source, target) in [
+        ("yiun1", "yun"),
+        ("yiung1", "yung"),
+        ("yiuk1", "yuk"),
+        ("yiuek1", "yuek"),
+        ("yiuok1", "yuok"),
+    ] {
+        assert!(!map
+            .normalize(source, SyllableScheme::GonPin)
+            .iter()
+            .any(|item| item.text == target));
+    }
     assert!(!map
         .normalize("iu1", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "yu"));
+}
+
+#[test]
+fn apical_i_input_matches_diaeresis_one_way() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    for (plain, marked) in [("i1", "ï"), ("si1", "sï"), ("sik5*", "sïk")] {
+        let outputs = map.normalize(plain, SyllableScheme::GonPin);
+        let target = outputs.iter().find(|item| item.text == marked).unwrap();
+        assert_eq!(target.tone, Some(if plain.ends_with('*') { 5 } else { 1 }));
+        assert_eq!(target.tone_starred, plain.ends_with('*'));
+    }
+    for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+        for (marked, plain) in [("ï", "i"), ("sï", "si"), ("sïk", "sik")] {
+            assert!(!map
+                .normalize(marked, scheme)
+                .iter()
+                .any(|item| item.text == plain));
+        }
+    }
 }

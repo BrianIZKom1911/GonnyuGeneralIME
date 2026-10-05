@@ -15,7 +15,7 @@ def test_tutorial_resource_contains_the_requested_content() -> None:
         "（1）南昌词典中，数字1-7为南昌话七个声调，具体调值见下。",
         "（2）丰城词典中，数字1-6为丰城话六个声调，具体调值见下。",
         "（3）黎川（Tiqien）词典中，数字1-7为黎川话七个声调，具体调值见下。",
-        "（4）新余市（Sinyi）词典中，标号1、1*、2、3、4、5、5*为新余市话声调标记，具体调值见下。",
+        "（4）新余市（Sinyi）词典中，标号1、1*、2、3、4、4*、5、5*为新余市话声调标记，具体调值见下。",
         "拼音说明",
         "词语标记说明",
         "A词语后面接“[义]B词语”时，B为A在普通话中的对应义。",
@@ -34,9 +34,12 @@ def test_tutorial_resource_contains_the_requested_content() -> None:
     assert tutorial.index("（2）丰城词典中") < tutorial.index("<tr><td>1</td><td>阴平</td><td>33</td></tr>")
     assert tutorial.index("（3）黎川（Tiqien）词典中") < tutorial.index("<tr><td>1</td><td>阴平</td><td>22</td></tr>")
     assert tutorial.index("（4）新余市（Sinyi）词典中") < tutorial.index("<tr><td>1</td><td>阴平甲</td><td>45</td></tr>")
-    assert "<tr><td>3</td><td>上声</td><td>31</td></tr>" in tutorial
-    assert "<tr><td>4</td><td>去声</td><td>11</td></tr>" in tutorial
-    assert "<tr><td>2</td><td>阳平</td><td>33</td></tr>" in tutorial
+    sinyi = tutorial.split("（4）新余市（Sinyi）词典中", 1)[1].split("（5）", 1)[0]
+    assert "<tr><td>3</td><td>上声</td><td>213</td></tr>" in sinyi
+    assert "<tr><td>4</td><td>去声甲</td><td>11</td></tr>" in sinyi
+    assert "<tr><td>4*</td><td>去声乙</td><td>33</td></tr>" in sinyi
+    assert "<tr><td>2</td><td>阳平</td><td>31</td></tr>" in sinyi
+    assert "去声乙为水北一带声调，市区已合并。" in sinyi
     assert "阳平阴去" not in tutorial
 
 

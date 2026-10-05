@@ -63,7 +63,7 @@ def test_entering_tone_rules_are_scoped_to_lancong_and_fungcen() -> None:
 
 def test_all_regional_entering_codas_preserve_omission_and_interchange() -> None:
     for region, codas in (("lancong", "tk"), ("fungcen", "tpk"), ("tiqien", "pk"),
-                          ("sinyi", "k"), ("songau", "tk"), ("seusong", ""), ("fenni", "")):
+                          ("sinyi", "tk"), ("songau", "tk"), ("seusong", ""), ("fenni", "")):
         rules = load_rules(RULES_PATH, region)
         expected = {"bae" + coda for coda in codas}
         assert {"baet", "baep", "baek"}.intersection(normalize("bae", rules)) == expected
@@ -352,11 +352,13 @@ def test_builds_sinyi_dictionary_with_starred_tone_markers(tmp_path: Path) -> No
 
     dictionary = (tmp_path / "gannyu_sinyi.dict.yaml").read_text(encoding="utf-8")
     assert counts["entries"] > 0
-    assert "七\tGqiêk\t" in dictionary
-    assert "Gqiêk5" not in dictionary
-    assert "Gqiêk5*" not in dictionary
+    assert "七\tGqiêt\t" in dictionary
+    assert "Gqiêt5" not in dictionary
+    assert "Gqiêt5*" not in dictionary
     schema = (tmp_path / "gannyu_sinyi.schema.yaml").read_text(encoding="utf-8")
-    assert "derive/^Gqiêk$/Fqiek/" in schema
+    assert "derive/^Gqiêt$/Fqiet/" in schema
+    assert "丝\tGsï\t" in dictionary
+    assert "derive/^Gsï$/Fsi/" in schema
 
 
 def test_sentence_readings_use_highest_frequency_toned_character_entries() -> None:
@@ -511,9 +513,20 @@ def test_zero_initial_iu_suffixes_share_yu_spellings() -> None:
     rules = load_rules(RULES_PATH)
     for source, legacy, target in (("iung", "yiung", "yung"), ("iun", "yiun", "yun"), ("iuk", "yiuk", "yuk"), ("iuek", "yiuek", "yuek"), ("iuok", "yiuok", "yuok")):
         assert target in normalize(source, rules)
-        assert target in normalize(legacy, rules)
+        assert target not in normalize(legacy, rules)
     assert "yiu" in normalize("iu", rules)
     assert "yu" not in normalize("iu", rules)
     algebra = compile_algebra({"yung", "yiu", "yu"}, rules)
     assert "    - derive/^Gyung$/Fiung/" in algebra
-    assert "    - derive/^Gyung$/Fyiung/" in algebra
+    assert "    - derive/^Gyung$/Fyiung/" not in algebra
+
+
+def test_apical_i_rule_preserves_literal_spelling_and_is_one_way() -> None:
+    rules = load_rules(RULES_PATH)
+    for plain, marked in (("i", "ï"), ("si", "sï"), ("sik", "sïk")):
+        assert marked in normalize(plain, rules)
+        assert plain in normalize(plain, rules)
+        assert plain not in normalize(marked, rules)
+    algebra = compile_algebra({"sï", "sïk"}, rules)
+    assert "    - derive/^Gsï$/Fsi/" in algebra
+    assert "    - derive/^Gsïk$/Fsik/" in algebra

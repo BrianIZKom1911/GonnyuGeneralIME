@@ -4,13 +4,10 @@
 /// segments as nit+teu, "nikteu" → "nikkteu" tries nik+kteu (usually
 /// falls back to nik+teu via fuzzy cross-matching).
 fn coda_doubled_variants(input: &str) -> Vec<String> {
-    let chars: Vec<char> = input.chars().collect();
-    let n = chars.len();
     let mut variants: Vec<String> = Vec::new();
-    for i in 0..n {
-        let c = chars[i];
+    for (i, c) in input.char_indices() {
         if c == 't' || c == 'k' {
-            let mut variant = String::with_capacity(n + 1);
+            let mut variant = String::with_capacity(input.len() + 1);
             variant.push_str(&input[..=i]);
             variant.push(c);
             variant.push_str(&input[i + 1..]);
@@ -488,7 +485,11 @@ impl WordSegmentationSearch<'_> {
             return;
         }
         let max_try = (remaining - (min_needed - 1)).min(6);
-        for syl_len in 1..=max_try {
+        for syl_len in self.input[cursor..]
+            .char_indices()
+            .take(max_try)
+            .map(|(offset, character)| offset + character.len_utf8())
+        {
             let candidate = &self.input[cursor..cursor + syl_len];
             let Some(syllable) = classify_syllable_candidate(
                 self.dictionary,
@@ -594,7 +595,11 @@ fn best_chunk_segmentation(
         let remaining = input.len() - cursor;
         let max_try = remaining.min(6);
         let mut best: Option<ChunkSegmentation> = None;
-        for syl_len in 1..=max_try {
+        for syl_len in input[cursor..]
+            .char_indices()
+            .take(max_try)
+            .map(|(offset, character)| offset + character.len_utf8())
+        {
             let candidate = &input[cursor..cursor + syl_len];
             let Some(syllable) =
                 classify_syllable_candidate_any_position(dictionary, fuzzy, candidate, cache)

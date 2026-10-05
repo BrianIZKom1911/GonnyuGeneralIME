@@ -59,6 +59,45 @@ fn repo_fuzzy() -> FuzzyMap {
     FuzzyMap::load_tsv_for_region(&path, "lancong").expect("load fuzzy")
 }
 
+#[test]
+fn diaeresis_i_readings_accept_plain_input_and_manual_segments() {
+    let body = format!(
+        "{DICT_HEADER}\n\
+         丝\tsɿ1\tsï1\tsi1\t赣\t\t\t100\t\t\n\
+         丝丝\tsɿ1 sɿ1\tsï1 sï1\tsi1 si1\t赣\t\t\t200\t\t\n\
+         叔\tsɿʔ5*\tsïk5*\tshu1\t赣\t\t\t100\t\t\n\
+         叔头\tsɿʔ5* tʰəu1\tsïk5* teu1\tshu1 tou2\t赣\t\t\t200\t\t\n\
+         额额\tɛ1 ɛ1\tê1 ê1\te2 e2\t赣\t\t\t200\t\t\n"
+    );
+    let dictionary = Dictionary::load_tsv(write_fixture("apical-i.tsv", &body)).unwrap();
+    let fuzzy = repo_fuzzy();
+    let tones = HashMap::new();
+    for input in ["si", "si1", "sï", "sï1"] {
+        let results = retrieve(&dictionary, &fuzzy, &tones, input);
+        assert!(results.iter().any(|item| item.text == "丝"), "{input}");
+    }
+    for input in ["sik", "sik5*", "sïk", "sïk5*"] {
+        let results = retrieve(&dictionary, &fuzzy, &tones, input);
+        assert!(results.iter().any(|item| item.text == "叔"), "{input}");
+    }
+    for input in ["sisi", "sïsï"] {
+        let results = retrieve(&dictionary, &fuzzy, &tones, input);
+        assert!(results.iter().any(|item| item.text == "丝丝"), "{input}");
+    }
+    for input in ["si'si", "si si", "sï'sï", "sï sï"] {
+        let results = retrieve_with_manual_segments(&dictionary, &fuzzy, &tones, input, None);
+        assert!(results.iter().any(|item| item.text == "丝丝"), "{input}");
+    }
+    for input in ["sikteu", "sïkteu"] {
+        let results = retrieve(&dictionary, &fuzzy, &tones, input);
+        assert!(results.iter().any(|item| item.text == "叔头"), "{input}");
+    }
+    for input in ["ee", "êê", "e'e", "ê'ê"] {
+        let results = retrieve_with_manual_segments(&dictionary, &fuzzy, &tones, input, None);
+        assert!(results.iter().any(|item| item.text == "额额"), "{input}");
+    }
+}
+
 fn tone_values() -> HashMap<String, u8> {
     let mut map = HashMap::new();
     map.insert("42".to_string(), 1);
