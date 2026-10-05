@@ -277,7 +277,7 @@ impl FuzzyMap {
         const MAX_OUTPUTS: usize = 64;
         while cursor < outputs.len() && outputs.len() < MAX_OUTPUTS {
             let (base, expandable) = outputs[cursor].clone();
-            if !expandable {
+            if !expandable || base.text.contains("yuo") {
                 cursor += 1;
                 continue;
             }
@@ -305,7 +305,7 @@ impl FuzzyMap {
                     FuzzyApplies::Anywhere => substitute_any(&base.text, from, to),
                 };
                 for candidate in substituted {
-                    if produced.contains(&candidate) {
+                    if produced.contains(&candidate) || outputs.len() >= MAX_OUTPUTS {
                         continue;
                     }
                     let tier = lowest_tier(base.tier, entry.priority_tier);
@@ -421,6 +421,9 @@ fn substitute_initial(text: &str, from: &str, to: &str) -> Vec<String> {
 }
 
 fn substitute_final(text: &str, from: &str, to: &str) -> Vec<String> {
+    if from == "eu" && to == "ieu" && text.ends_with("ieu") {
+        return Vec::new();
+    }
     if from.is_empty() {
         // Append coda only if text doesn't already end with any stop coda
         if to.is_empty() || text.ends_with(['p', 't', 'k']) {

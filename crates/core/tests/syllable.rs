@@ -49,6 +49,45 @@ fn zero_initial_ui_compatibility_preserves_onset_ui() {
 }
 
 #[test]
+fn eo_accepts_o_and_e_at_any_position_one_way() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    for (input, expected) in [
+        ("o6", "eo"),
+        ("e6", "eo"),
+        ("got6", "geot"),
+        ("get6", "geot"),
+        ("gop6", "geop"),
+        ("gep6", "geop"),
+        ("gok6", "geok"),
+        ("gek6", "geok"),
+        ("yue6", "yueo"),
+        ("yuek6", "yueok"),
+    ] {
+        assert!(
+            map.normalize(input, SyllableScheme::GonPin)
+                .iter()
+                .any(|item| item.text == expected && item.tone == Some(6)),
+            "{input} → {expected}"
+        );
+    }
+    for input in [
+        "yuo", "yuon", "yuong", "yuot", "yuop", "yuok", "gyuo", "jyuot",
+    ] {
+        for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+            let forms = map.normalize(input, scheme);
+            assert_eq!(forms.len(), 1, "{input}");
+            assert_eq!(forms[0].text, input);
+        }
+    }
+    for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+        assert!(!map
+            .normalize("eo", scheme)
+            .iter()
+            .any(|item| item.text == "o" || item.text == "e"));
+    }
+}
+
+#[test]
 fn open_e_input_matches_circumflex_one_way() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     for (plain, circumflex) in [("e", "ê"), ("en", "ên"), ("gek", "gêk")] {

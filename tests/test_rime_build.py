@@ -94,6 +94,26 @@ def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     assert "    - derive/^Ggui$/Fguêi/" in algebra
 
 
+def test_eo_accepts_o_and_e_at_any_position_one_way() -> None:
+    for region in ("lancong", "fenni", "fungcen", "tiqien", "sinyi", "songau", "seusong", "jingon", "yikyan-henfeng"):
+        rules = load_rules(RULES_PATH, region)
+        for source, target in (("o", "eo"), ("e", "eo"), ("got", "geot"), ("get", "geot"),
+                               ("gop", "geop"), ("gep", "geop"), ("gok", "geok"), ("gek", "geok"),
+                               ("yue", "yueo"), ("yuek", "yueok")):
+            assert target in normalize(source, rules), (region, source, target)
+        for reverse in (False, True):
+            forms = normalize("eo", rules, reverse=reverse)
+            assert "o" not in forms and "e" not in forms
+        for source in ("yuo", "yuon", "yuong", "yuot", "yuop", "yuok", "gyuo", "jyuot"):
+            for reverse in (False, True):
+                assert normalize(source, rules, reverse=reverse) == {source: 0}
+        algebra = compile_algebra({"eo", "geot", "yueok"}, rules)
+        assert "    - derive/^Gyueok$/Fyuok/" not in algebra
+        for target, source in (("eo", "o"), ("eo", "e"), ("geot", "got"), ("geot", "get"),
+                               ("yueok", "yuek")):
+            assert f"    - derive/^G{target}$/F{source}/" in algebra
+
+
 def test_open_e_input_matches_circumflex_one_way() -> None:
     rules = load_rules(RULES_PATH)
     for plain, circumflex in (("e", "ê"), ("en", "ên"), ("gek", "gêk")):

@@ -61,6 +61,8 @@ def substitute(text: str, source: str, target: str, applies: str) -> list[str]:
     if applies == "syllable-initial":
         return [target + text[len(source) :]] if text.startswith(source) else []
     if applies == "syllable-final":
+        if source == "eu" and target == "ieu" and text.endswith("ieu"):
+            return []
         if not source:
             if not target or text.endswith(("p", "t", "k")):
                 return []
@@ -92,7 +94,7 @@ def normalize(value: str, rules: list[FuzzyRule], reverse: bool = False) -> dict
     while cursor < len(outputs) and len(outputs) < MAX_FORMS:
         base, base_tier, expandable = outputs[cursor]
         cursor += 1
-        if not expandable:
+        if not expandable or "yuo" in base:
             continue
         for rule in rules:
             if rule.starts_with and not base.startswith(rule.starts_with):
