@@ -76,21 +76,33 @@
 - 对中英文`README.md`文档加上本地区：
 
   - 首先是开头仿照别个地区添加拼音声明；
+
   - 然后在拼音表添加ipa，仅添加与默认ipa不同个ipa声明。如对应拼音不存在，新建一行，但需要分类正确。韵腹排序（a,o,e,i,u,yu）以及韵尾排序（i,u,m,n,ng,t,p,k）；
-  - 然后在`resource/tutorial`教程当中参考别地区添加本地调值。
-  - 最后，如果本地区有入声，参考别地区在`resource/fuzzy_shceme.tsv`中参考别地区，仅为本地有个入声韵尾添加入声互相兼容跟到不输入入声个兼容。
+
+
+－ 然后在`resource/tutorial`教程当中参考别地区添加本地调值。
+
+- 如果本地区有入声，参考别地区在`resource/fuzzy_shceme.tsv`中参考别地区，仅为本地有个入声韵尾添加入声互相兼容跟到不输入入声个兼容。
+
+- 最后，在`resource/manifest.toml`当中仿照填入一起地区注册数据。
 
 ## 接入词典管理工具
 
+本项目有外带词典管理工具`dict_studio`.请使用联系方式索取。fork本项目并且使用git clone命令下载到本地文件夹后，请把`dict_studio`搁得`tools/`文件夹当中，把`tools/`文件夹放置在GonnyuGeneralIME项目文件夹平行位置，然后运行：
 
+```
+python3 tools/dict_studio
+```
 
-## 添加词条
+如果python环境缺失，请向LLM或者互联网寻求帮助。
 
-## 词条修改
+## 检索
+
+## 添加与修改字词
+
+## 字管理
 
 ## 音系管理
-
-
 
 ## 联系方法
 
