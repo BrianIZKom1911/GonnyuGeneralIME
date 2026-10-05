@@ -2,7 +2,7 @@
 
 > 一种属于赣鄱大地的数字化书写方案。
 
-目前支持：**南昌话(Lancong)、分宜话(Fenni)、丰城话(Fungcen)、黎川话（Tiqien）、新余话（Sinyi）、上高话（Songau）、宿松话（Seusong）、吉安话（Jingon）、弋阳话-横峰话（Yikyan-Henfeng）**，更多地区等你来接入！
+目前支持：**南昌话(Lancong)、分宜话(Fenni)、丰城话(Fungcen)、黎川话（Tiqien）、新余话（Sinyi）、上高话（Songau）、宿松话（Seusong）、吉安话（Jingon）、弋阳话-横峰话（Yikyan-Henfeng）**，更多地区等你来接入，已有地区也等你来增补！
 
 [![参与共建 · 贡献指南](https://img.shields.io/badge/%E5%8F%82%E4%B8%8E%E5%85%B1%E5%BB%BA-%E8%B4%A1%E7%8C%AE%E6%8C%87%E5%8D%97-006d77?style=for-the-badge&logo=github&logoColor=white)](CONTRIBUTION.md)
 
