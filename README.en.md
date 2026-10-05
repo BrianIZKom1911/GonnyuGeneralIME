@@ -551,6 +551,8 @@ The mobile input engine directly uses the following open-source projects. Exact 
 1. RIME Developers. **librime** `1.17.0`, BSD 3-Clause License. <https://github.com/rime/librime>
 2. librime-lua Developers. **librime-lua** commit `ad1e4a6c98abf634dd34242a747f9b1d5d069fbe`, BSD 3-Clause License. <https://github.com/hchunhui/librime-lua>
 
+The project references the [open-source version of Hamster](https://github.com/imfuxiao/Hamster) by xiao.fu (imfuxiao), licensed under the [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt). Copyright (c) 2025 xiao.fu.
+
 ### Licensing and rights reservation
 
 The main project code is licensed under the GNU GPLv3; see `LICENSE` for details.
@@ -560,8 +562,6 @@ and other rights are reserved by their respective rights holder. Use of the name
 derivative projects, redistributions, or commercial promotion requires permission.
 
 Copyright in the project documentation belongs to the rights holder, with all rights reserved. Verbatim republication is permitted with attribution to the author and project.
-
-The project references the [open-source version of Hamster](https://github.com/imfuxiao/Hamster) by xiao.fu (imfuxiao), licensed under the [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt). Copyright (c) 2025 xiao.fu.
 
 ### Acknowledgements
 

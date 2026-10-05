@@ -551,6 +551,8 @@ Windows 小狼毫将压缩包内容复制到 `%APPDATA%\Rime`，在输入法菜�
 1. RIME Developers. **librime**，版本 `1.17.0`，BSD 3-Clause License。<https://github.com/rime/librime>
 2. librime-lua Developers. **librime-lua**，固定提交 `ad1e4a6c98abf634dd34242a747f9b1d5d069fbe`，BSD 3-Clause License。<https://github.com/hchunhui/librime-lua>
 
+本项目参考了 xiao.fu（imfuxiao）的[仓输入法（Hamster）开源版本](https://github.com/imfuxiao/Hamster)。该开源版本采用 [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt)，版权声明为 Copyright (c) 2025 xiao.fu。
+
 ### 许可与权利保留
 
 本项目主体代码采用 GNU GPLv3 发布，具体以仓库中的 `LICENSE` 为准。但以下内容除外：
@@ -560,8 +562,6 @@ Windows 小狼毫将压缩包内容复制到 `%APPDATA%\Rime`，在输入法菜�
 未经权利人许可，不得将上述名称或图片用于衍生项目、重新发布或商业宣传。
 
 项目文档项目文档的著作权归权利人所有，保留全部权利。允许原文转载，转载时请注明作者及项目来源。
-
-本项目参考了 xiao.fu（imfuxiao）的[仓输入法（Hamster）开源版本](https://github.com/imfuxiao/Hamster)。该开源版本采用 [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt)，版权声明为 Copyright (c) 2025 xiao.fu。
 
 ### 致谢
 
