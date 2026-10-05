@@ -14,7 +14,6 @@ common	rime	iong	yong	iuŋ	用	syllable-final	false	false	primary	iong	iong→yo
 common	rime	u	wu	u	乌	syllable-final	false	false	primary	u	单写 u→wu
 common	rime	ui	wi	ui	为	syllable-final	false	false	primary	ui	单写 ui→wi
 common	rime	ung	wung	uŋ	翁	syllable-final	false	false	primary	ung	零声母 ung→wung，与 ueng→weng 区分
-common	rime	wng	wung	uŋ	翁	syllable-final	false	false	primary	wng	零声母 wng 旧写兼容 wung
 common	rime	uei	wei	uei	为	syllable-final	false	false	primary	uei	零声母 uei→wei；e 可单向匹配 ê，覆盖 wêi
 common	rime	uei	wêi	uɛi	为	syllable-final	false	false	primary	uei	零声母 uei 输入单向兼容 wêi；独立于 ui→wi
 common	rime	uêi	wêi	uɛi	为	syllable-final	false	true	primary	uêi	零声母 uêi→wêi，独立于 ui→wi
@@ -39,12 +38,12 @@ common	rime	iau	yeu	iɛu	妖	syllable-final	false	false	primary	iau	零声母 ia
 common	rime	yao	yeu	iɛu	妖	syllable-final	false	false	primary	yao	普通话拼音习惯输入
 common	rime	ao	au	au	抱	syllable-final	true	true	primary		旧 ao 写法兼容
 common	rime	ou	eu	ɛu	后	syllable-final	false	false	primary	cou,dou,fou,gou,hou,jou,kou,lou,mou,ngou,pou,sou,tou,you,zou	普通话 ou 输入兼容规范 eu
-common	rime	ion	on	on	专	syllable-final	false	false	secondary		旧 i 介音兼容写法
-common	rime	ioin	on	on	专	syllable-final	false	false	secondary		旧写法向后兼容
-common	rime	nyoin	on	on	袁	syllable-final	false	false	secondary		允许 nyoin / ioin 相混
-common	rime	uoin	won	uon	碗	syllable-final	false	false	secondary	uoin	零声母旧写向后兼容
 common	rime	yoin	yuon	yon	袁	syllable-final	false	false	secondary	yoin	零声母旧写向后兼容
-common	coda	n	ng	ŋ	牙	syllable-final	true	true	primary		音节尾
+yikyan-henfeng	rime	on	ong			syllable-final	false	true	primary		
+yikyan-henfeng	rime	en	eng			syllable-final	false	true	primary		
+yikyan-henfeng	rime	uon	uong			syllable-final	false	true	primary		
+common	rime	yun	yung			syllable-final	false	true	primary		
+common	rime	yueng	yuen			syllable-final	false	true	primary		
 lancong	coda		t		客	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带尾（za→zat）
 lancong	coda		k		学	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带 k 形式（lok）
 lancong	coda	t	k		客/学	syllable-final	true	false	secondary		入声尾互相模糊
@@ -90,9 +89,4 @@ common	rime	iun	yun	iun		syllable-final	false	false	primary	iun	零声母 iu 系
 common	rime	iuk	yuk	iuʔ		syllable-final	false	false	primary	iuk	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
 common	rime	iuek	yuek	iuəʔ		syllable-final	false	false	primary	iuek	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
 common	rime	iuok	yuok	iuɔʔ		syllable-final	false	false	primary	iuok	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
-common	rime	yiung	yung			syllable-final	false	false	primary	yiung	兼容带韵尾的旧 yiu 系拼写
-common	rime	yiun	yun			syllable-final	false	false	primary	yiun	兼容带韵尾的旧 yiu 系拼写
-common	rime	yiuk	yuk			syllable-final	false	false	primary	yiuk	兼容带韵尾的旧 yiu 系拼写
-common	rime	yiuek	yuek			syllable-final	false	false	primary	yiuek	兼容带韵尾的旧 yiu 系拼写
-common	rime	yiuok	yuok			syllable-final	false	false	primary	yiuok	兼容带韵尾的旧 yiu 系拼写
 yikyan-henfeng	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式

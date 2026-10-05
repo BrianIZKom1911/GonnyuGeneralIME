@@ -202,15 +202,13 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | k | [kʰ] | - | - | - | - | - | - | - |  |  |
 | ng | [ŋ] | - | - | - | - | - | - | - | - | Velar nasal; example: 五 ng3. |
 | h | [h] | [x] | - | [x] | [x] | [x] | [x] | [x] | — | The default [h] is articulated farther back than Mandarin h. |
-| v | - | [v] | [v] | - | [v] | - | - | - |  |  |
+| v | - | [v] | [v] | - | [v] | - | - | - | w, wu (at the start of a syllable, one-way) |  |
 | ch | - | - | - | - | - | [tʂʰ] | - | - |  |  |
 | r | - | - | - | - | - | [ʐ] | - | - |  |  |
 | sh | - | - | - | - | - | [ʂ] | - | - |  |  |
 | zh | - | - | - | - | - | [tʂ] | - | - |  |  |
 
 ### Finals
-
-Syllable-final `-n` and `-ng` match in both directions in every region.
 
 Checked-tone codas follow these spelling and input rules.
 
@@ -244,8 +242,8 @@ Checked-tone codas follow these spelling and input rules.
 | on | [on] | - | [ɔn] | [ɔn] | [ɔn] | - | [ɔn] | - | — |  |
 | en | [ɛn]  or  [ɨn] | [ən] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | — |  |
 | ang | [ɑŋ] | - | [aŋ] | [aŋ] | - | - | - | - | — |  |
-| ong | [ɔŋ] | [oŋ] | - | [oŋ] | - | [oŋ] | - | - | on | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | [əŋ] | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | en | Most speakers no longer distinguish en and eng in Yikyan. |
+| ong | [ɔŋ] | [oŋ] | - | [oŋ] | - | [oŋ] | - | - | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
+| eng | - | [əŋ] | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | [æt] | - | - | [æt] | - | - | - | — |  |
 | at | [at] | - | - | - | - | - | - | - | — |  |
 | ot | [ot] | - | - | - | [ɔt] | - | - | - | — |  |
@@ -294,7 +292,7 @@ With no initial consonant:
 | ian | - | [ian] | - | [ian] | [ian] | - | - | [ian] | - |  |
 | iaen | - | - | - | - | [iæn] | - | - | - |  |  |
 | ion | - | - | - | [ion] or [iɔn] | [iɔn] | - | - | - |  |  |
-| ien | [iɛn] | - | - | [ien] | - | - | - | [ien] | - |  |
+| ien | [iɛn] | - | - | [ien] | - | - | - | [ien] | en (after g, k, ng) |  |
 | iun | - | - | - | [iun] | - | - | - | - | - |  |
 | ing | - | [iŋ] | [iŋ] | - | - | - | - | - | - |  |
 | iang | [iɑŋ] | - | [iaŋ] | [iaŋ] | - | - | - | - | - |  |
@@ -302,7 +300,7 @@ With no initial consonant:
 | iung | [iuŋ] | - | - | - | - | - | - | - | - |  |
 | it | [it] | - | - | - | - | - | - | - | — |  |
 | iat | - | [iat] | - | - | - | - | - | - | - |  |
-| iet | [iet] | [iɛt] | - | - | [iɛt] | - | - | - | - |  |
+| iet | [iet] | [iɛt] | - | - | [iɛt] | - | - | - | et (after ng) |  |
 | ip | - | [ip] | [ip] | - | - | - | - | - | - |  |
 | iap | - | [iap] | [iap] | - | - | - | - | - | - |  |
 | iep | - | [iɛp] | - | - | - | - | - | - | — |  |
@@ -344,7 +342,7 @@ With no initial consonant:
 | uien | - | [uiɛn] | - | - | - | - | - | - | - |  |
 | ung | [uŋ] | - | - | - | - | - | - | - | — |  |
 | uang | [uɑŋ] | - | [uaŋ] | [uaŋ] | - | - | - | - | - |  |
-| uong | [uɔŋ] | [uoŋ] | - | [uoŋ] | - | - | - | - | uon |  |
+| uong | [uɔŋ] | [uoŋ] | - | [uoŋ] | - | - | - | - | uon (Yikyan) |  |
 | ut | [ut] | - | - | - | - | - | - | - | - |  |
 | uat | [uat] | - | - | - | - | - | - | - | - |  |
 | uaet | - | [uæt] | - | - | - | - | - | - | - |  |
@@ -385,7 +383,7 @@ With no initial consonant:
 | yung | - | [yŋ] | - | - | - | - | - | [yn] | yun |  |
 | yuong | - | - | - | - | - | - | - | [yɔŋ] |  |  |
 | yut | [yt] | - | - | - | - | - | - | - | - |  |
-| yuot | [yot] | - | - | - | - | - | - | - | yue, yuet |  |
+| yuot | [yot] | - | - | - | - | - | - | - | yue, yuet, yuek |  |
 | yuet | - | [yet] | - | - | - | - | - | - | - |  |
 | yuk | - | [yʔ] | [yʔ] | - | - | - | - | - | - |  |
 | yuak | - | - | - | - | - | - | - | [yaʔ] | - |  |
