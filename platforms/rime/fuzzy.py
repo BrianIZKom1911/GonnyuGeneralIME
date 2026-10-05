@@ -57,10 +57,14 @@ def load_rules(path: Path, region: str | None = None) -> list[FuzzyRule]:
     return rules
 
 
-def substitute(text: str, source: str, target: str, applies: str) -> list[str]:
+def substitute(
+    text: str, source: str, target: str, applies: str, initials: tuple[str, ...] = ()
+) -> list[str]:
     if applies == "syllable-initial":
         return [target + text[len(source) :]] if text.startswith(source) else []
     if applies == "syllable-final":
+        if source == "o" and target == "eo" and text != source:
+            return []
         if source == "eu" and target == "ieu" and text.endswith("ieu"):
             return []
         if not source:
@@ -79,7 +83,7 @@ def substitute(text: str, source: str, target: str, applies: str) -> list[str]:
     outputs = []
     start = 0
     while (position := text.find(source, start)) >= 0:
-        if source == "y" and target == "yu" and text[position + 1 :].startswith("u"):
+        if source == "u" and target == "yu" and text[:position] not in initials:
             start = position + len(source)
             continue
         outputs.append(text[:position] + target + text[position + len(source) :])
@@ -105,7 +109,7 @@ def normalize(value: str, rules: list[FuzzyRule], reverse: bool = False) -> dict
                 source, target = rule.target, rule.source
             else:
                 source, target = rule.source, rule.target
-            for candidate in substitute(base, source, target, rule.applies):
+            for candidate in substitute(base, source, target, rule.applies, rule.starts_with):
                 if candidate in produced:
                     continue
                 produced.add(candidate)
@@ -129,7 +133,7 @@ def inverse_candidates(value: str, rules: list[FuzzyRule]) -> set[str]:
             if rule.bidirectional:
                 directions.append((rule.source, rule.target))
             for source, target in directions:
-                for candidate in substitute(base, source, target, rule.applies):
+                for candidate in substitute(base, source, target, rule.applies, rule.starts_with):
                     if candidate in outputs:
                         continue
                     outputs.add(candidate)

@@ -65,9 +65,9 @@ else
 fi
 
 resource_rebuild=0
-if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$resource_manifest" || ! -d "$rime_resource_root/shared" || ! -d "$rime_resource_root/prebuilt" ]]; then
+if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$resource_manifest" || ! -d "$rime_resource_root/shared" || ! -d "$rime_resource_root/prebuilt" || ! -f "$rime_resource_root/shared/lua/gannyu_data_lifecycle.lua" ]]; then
   resource_rebuild=1
-elif find "$repo_root/resources" "$repo_root/platforms/rime/mobile" -type f -newer "$resource_manifest" -print -quit | grep -q .; then
+elif find "$repo_root/resources" "$repo_root/platforms/rime" -type f -newer "$resource_manifest" -print -quit | grep -q .; then
   resource_rebuild=1
 fi
 if [[ "$resource_rebuild" == "1" ]]; then

@@ -625,6 +625,7 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
         single_character_frequencies,
     )
     for name in (
+        "gannyu_data_lifecycle.lua",
         "gannyu_annotation_filter.lua",
         "gannyu_single_char_filter.lua",
         "gannyu_relation_filter.lua",

@@ -302,7 +302,9 @@ impl FuzzyMap {
                 let substituted = match entry.applies {
                     FuzzyApplies::SyllableInitial => substitute_initial(&base.text, from, to),
                     FuzzyApplies::SyllableFinal => substitute_final(&base.text, from, to),
-                    FuzzyApplies::Anywhere => substitute_any(&base.text, from, to),
+                    FuzzyApplies::Anywhere => {
+                        substitute_any(&base.text, from, to, &entry.starts_with)
+                    }
                 };
                 for candidate in substituted {
                     if produced.contains(&candidate) || outputs.len() >= MAX_OUTPUTS {
@@ -385,7 +387,7 @@ fn strip_tone(input: &str) -> StrippedSyllable {
     }
 }
 
-fn substitute_any(text: &str, from: &str, to: &str) -> Vec<String> {
+fn substitute_any(text: &str, from: &str, to: &str, initials: &[String]) -> Vec<String> {
     if from.is_empty() || !text.contains(from) {
         return Vec::new();
     }
@@ -393,12 +395,10 @@ fn substitute_any(text: &str, from: &str, to: &str) -> Vec<String> {
     let mut start = 0;
     while let Some(position) = text[start..].find(from) {
         let absolute = start + position;
-        if from == "y" && to == "yu" {
-            let suffix = &text[absolute + from.len()..];
-            if suffix.starts_with('u') {
-                start = absolute + from.len();
-                continue;
-            }
+        if from == "u" && to == "yu" && !initials.iter().any(|initial| text[..absolute] == *initial)
+        {
+            start = absolute + from.len();
+            continue;
         }
         let mut next = String::with_capacity(text.len() + to.len());
         next.push_str(&text[..absolute]);
@@ -421,6 +421,9 @@ fn substitute_initial(text: &str, from: &str, to: &str) -> Vec<String> {
 }
 
 fn substitute_final(text: &str, from: &str, to: &str) -> Vec<String> {
+    if from == "o" && to == "eo" && text != from {
+        return Vec::new();
+    }
     if from == "eu" && to == "ieu" && text.ends_with("ieu") {
         return Vec::new();
     }

@@ -24,6 +24,15 @@ endif()
 option(GANNYU_RIME_BUILD_PROBES "Build host-only Rime adapter probes" ON)
 
 if(GANNYU_RIME_BUILD_PROBES)
+  find_package(Threads REQUIRED)
+  enable_testing()
+  add_executable(gannyu_rime_snapshot_probe rime_snapshot_probe.cpp)
+  target_include_directories(gannyu_rime_snapshot_probe PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../../crates/ffi/include"
+    "${RIME_INCLUDE_DIR}")
+  target_link_libraries(gannyu_rime_snapshot_probe PRIVATE Threads::Threads)
+  add_test(NAME rime_snapshot_equivalence COMMAND gannyu_rime_snapshot_probe)
+
   add_executable(gannyu_rime_engine_probe rime_engine_probe.cpp)
   target_link_libraries(gannyu_rime_engine_probe PRIVATE gannyu_rime_engine)
 

@@ -1,12 +1,6 @@
 region	category	gon_fuzzy	gon_pin	ipa	example	applies	bidirectional	chainable	priority_tier	starts_with	note
 common	onset	i	y	i	也	syllable-initial	false	false	primary	ia,ie,io	零声母 i 系旧写兼容；ia→ya、ieu→yeu、ion→yon、iou→you
 common	onset	u	w	u	乌	syllable-initial	false	false	primary	ua,ue,uo	零声母 u 系旧写兼容；ua→wa、uen→wen、uon→won
-common	rime	y	yu	y	与	syllable-final	false	false	primary	y	零声母 y→yu
-common	rime	yn	yun	yən	云	syllable-final	false	false	primary	yn	零声母 yn→yun
-common	rime	yng	yung	yəŋ	雍	syllable-final	false	false	primary	yng	零声母 yng→yung
-common	rime	yon	yuon	yon	袁	syllable-final	false	false	primary	yon	零声母 yon→yuon
-common	rime	ye	yue	ye	月	anywhere	false	true	primary	ye,jye,lye,nye,qye,xye	ye 系专用桥接，须先于通用 y→yu
-common	nucleus	y	yu	y	女	anywhere	false	false	primary	by,cy,dy,fy,gy,hy,jy,ky,ly,my,ngy,ny,py,qy,ry,sy,ty,xy,zy	带声母 y 系统一在 y 后补 u
 common	rime	i	yi	i	一	syllable-final	false	false	primary	i	单写 i→yi
 common	rime	in	yin	ɪŋ	因	syllable-final	false	false	primary	in	单写 in→yin
 common	rime	iu	yiu	iu	有	syllable-final	false	false	primary	iu	单写 iu→yiu
@@ -32,8 +26,7 @@ common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon �
 common	rime	yan	yen	ian	烟	syllable-final	false	false	primary	yan	仅保留输入 yan→yen 的模糊，不改写现有 yan
 common	rime	i	ï	ɿ		anywhere	false	false	primary		i 可单向模糊匹配 ï
 common	rime	e	ê	ɛ	额	anywhere	false	false	primary		e 可单向模糊匹配 ê
-common	rime	o	eo	ɵ	儿	anywhere	false	false	primary		
-common	rime	e	eo	ɵ	儿	anywhere	false	false	primary		
+common	rime	o	eo	ɵ	儿	syllable-final	false	false	primary	o	独立音节 o 单向兼容 eo
 common	rime	eu	ieu	iɛu	够	syllable-final	false	true	secondary	ng,g,k	g/k/ng 后可省略 i
 common	rime	iau	yeu	iɛu	妖	syllable-final	false	false	primary	iau	零声母 iau→yeu
 common	rime	yao	yeu	iɛu	妖	syllable-final	false	false	primary	yao	普通话拼音习惯输入
@@ -67,7 +60,7 @@ common	rime	suon	son		算	syllable-final	false	true	primary
 common	onset	siu	seu		兽	syllable-final	false	false	primary		
 common	rime	en	ien			syllable-final	false	false	primary	ng,k,g	
 common	rime	et	iet		额	syllable-final	false	false	primary	ng	
-common	rime	u	yu	y	与	anywhere	false	false	secondary		yu 可从 u 输入，涵盖 uon→yuon、uot→yuot 等
+common	rime	u	yu	y	与	anywhere	false	false	secondary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	yu 可从声母后的 u 输入，且 u 不接在 y 后
 tiqien	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 tiqien	coda		p			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 tiqien	coda	k	p			syllable-final	true	false	secondary		自动生成：完整音系检测到两种入声韵尾，允许互相模糊

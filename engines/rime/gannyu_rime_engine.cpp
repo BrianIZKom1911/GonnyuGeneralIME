@@ -158,7 +158,14 @@ Runtime& GlobalRuntime() {
   return runtime;
 }
 
-bool EnsureRuntime(const char* shared_data_dir, const char* prebuilt_data_dir, const char* user_data_dir) {
+void FinalizeUnusedRuntimeLocked(Runtime& runtime) {
+  if (runtime.handles.empty() && runtime.initialized && runtime.api != nullptr) {
+    runtime.api->finalize();
+    runtime.initialized = false;
+  }
+}
+
+bool EnsureRuntimeLocked(const char* shared_data_dir, const char* prebuilt_data_dir, const char* user_data_dir) {
   if (shared_data_dir == nullptr || *shared_data_dir == '\0' ||
       prebuilt_data_dir == nullptr || *prebuilt_data_dir == '\0' ||
       user_data_dir == nullptr || *user_data_dir == '\0') {
@@ -166,7 +173,6 @@ bool EnsureRuntime(const char* shared_data_dir, const char* prebuilt_data_dir, c
     return false;
   }
   Runtime& runtime = GlobalRuntime();
-  std::lock_guard<std::mutex> lock(runtime.mutex);
   if (runtime.setup) {
     if (runtime.shared_data_dir != shared_data_dir ||
         runtime.prebuilt_data_dir != prebuilt_data_dir ||
@@ -254,22 +260,40 @@ std::string Snapshot(GannyuPipelineHandle* handle, bool handled, const std::opti
   if (commit.has_value() && !commit->empty()) output << ",\"commitText\":\"" << JsonEscape(*commit) << "\"";
   output << ",\"candidates\":[";
   bool first_candidate = true;
+  auto append_candidate = [&](const RimeCandidate& candidate, int index) {
+    if (!first_candidate) output << ',';
+    first_candidate = false;
+    output << "{\"text\":\"" << JsonEscape(candidate.text) << "\"";
+    if (candidate.comment != nullptr && candidate.comment[0] != '\0') output << ",\"annotation\":\"" << JsonEscape(candidate.comment) << "\"";
+    output << ",\"globalIndex\":" << index;
+    output << ",\"pageIndex\":" << index << ",\"deletable\":false}";
+  };
   auto append_context_candidates = [&] {
     if (!has_context) return;
     for (int index = 0; index < context.menu.num_candidates &&
          (handle->candidate_limit == 0 || index + context.menu.page_no * context.menu.page_size < static_cast<int>(handle->candidate_limit)); ++index) {
-      if (!first_candidate) output << ',';
-      first_candidate = false;
-      const RimeCandidate& candidate = context.menu.candidates[index];
-      output << "{\"text\":\"" << JsonEscape(candidate.text) << "\"";
-      if (candidate.comment != nullptr && candidate.comment[0] != '\0') output << ",\"annotation\":\"" << JsonEscape(candidate.comment) << "\"";
-      output << ",\"globalIndex\":" << context.menu.page_no * context.menu.page_size + index;
-      output << ",\"pageIndex\":" << (context.menu.page_no * context.menu.page_size + index) << ",\"deletable\":false}";
+      append_candidate(context.menu.candidates[index], context.menu.page_no * context.menu.page_size + index);
     }
   };
+  bool iterated_candidates = false;
+  if (handle->candidate_limit > 0 && has_context && context.menu.page_size > 0 &&
+      RIME_PROVIDED(Api(), candidate_list_from_index) &&
+      RIME_PROVIDED(Api(), candidate_list_next) && RIME_PROVIDED(Api(), candidate_list_end)) {
+    RimeCandidateListIterator iterator{};
+    const int start_index = context.menu.page_no * context.menu.page_size;
+    if (Api()->candidate_list_from_index(handle->session, &iterator, start_index)) {
+      auto end_iteration = [](RimeCandidateListIterator* value) { Api()->candidate_list_end(value); };
+      std::unique_ptr<RimeCandidateListIterator, decltype(end_iteration)> guard(&iterator, end_iteration);
+      iterated_candidates = true;
+      while (iterator.index + 1 < static_cast<int>(handle->candidate_limit) &&
+             Api()->candidate_list_next(&iterator)) {
+        append_candidate(iterator.candidate, iterator.index);
+      }
+    }
+  }
   const int original_page = has_context ? context.menu.page_no : 0;
-  append_context_candidates();
-  if (handle->candidate_limit > 0 && has_context) {
+  if (!iterated_candidates) append_context_candidates();
+  if (!iterated_candidates && handle->candidate_limit > 0 && has_context) {
     while (context.menu.page_size > 0 && !context.menu.is_last_page && context.menu.page_no * context.menu.page_size < static_cast<int>(handle->candidate_limit)) {
       const int previous_page = context.menu.page_no;
       Api()->free_context(&context);
@@ -325,17 +349,21 @@ int Create(const char* shared_data_dir,
   if (out_handle == nullptr) return kInvalidArgument;
   *out_handle = nullptr;
   const char* shared = ResolveSharedData(shared_data_dir);
-  if (!EnsureRuntime(shared, prebuilt_data_dir, user_data_dir)) return kLoadFailure;
   Runtime& runtime = GlobalRuntime();
   std::lock_guard<std::mutex> runtime_lock(runtime.mutex);
+  if (!EnsureRuntimeLocked(shared, prebuilt_data_dir, user_data_dir)) return kLoadFailure;
   auto handle = std::make_unique<GannyuPipelineHandle>();
   const std::string region = region_id && *region_id ? region_id : "lancong";
   handle->schema_id = "gannyu_" + region;
-  if (!StartSessionLocked(handle.get())) return kLoadFailure;
+  if (!StartSessionLocked(handle.get())) {
+    FinalizeUnusedRuntimeLocked(runtime);
+    return kLoadFailure;
+  }
   try {
     runtime.handles.push_back(handle.get());
   } catch (...) {
     StopSessionLocked(handle.get());
+    FinalizeUnusedRuntimeLocked(runtime);
     throw;
   }
   *out_handle = handle.release();
@@ -401,10 +429,7 @@ int gannyu_runtime_finalize(void) {
       SetError("destroy all Rime pipeline handles before finalizing the runtime");
       return kInvalidArgument;
     }
-    if (runtime.initialized && runtime.api != nullptr) {
-      runtime.api->finalize();
-      runtime.initialized = false;
-    }
+    FinalizeUnusedRuntimeLocked(runtime);
     return kOk;
   });
 }
@@ -575,6 +600,7 @@ void gannyu_pipeline_destroy(GannyuPipelineHandle* handle) {
     runtime.handles.erase(std::remove(runtime.handles.begin(), runtime.handles.end(), handle),
                           runtime.handles.end());
     delete handle;
+    FinalizeUnusedRuntimeLocked(runtime);
   } catch (...) {
   }
 }

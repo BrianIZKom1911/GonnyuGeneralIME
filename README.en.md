@@ -225,7 +225,7 @@ Checked-tone codas follow these spelling and input rules.
 | o | [o] | - | [ɔ] | - | - | - | [ɔ] | - | — |  |
 | oe | - | - | - | [ø] | - | - | [œ] or [ø] | - |  |  |
 | e* | [e] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | - | [ə] or [ɛ] | [ə] or [ɛ] or [ɯ] | — |  |
-| eo | [ɵ] | - | - | - | - | - | - | - | o, e (any position, one-way) |  |
+| eo | [ɵ] | - | - | - | - | - | - | - | o (standalone syllable, one-way) |  |
 | ai | [ai] | - | - | - | - | - | - | - | — |  |
 | oi | [oi] | - | [ɔi] | [ɔi] | [ɔi] | - | [ɔi] | - | — |  |
 | ei | [ei] or [ɨi] | [ɛi] | [ɛi] | [əi] | - | - | - | - | — | In Nanchang, [ei] occurs only in contracted pronunciations. |
@@ -250,18 +250,18 @@ Checked-tone codas follow these spelling and input rules.
 | ot | [ot] | - | - | [ɔt] | [ɔt] | - | - | - | — |  |
 | oet | - | - | - | [øt] | - | - | - | - | — |  |
 | et | [ɛt]  or  [ɨt] | - | - | [ət] | - | - | - | - | — |  |
-| eot | - | [ɵt] | - | [ɵt] | - | - | - | - | ot, et |  |
+| eot | - | [ɵt] | - | [ɵt] | - | - | - | - | — |  |
 | ait | - | - | - | [ait] | - | - | - | - | — |  |
 | ap | - | [ap] | [ap] | - | - | - | - | - | — |  |
 | aep | - | [æp] | - | - | - | - | - | - | — |  |
 | op | - | - | [ɔp] | - | - | - | - | - | — |  |
 | ep | - | - | [ɛp] | - | - | - | - | - | - |  |
-| eop | - | [ɵp] | - | - | - | - | - | - | op, ep |  |
+| eop | - | [ɵp] | - | - | - | - | - | - | — |  |
 | ak | [aʔ] | - | - | - | - | - | - | - | — |  |
 | aek | - | [æʔ] or [æk] | - | - | [æʔ] | - | - | - | — |  |
 | ok | [ɔʔ] | [oʔ] | - | [oʔ] | - | - | - | - | — |  |
 | ek | - | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | - | - | [ɛʔ] or [ɤʔ] or [ɪʔ] | — | [ɤʔ] can be written ek or uk. |
-| eok | - | [ɵʔ] | - | - | - | - | - | - | ok, ek |  |
+| eok | - | [ɵʔ] | - | - | - | - | - | - | — |  |
 | aik | - | - | [aiʔ] | [aiʔ] | - | - | - | - | - |  |
 | oik | - | - | [ɔiʔ] | - | - | - | - | - | - |  |
 | euk | - | - | - | [ɪuʔ] | - | - | - | - | — |  |
@@ -379,9 +379,9 @@ With no initial consonant:
 
 | gon-pin | Default IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Jingon IPA | Yikyan-Henfeng IPA | Accepted alternative input | Notes |
 | --- | --- | --- | ------- | ------- | ------- | ------- | ------- | ------- | --- | --- |
-| yu | [y] | - | - | - | - | - | - | - | v (after an initial only), y, u |  |
+| yu | [y] | - | - | - | - | - | - | - | v (after an initial only), u (after an initial only, never immediately after y) |  |
 | yue | [ye] | - | - | - | - | - | [yɛ] | [yɛ] | - |  |
-| yueo | - | [yɵ] | - | - | - | - | - | - | yue |  |
+| yueo | - | [yɵ] | - | - | - | - | - | - | — |  |
 | yuon | [yon] | - | - | - | - | - | [yɔn] | - | yoin (without an initial), yuen |  |
 | yuen | - | - | - | - | - | - | [yɛn] | [yɛn] or [yɛŋ] | yueng |  |
 | yun | [yn] | - | - | - | - | - | - | - | — |  |
@@ -394,7 +394,7 @@ With no initial consonant:
 | yuak | - | - | - | - | - | - | - | [yaʔ] | - |  |
 | yuok | - | - | - | - | - | - | - | [yɔʔ] | - |  |
 | yuek | - | - | - | - | - | - | - | [yəʔ] or [yɛʔ] or [yɪʔ] | — |  |
-| yueok | - | [yɵʔ] | - | - | - | - | - | - | yuek |  |
+| yueok | - | [yɵʔ] | - | - | - | - | - | - | — |  |
 | yuk | - | [yʔ] | [yʔ] | - | - | - | - | - | - |  |
 
 #### Syllabic laterals and nasals

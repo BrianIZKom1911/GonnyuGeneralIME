@@ -94,13 +94,12 @@ def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     assert "    - derive/^Ggui$/Fguêi/" in algebra
 
 
-def test_eo_accepts_o_and_e_at_any_position_one_way() -> None:
+def test_eo_accepts_only_standalone_o_one_way() -> None:
     for region in ("lancong", "fenni", "fungcen", "tiqien", "sinyi", "songau", "seusong", "jingon", "yikyan-henfeng"):
         rules = load_rules(RULES_PATH, region)
-        for source, target in (("o", "eo"), ("e", "eo"), ("got", "geot"), ("get", "geot"),
-                               ("gop", "geop"), ("gep", "geop"), ("gok", "geok"), ("gek", "geok"),
-                               ("yue", "yueo"), ("yuek", "yueok")):
-            assert target in normalize(source, rules), (region, source, target)
+        assert "eo" in normalize("o6", rules)
+        for source, target in (("e", "eo"), ("go", "geo"), ("oo", "oeo"), ("ot", "eot"), ("et", "eot"), ("got", "geot"), ("get", "geot"), ("gop", "geop"), ("gep", "geop"), ("gok", "geok"), ("gek", "geok"), ("yue", "yueo"), ("yuek", "yueok")):
+            assert target not in normalize(source, rules), (region, source, target)
         for reverse in (False, True):
             forms = normalize("eo", rules, reverse=reverse)
             assert "o" not in forms and "e" not in forms
@@ -109,9 +108,10 @@ def test_eo_accepts_o_and_e_at_any_position_one_way() -> None:
                 assert normalize(source, rules, reverse=reverse) == {source: 0}
         algebra = compile_algebra({"eo", "geot", "yueok"}, rules)
         assert "    - derive/^Gyueok$/Fyuok/" not in algebra
-        for target, source in (("eo", "o"), ("eo", "e"), ("geot", "got"), ("geot", "get"),
+        assert "    - derive/^Geo$/Fo/" in algebra
+        for target, source in (("eo", "e"), ("geot", "got"), ("geot", "get"),
                                ("yueok", "yuek")):
-            assert f"    - derive/^G{target}$/F{source}/" in algebra
+            assert f"    - derive/^G{target}$/F{source}/" not in algebra
 
 
 def test_open_e_input_matches_circumflex_one_way() -> None:
@@ -142,6 +142,7 @@ def test_zero_initial_iu_input_keeps_yiu_distinct_from_yu() -> None:
 
 def test_builds_rime_dictionary_annotations_and_relations(tmp_path: Path) -> None:
     counts = build("lancong", tmp_path)
+    assert (tmp_path / "lua/gannyu_data_lifecycle.lua").is_file()
 
     dictionary = (tmp_path / "gannyu_lancong.dict.yaml").read_text(encoding="utf-8")
     data = (tmp_path / "lua" / "gannyu_lancong_data.lua").read_text(encoding="utf-8")
@@ -423,7 +424,7 @@ def test_fuzzy_rules_keep_core_directions_and_non_chainable_boundary() -> None:
 
 def test_yuo_family_accepts_all_supported_mandarin_style_spellings() -> None:
     rules = load_rules(RULES_PATH)
-    variants = ("yue", "ue", "ve", "ye")
+    variants = ("yue", "ue", "ve")
 
     for onset in ("", "j", "n", "q", "x"):
         expected = f"{onset}yuon"
@@ -474,7 +475,7 @@ def test_algebra_is_explicit_and_scoped_to_gan_syllables() -> None:
     assert "    - fuzz/^Gnit$/Fni/" in algebra
     assert "    - fuzz/^Gnik$/Fni/" in algebra
     assert "    - fuzz/^Gnit$/Fnik/" in algebra
-    assert "    - derive/^Gyuon$/Fyon/" in algebra
+    assert "    - derive/^Gyuon$/Fyon/" not in algebra
     assert not any(rule.startswith("    - ") and "Fion/" in rule for rule in algebra)
     assert all("^M" not in rule for rule in algebra)
     assert algebra[-3:] == [
@@ -530,3 +531,22 @@ def test_apical_i_rule_preserves_literal_spelling_and_is_one_way() -> None:
     algebra = compile_algebra({"sï", "sïk"}, rules)
     assert "    - derive/^Gsï$/Fsi/" in algebra
     assert "    - derive/^Gsïk$/Fsik/" in algebra
+
+
+def test_u_to_yu_requires_an_immediately_preceding_initial() -> None:
+    rules = load_rules(RULES_PATH)
+    for initial in ("b", "p", "m", "f", "v", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "r", "z", "c", "s", "ng", "zh", "ch", "sh"):
+        for ending in ("u", "un", "ung", "uon", "uot"):
+            assert f"{initial}y{ending}" in normalize(f"{initial}{ending}", rules)
+    for source, forbidden in (("u", "yu"), ("un", "yun"), ("wu", "wyu"), ("yu", "yyu"), ("nyu", "nyyu"), ("yuu", "yuyu"), ("nuu", "nuyu"), ("nau", "nayu")):
+        assert forbidden not in normalize(source, rules)
+
+
+def test_y_to_yu_expansions_are_removed() -> None:
+    rules = load_rules(RULES_PATH)
+    for initial in ("", "b", "n", "ng", "j", "q", "x", "zh"):
+        for ending in ("y", "yn", "yng", "yon", "ye", "yen", "yet", "yek"):
+            assert not any(output.startswith(f"{initial}yu") for output in normalize(f"{initial}{ending}", rules))
+    algebra = compile_algebra({"yu", "yun", "yung", "yuon", "yue", "nyu"}, rules)
+    for source, target in (("y", "yu"), ("yn", "yun"), ("yng", "yung"), ("yon", "yuon"), ("ye", "yue"), ("ny", "nyu")):
+        assert f"    - derive/^G{target}$/F{source}/" not in algebra

@@ -49,25 +49,32 @@ fn zero_initial_ui_compatibility_preserves_onset_ui() {
 }
 
 #[test]
-fn eo_accepts_o_and_e_at_any_position_one_way() {
+fn eo_accepts_only_standalone_o_one_way() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    for (input, expected) in [
-        ("o6", "eo"),
-        ("e6", "eo"),
-        ("got6", "geot"),
-        ("get6", "geot"),
-        ("gop6", "geop"),
-        ("gep6", "geop"),
-        ("gok6", "geok"),
-        ("gek6", "geok"),
-        ("yue6", "yueo"),
-        ("yuek6", "yueok"),
+    assert!(map
+        .normalize("o6", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "eo" && item.tone == Some(6)));
+    for (input, forbidden) in [
+        ("e", "eo"),
+        ("go", "geo"),
+        ("oo", "oeo"),
+        ("ot", "eot"),
+        ("et", "eot"),
+        ("got", "geot"),
+        ("get", "geot"),
+        ("gop", "geop"),
+        ("gep", "geop"),
+        ("gok", "geok"),
+        ("gek", "geok"),
+        ("yue", "yueo"),
+        ("yuek", "yueok"),
     ] {
         assert!(
-            map.normalize(input, SyllableScheme::GonPin)
+            !map.normalize(input, SyllableScheme::GonPin)
                 .iter()
-                .any(|item| item.text == expected && item.tone == Some(6)),
-            "{input} → {expected}"
+                .any(|item| item.text == forbidden),
+            "{input}"
         );
     }
     for input in [
@@ -253,7 +260,7 @@ fn yu_normalizes_to_yu() {
 #[test]
 fn yu_v_w_fuzzy_rules_are_one_way_and_onset_scoped() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
-    assert!(map
+    assert!(!map
         .normalize("u", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "yu"));
@@ -422,7 +429,7 @@ fn gkng_eu_rule_is_prefix_scoped() {
 #[test]
 fn yuo_family_accepts_all_supported_mandarin_style_spellings() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
-    let variants = ["yue", "ue", "ve", "ye"];
+    let variants = ["yue", "ue", "ve"];
 
     for onset in ["", "j", "n", "q", "x"] {
         let expected = format!("{onset}yuon");
@@ -572,6 +579,60 @@ fn apical_i_input_matches_diaeresis_one_way() {
                 .normalize(marked, scheme)
                 .iter()
                 .any(|item| item.text == plain));
+        }
+    }
+}
+
+#[test]
+fn u_to_yu_requires_an_immediately_preceding_initial() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
+    for initial in [
+        "b", "p", "m", "f", "v", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "r", "z", "c",
+        "s", "ng", "zh", "ch", "sh",
+    ] {
+        for ending in ["u", "un", "ung", "uon", "uot"] {
+            let input = format!("{initial}{ending}");
+            let expected = format!("{initial}y{ending}");
+            assert!(
+                map.normalize(&input, SyllableScheme::GonPin)
+                    .iter()
+                    .any(|item| item.text == expected),
+                "{input}"
+            );
+        }
+    }
+    for (input, forbidden) in [
+        ("u", "yu"),
+        ("un", "yun"),
+        ("wu", "wyu"),
+        ("yu", "yyu"),
+        ("nyu", "nyyu"),
+        ("yuu", "yuyu"),
+        ("nuu", "nuyu"),
+        ("nau", "nayu"),
+    ] {
+        assert!(
+            !map.normalize(input, SyllableScheme::GonPin)
+                .iter()
+                .any(|item| item.text == forbidden),
+            "{input}"
+        );
+    }
+}
+
+#[test]
+fn y_to_yu_expansions_are_removed() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
+    for initial in ["", "b", "n", "ng", "j", "q", "x", "zh"] {
+        for ending in ["y", "yn", "yng", "yon", "ye", "yen", "yet", "yek"] {
+            let input = format!("{initial}{ending}");
+            let forbidden_prefix = format!("{initial}yu");
+            assert!(
+                !map.normalize(&input, SyllableScheme::GonPin)
+                    .iter()
+                    .any(|item| item.text.starts_with(&forbidden_prefix)),
+                "{input}"
+            );
         }
     }
 }
