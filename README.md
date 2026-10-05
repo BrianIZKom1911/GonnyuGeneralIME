@@ -539,6 +539,10 @@ Windows 小狼毫将压缩包内容复制到 `%APPDATA%\Rime`，在输入法菜�
 8. 《中国语言资源保护工程汉语方言用字规范》 http://www.moe.gov.cn/s78/A19/tongzhi/201704/W020170405307025943395.pdf. 访问日期2026-08-04.
 9. Bilibili 新概念南昌话系列.  https://www.bilibili.com/video/BV1Us4y1C7fp/?share_source=copy_web&vd_source=5078721afbb2afc4394ca2602bb990de
 10. 肖萍、肖介汉. 《江西吴城方言词典》[M]. 北京：商务印书馆，2017. 书目信息可参见 [语言学书目汇编](https://geolinguistics.sakura.ne.jp/Monograph/SIG-Mono7-LAAA-3-ebook.pdf).
+11. 李荣主编，颜森编纂. 《黎川方言词典》[M]. 南京：江苏教育出版社，1995年12月. ISBN 7-5343-2626-5. [书目](https://cir.nii.ac.jp/crid/1971993809687512866).
+12. 杨时逢. 《南昌音系》[J]. 中央研究院历史语言研究所集刊，1969，39（上）：125–204. 含1935年调查资料. [原文](https://www11.ihp.sinica.edu.tw/storage/w2_file/3942MsWGVpd.pdf).
+13. 李如龙、张双庆主编. 《客赣方言调查报告》[M]. 厦门：厦门大学出版社，1992. ISBN 7-5615-0385-7. [书目](https://books.google.com/books?id=ApAtAQAAIAAJ).
+14. 江西省地方志编纂委员会编，陈昌仪主编. 《江西省方言志》[M]. 北京：方志出版社，2005. 《江西省志》第96卷. ISBN 7-80192-490-8. [书目](https://search.worldcat.org/title/70105497).
 
 ### 依赖声明
 
@@ -556,6 +560,8 @@ Windows 小狼毫将压缩包内容复制到 `%APPDATA%\Rime`，在输入法菜�
 未经权利人许可，不得将上述名称或图片用于衍生项目、重新发布或商业宣传。
 
 项目文档项目文档的著作权归权利人所有，保留全部权利。允许原文转载，转载时请注明作者及项目来源。
+
+本项目参考了 xiao.fu（imfuxiao）的[仓输入法（Hamster）开源版本](https://github.com/imfuxiao/Hamster)。该开源版本采用 [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt)，版权声明为 Copyright (c) 2025 xiao.fu。
 
 ### 致谢
 
