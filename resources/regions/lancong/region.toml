@@ -13,6 +13,7 @@ status = "active"
 7 = { name = "阳入", value = "1/2" }
 
 [phonology]
+editor_hat_e = false
 syllables = "phonology/syllables.jsonl"
 fuzzy_map = "../../fuzzy_scheme.tsv"
 

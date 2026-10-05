@@ -222,8 +222,9 @@ Checked-tone codas follow these spelling and input rules.
 | --- | --- | --- | ------- | ------- | ------- | ------- | ------- | ------- | --- | --- |
 | ae | - | [æ] | - | - | [æ] | [æ] | [æ] | - | — |  |
 | a | [a] | - | - | - | - | - | - | - | — |  |
-| o | [o] or [ɵ] | - | [ɔ] | - | - | - | [ɔ] | - | — |  |
-| oe | - | - | - | - | - | - | [œ] | - |  |  |
+| o | [o] | - | [ɔ] | - | - | - | [ɔ] | - | — |  |
+| eo | [ɵ] | [ɵ] | [ɵ] | - | - | - | [ɵ] | - | — |  |
+| oe | - | - | - | - | - | - | [œ] or [ø] | - |  |  |
 | e* | [e] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | - | [ə] or [ɛ] | [ə] or [ɛ] or [ɯ] | — |  |
 | yng | - | - | - | - | - | - | - | [yŋ] |  |  |
 | ai | [ai] | - | - | - | - | - | - | - | — |  |
@@ -245,21 +246,24 @@ Checked-tone codas follow these spelling and input rules.
 | eng | - | [əŋ] | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | [æt] | - | - | [æt] | - | - | - | — |  |
 | at | [at] | - | - | - | - | - | - | - | — |  |
-| ot | [ot] | [ɵt] or [ot] | - | - | [ɔt] | - | - | - | — |  |
+| ot | [ot] | [ot] | - | - | [ɔt] | - | - | - | — |  |
+| eot | - | [ɵt] | - | - | - | - | - | - | — |  |
 | et | [ɛt]  or  [ɨt] | - | - | - | - | - | - | - | — |  |
 | aep | - | [æp] | - | - | - | - | - | - | — |  |
 | ap | - | [ap] | [ap] | - | - | - | - | - | — |  |
-| op | - | [ɵp] | [ɔp] | - | - | - | - | - | — |  |
+| op | - | - | [ɔp] | - | - | - | - | - | — |  |
+| eop | - | [ɵp] | - | - | - | - | - | - | — |  |
 | ep | - | - | [ɛp] | - | - | - | - | - | - |  |
 | aek | - | [æʔ] or [æk] | - | - | [æʔ] | - | - | - | — |  |
 | ak | [aʔ] | - | - | - | - | - | - | - | — |  |
 | aik | - | - | [aiʔ] | [aiʔ] | - | - | - | - | - |  |
-| ok | [ɔʔ] | [oʔ] or [ɵʔ] or [ɔʔ] | - | [oʔ] | - | - | - | - | — |  |
+| ok | [ɔʔ] | [oʔ] or [ɔʔ] | - | [oʔ] | - | - | - | - | — |  |
+| eok | - | [ɵʔ] | - | - | - | - | - | - | — |  |
 | oik | - | - | [ɔiʔ] | - | - | - | - | - | - |  |
 | ek | - | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | - | - | [ɛʔ] or [ɤʔ] or [ɪʔ] | — | [ɤʔ] can be written ek or uk. |
 | euk | - | - | - | [ɪuʔ] | - | - | - | - | — |  |
 
-\* Some regions use `ê` for [ɛ]; input uses `e`. The same input spelling applies to `ê` in other finals and to ordinary `e`. Input `e` can match `ê` through one-way fuzzy matching.
+\* Some regions use `ê` for IPA [ɛ] or [e]; input uses `e`. The same input spelling applies to `ê` in other finals and to ordinary `e`. Input `e` can match `ê` through one-way fuzzy matching.
 
 #### Front-vowel finals
 
@@ -356,9 +360,9 @@ With no initial consonant:
 
 \* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling.
 
-\* `uei`: `uei` and `uêi` are shortened to `ui` after an initial consonant and grouped under `ui` in this table. With no initial, the forms are `wei` and `wêi`; [ui] has the form `wi`. Some varieties use `ê` to distinguish [ɛ]; `ê` is entered as `e`, which matches `ê` through a one-way fuzzy rule. The same input rule applies to other spellings containing `ê`.
+\* `uei`: `uei` and `uêi` are shortened to `ui` after an initial consonant and grouped under `ui` in this table. With no initial, the forms are `wei` and `wêi`; [ui] has the form `wi`.
 
-\* `uen`: `uen` and `uên` are shortened to `un` after an initial consonant and grouped under `un` in this table. With no initial, the forms are `wen` and `wên`. Some varieties use `ê` to distinguish [ɛ]; `ê` is entered as `e`, which matches `ê` through a one-way fuzzy rule.
+\* `uen`: `uen` and `uên` are shortened to `un` after an initial consonant and grouped under `un` in this table. With no initial, the forms are `wen` and `wên`.
 
 
 #### Rounded front-vowel finals
@@ -368,7 +372,7 @@ With no initial consonant:
 | gon-pin | Default IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Jingon IPA | Yikyan-Henfeng IPA | Accepted alternative input | Notes |
 | --- | --- | --- | ------- | ------- | ------- | ------- | ------- | ------- | --- | --- |
 | yu | [y] | - | - | - | - | - | - | - | y, v, u |  |
-| yuo | - | [yɵ] | - | - | - | - | - | - | - |  |
+| yueo | - | [yɵ] | - | - | - | - | - | - | - |  |
 | yue | [ye] | - | - | - | - | - | [yɛ] | [yɛ] | - |  |
 | yng | - | - | - | - | - | - | - | [yŋ] |  |  |
 | yun | [yn] | - | - | [iun] | - | - | - | - | — |  |
@@ -381,7 +385,8 @@ With no initial consonant:
 | yuet | - | [yet] | - | - | - | - | - | - | yuot |  |
 | yuk | - | [yʔ] or [iuʔ] | [yʔ] or [iuʔ] | [iuʔ] | - | - | - | - | - |  |
 | yuak | - | - | - | - | - | - | - | [yaʔ] | - |  |
-| yuok | - | [yɵʔ] | - | [iuɔʔ] | - | - | - | [yɔʔ] | - |  |
+| yuok | - | - | - | [iuɔʔ] | - | - | - | [yɔʔ] | - |  |
+| yueok | - | [yɵʔ] | - | - | - | - | - | - | - |  |
 | yuek | - | - | - | [iuəʔ] | - | - | - | [yəʔ] or [yɛʔ] or [yɪʔ] | — |  |
 
 #### Syllabic laterals and nasals
