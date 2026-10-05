@@ -535,7 +535,7 @@ def write_mobile_default(output: Path, regions: tuple[str, ...]) -> None:
     schema_list = "\n".join(f"  - schema: gannyu_{region}" for region in regions)
     (output / "default.yaml").write_text(
         "# Generated mobile Rime defaults; do not edit.\n"
-        "config_version: \"0.2.4\"\n\n"
+        f"config_version: \"{VERSION}\"\n\n"
         f"schema_list:\n{schema_list}\n\n"
         "menu:\n"
         "  page_size: 9\n\n"
