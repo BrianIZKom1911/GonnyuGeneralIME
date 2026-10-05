@@ -14,6 +14,7 @@ status = "active"
 
 [phonology]
 editor_hat_e = false
+editor_diaeresis_i = false
 syllables = "phonology/syllables.jsonl"
 fuzzy_map = "../../fuzzy_scheme.tsv"
 

@@ -109,7 +109,7 @@ status = "active"
 "ɛn" = "ên"
 "ɛʔ" = "êk"
 "ɪʔ" = "ek"
-"ɿ" = "i"
+"ɿ" = "ï"
 
 [phonology]
 syllables = "phonology/syllables.jsonl"
