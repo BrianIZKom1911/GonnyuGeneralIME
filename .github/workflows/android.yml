@@ -10,7 +10,8 @@ on:
       - Cargo.lock
       - crates/**
       - platforms/android/**
-      - platforms/rime/mobile/**
+      - platforms/rime/**
+      - engines/rime/**
       - resources/**
       - .github/workflows/android.yml
 
