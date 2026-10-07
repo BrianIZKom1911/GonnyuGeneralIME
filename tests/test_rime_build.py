@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -214,6 +215,12 @@ def test_rime_build_writes_resource_manifest(tmp_path: Path) -> None:
     assert any(file["path"] == "lua/gannyu_lancong_data.lua" for file in manifest["files"])
     assert any(file["path"] == "lua/gannyu_lancong_annotations.bin" for file in manifest["files"])
     assert any(file["path"] == "lua/gannyu_annotation_store.lua" for file in manifest["files"])
+    reader = (tmp_path / "lua/gannyu_annotation_store.lua").read_bytes()
+    source = Path(__file__).resolve().parents[1] / "platforms/rime/gannyu_annotation_store.lua"
+    assert reader == source.read_bytes()
+    record = next(file for file in manifest["files"] if file["path"] == "lua/gannyu_annotation_store.lua")
+    assert record["size"] == len(reader)
+    assert record["sha256"] == hashlib.sha256(reader).hexdigest()
 
 
 def test_rime_mandarin_only_annotation_includes_dialect_reading() -> None:
