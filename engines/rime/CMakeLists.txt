@@ -33,6 +33,12 @@ if(GANNYU_RIME_BUILD_PROBES)
   target_link_libraries(gannyu_rime_snapshot_probe PRIVATE Threads::Threads)
   add_test(NAME rime_snapshot_equivalence COMMAND gannyu_rime_snapshot_probe)
 
+  add_executable(gannyu_rime_resource_cleanup_probe rime_resource_cleanup_probe.cpp)
+  target_include_directories(gannyu_rime_resource_cleanup_probe PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../../crates/ffi/include"
+    "${RIME_INCLUDE_DIR}")
+  add_test(NAME rime_resource_cleanup COMMAND gannyu_rime_resource_cleanup_probe)
+
   add_executable(gannyu_rime_engine_probe rime_engine_probe.cpp)
   target_link_libraries(gannyu_rime_engine_probe PRIVATE gannyu_rime_engine)
 

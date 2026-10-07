@@ -235,9 +235,9 @@ std::optional<std::string> TakeCommit(RimeSessionId session) {
   RimeCommit commit{};
   RIME_STRUCT_INIT(RimeCommit, commit);
   if (!Api()->get_commit(session, &commit)) return std::nullopt;
-  std::string text = commit.text ? commit.text : "";
-  Api()->free_commit(&commit);
-  return text;
+  auto free_commit = [](RimeCommit* value) { Api()->free_commit(value); };
+  std::unique_ptr<RimeCommit, decltype(free_commit)> commit_guard(&commit, free_commit);
+  return std::string(commit.text ? commit.text : "");
 }
 
 std::string Snapshot(GannyuPipelineHandle* handle, bool handled, const std::optional<std::string>& commit) {
@@ -246,7 +246,15 @@ std::string Snapshot(GannyuPipelineHandle* handle, bool handled, const std::opti
   RimeStatus status{};
   RIME_STRUCT_INIT(RimeStatus, status);
   bool has_context = Api()->get_context(handle->session, &context);
+  auto free_context = [&has_context](RimeContext* value) {
+    if (has_context) Api()->free_context(value);
+  };
+  std::unique_ptr<RimeContext, decltype(free_context)> context_guard(&context, free_context);
   const bool has_status = Api()->get_status(handle->session, &status);
+  auto free_status = [has_status](RimeStatus* value) {
+    if (has_status) Api()->free_status(value);
+  };
+  std::unique_ptr<RimeStatus, decltype(free_status)> status_guard(&status, free_status);
   std::ostringstream output;
   const char* raw_input = Api()->get_input(handle->session);
   output << "{\"handled\":" << (handled ? "true" : "false") << ",\"rawInput\":\"";
@@ -296,6 +304,7 @@ std::string Snapshot(GannyuPipelineHandle* handle, bool handled, const std::opti
   if (!iterated_candidates && handle->candidate_limit > 0 && has_context) {
     while (context.menu.page_size > 0 && !context.menu.is_last_page && context.menu.page_no * context.menu.page_size < static_cast<int>(handle->candidate_limit)) {
       const int previous_page = context.menu.page_no;
+      has_context = false;
       Api()->free_context(&context);
       Api()->process_key(handle->session, kPageDown, 0);
       RIME_STRUCT_INIT(RimeContext, context);
@@ -304,6 +313,7 @@ std::string Snapshot(GannyuPipelineHandle* handle, bool handled, const std::opti
       if (!has_context || context.menu.page_no <= previous_page) break;
     }
     while (has_context && context.menu.page_no > original_page) {
+      has_context = false;
       Api()->free_context(&context);
       Api()->process_key(handle->session, kPageUp, 0);
       RIME_STRUCT_INIT(RimeContext, context);
@@ -320,8 +330,8 @@ std::string Snapshot(GannyuPipelineHandle* handle, bool handled, const std::opti
          << (handle->candidate_limit > 0 ? "false" : (has_context && context.menu.num_candidates > 0 && !context.menu.is_last_page ? "true" : "false"));
   output << ",\"schemaId\":\"" << JsonEscape(handle->schema_id) << "\"";
   output << ",\"asciiMode\":" << (has_status && status.is_ascii_mode ? "true" : "false") << '}';
-  if (has_context) Api()->free_context(&context);
-  if (has_status) Api()->free_status(&status);
+  context_guard.reset();
+  status_guard.reset();
   return output.str();
 }
 
