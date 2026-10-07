@@ -10,7 +10,9 @@ import itertools
 import json
 import re
 import shutil
+import struct
 import tomllib
+import zlib
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -486,6 +488,21 @@ def build_single_character_frequencies(entries: list[Entry]) -> dict[str, int]:
     return frequencies
 
 
+def write_annotation_store(path: Path, name: str, annotations: dict[str, str]) -> None:
+    index = bytearray()
+    blob = bytearray()
+    for key, value in sorted(annotations.items(), key=lambda item: item[0].encode("utf-8")):
+        key_bytes, value_bytes = key.encode("utf-8"), value.encode("utf-8")
+        offset = len(blob)
+        index.extend(struct.pack("<IIII", offset, len(key_bytes), offset + len(key_bytes), len(value_bytes)))
+        blob.extend(key_bytes)
+        blob.extend(value_bytes)
+    name_bytes = name.encode("ascii")
+    payload = name_bytes + index + blob
+    header = b"GNYANN01" + struct.pack("<IIII", len(annotations), len(blob), len(name_bytes), zlib.adler32(payload))
+    path.write_bytes(header + payload)
+
+
 def write_lua_data(
     path: Path,
     annotations: dict[str, str],
@@ -494,6 +511,8 @@ def write_lua_data(
     after: dict[str, list[str]],
     single_character_frequencies: dict[str, int],
 ) -> None:
+    name = path.stem.removesuffix("_data")
+    write_annotation_store(path.with_name(f"{name}_annotations.bin"), name, annotations)
     def table_map(values: dict[str, str]) -> str:
         return "\n".join(f"  [{lua_quote(key)}] = {lua_quote(value)}," for key, value in sorted(values.items()))
 
@@ -509,7 +528,7 @@ def write_lua_data(
 
     path.write_text(
         "return {\n"
-        f" annotations = {{\n{table_map(annotations)}\n }},\n"
+        f" annotations = require(\"gannyu_annotation_store\").open({lua_quote(name)}),\n"
         f" readings = {{\n{table_map(readings)}\n }},\n"
         f" before = {{\n{list_map(before)}\n }},\n"
         f" after = {{\n{list_map(after)}\n }},\n"
@@ -625,6 +644,7 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
         single_character_frequencies,
     )
     for name in (
+        "gannyu_annotation_store.lua",
         "gannyu_data_lifecycle.lua",
         "gannyu_annotation_filter.lua",
         "gannyu_single_char_filter.lua",

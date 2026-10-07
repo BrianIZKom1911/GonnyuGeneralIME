@@ -152,7 +152,9 @@ def test_builds_rime_dictionary_annotations_and_relations(tmp_path: Path) -> Non
     assert counts["fuzzy_spellings"] > 0
     assert "䁐牛\tGyang Gniu\t156320" in dictionary
     assert "䁐牛\tying niu\t156320" in dictionary
-    assert '["䁐牛"] = "yang4 niu4 [义]放牛"' in data
+    annotations = (tmp_path / "lua/gannyu_lancong_annotations.bin").read_bytes()
+    assert "䁐牛yang4 niu4 [义]放牛".encode() in annotations
+    assert 'require("gannyu_annotation_store").open("gannyu_lancong")' in data
     assert '  ["我"] = "ngo3",' in data
     assert '  ["们"] = "men4",' in data
     assert '  ["嗰"] = "go0",' in data
@@ -210,6 +212,8 @@ def test_rime_build_writes_resource_manifest(tmp_path: Path) -> None:
     ]
     assert any(file["path"] == "gannyu_lancong.schema.yaml" for file in manifest["files"])
     assert any(file["path"] == "lua/gannyu_lancong_data.lua" for file in manifest["files"])
+    assert any(file["path"] == "lua/gannyu_lancong_annotations.bin" for file in manifest["files"])
+    assert any(file["path"] == "lua/gannyu_annotation_store.lua" for file in manifest["files"])
 
 
 def test_rime_mandarin_only_annotation_includes_dialect_reading() -> None:
