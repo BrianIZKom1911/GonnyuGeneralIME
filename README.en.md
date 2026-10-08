@@ -517,52 +517,52 @@ The Seusong (Susong) dictionary uses the following tone markers:
 
 The Jingon (Jian City) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平 | 334 |
-| 2 | 阳平 | 11 |
-| 3 | 上声 | 53 |
-| 4 | 去声 | 214 |
-| 5 | 高升调 | 35 |
+| 1 | yin level | 334 |
+| 2 | yang level | 11 |
+| 3 | rising | 53 |
+| 4 | departing | 214 |
+| 5 | high rising | 35 |
 
 #### Yikyan-Henfeng (Yiyang-Hengfeng)
 
 The Yikyan-Henfeng (Yiyang-Hengfeng) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平 | 44 |
-| 2 | 阳平 | 22 |
-| 3 | 上声 | 412 |
-| 4 | 阴去 | 45 |
-| 5 | 阳去 | 212 |
-| 6 | 阴入 | 5 |
-| 7 | 阳入 | 4 |
+| 1 | yin level | 44 |
+| 2 | yang level | 22 |
+| 3 | rising | 412 |
+| 4 | yin departing | 45 |
+| 5 | yang departing | 212 |
+| 6 | yin checked | 5 |
+| 7 | yang checked | 4 |
 
 #### Jisuibaedu (Jishuibadou)
 
 The Jisuibaedu (Jishuibadou) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平 | 44 |
-| 2 | 阳平 | 53 |
-| 3 | 上声 | 213 |
-| 4 | 去声 | 31 |
+| 1 | yin level | 44 |
+| 2 | yang level | 53 |
+| 3 | rising | 213 |
+| 4 | departing | 31 |
 
 #### Xyucuênn (Suichuan)
 
 The Xyucuênn (Suichuan) dictionary uses the following tone markers:
 
-| Marker | Traditional tone category | Pitch value |
+| Marker | Tone category | Pitch value |
 | --- | --- | --- |
-| 1 | 阴平 | 52 |
-| 2 | 阳平 | 22 |
-| 3 | 阴上 | 21 |
-| 4 | 阳上 | 25 |
-| 5 | 去声甲 | 215 |
-| 5* | 去声乙 | 55 |
-| 6 | 入声 | 5 |
+| 1 | yin level | 52 |
+| 2 | yang level | 22 |
+| 3 | yin rising | 21 |
+| 4 | yang rising | 25 |
+| 5 | departing A | 215 |
+| 5* | departing B | 55 |
+| 6 | checked | 5 |
 
 ## References
 
