@@ -1,5 +1,7 @@
 # GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method
 
+[简体中文](README.md) | **English**
+
 > A digital writing system rooted in the Gon(Gan)–Poyang region.
 
 Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Tiqien (Lichuan), Sinyi (Xinyu City), Songau (Shanggao), Seusong (Susong), Jingon (Ji'an), Yikyan-Henfeng (Yiyang and Hengfeng), Jisuibaedu (Jishuibadou), and Xyucuênn (Suichuan)**. Contributions are welcome for additional localities and additions to existing regional dictionaries.
@@ -16,16 +18,19 @@ Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Ti
 
 Rime schema repositories for Lancong (Nanchang), Fenni (Fenyi), and Fungcen. Other installation options are available in the [Installation](#installation) section below.
 
-## Release 1.1.2
+## Release 1.2.0
 
-- fix(dict): Refine the Lancong (Nanchang) and Sinyi (Xinyu) dictionaries.
-- fix(pinyin): Refine romanisation rules.
-- perf: Optimise Android and macOS performance.
+- feat(dict): Add Jishuibadou and Xyucuênn, and expand regional dictionaries and readings.
+- feat(input): Improve Xyucuênn nasal-vowel input aliases and add one-way `ing` to `en` fuzzy input for Fungcen.
+- perf(rime): Compact candidate annotation indexes to reduce Rime resource usage.
+- fix(rime): Correct session reset, candidate reads, and resource cleanup.
+- fix(platforms): Update Android and macOS build workflows and fix Windows, Linux/Fcitx5, and Rime support.
+
 
 ## Contents
 
 - [GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method](#gonnyugeneralime--a-general-gongan-chinese-input-method)
-  - [Release 1.1.2](#release-112)
+  - [Release 1.2.0](#release-120)
   - [Contents](#contents)
   - [Overview](#overview)
     - [What it provides](#what-it-provides)
@@ -43,7 +48,6 @@ Rime schema repositories for Lancong (Nanchang), Fenni (Fenyi), and Fungcen. Oth
     - [Windows](#windows)
     - [Linux Fcitx5](#linux-fcitx5)
     - [Rime](#rime)
-  - [Dictionary search with Dict Studio](#dictionary-search-with-dict-studio)
   - [The Gon-pin Romanisation](#the-gon-pin-romanisation)
     - [Initials](#initials)
     - [Finals](#finals)
@@ -178,12 +182,6 @@ Restart Fcitx5 with `fcitx5 -r`, or sign out and back in. Then add **Gannyu Gan 
 Download `GonnyuGeneralIME-version-rime-region.zip` for the required locality. The archive works with Rime front ends on every platform.
 
 For Windows Weasel, copy the archive contents into `%APPDATA%\Rime` and redeploy from the input-method menu. For Linux Fcitx5 Rime, copy the contents into `~/.local/share/fcitx5/rime/`, redeploy, then select the locality from the schema menu. For iOS and Android, import or deploy the ZIP in the installed Rime front end.
-
-## Dictionary search with Dict Studio
-
-![Example of Yikyan dictionary data in the Gon(Gan) Dictionary Studio](resources/images/contribution/dict-studio-yikyan-henfeng.png)
-
-Enter a headword and its Gon(Gan) pronunciation in the first two fields, then click **Filter**. **Advanced Search** supports additional fields such as IPA, Mandarin Pinyin, frequency, prefixes, and suffixes. The full contribution guide is currently available in Chinese: [Contribution guide](CONTRIBUTION.md).
 
 ## The Gon-pin Romanisation
 
@@ -634,3 +632,4 @@ We believe our work is an important part of protecting Sinitic linguistic divers
 4. AstroChung. Yikyan (Yiyang) dictionary maintenance.
 5. 江南西道客. Fungcen (Fengcheng) dictionary resources. Email: yunmoqingchen@qq.com.
 6. 剑邑 Jason. Fungcen (Fengcheng) testing and feedback.
+7. Brian Z. Xinyu (新喻) readings and dictionary entries. <https://github.com/BrianIZKom1911>

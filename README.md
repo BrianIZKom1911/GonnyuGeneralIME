@@ -1,5 +1,7 @@
 # 赣语通用输入法 GonnyuGeneralIME
 
+**简体中文** | [English](README.en.md)
+
 > 一种属于赣鄱大地的数字化书写方案。
 
 目前支持：**南昌话(Lancong)、分宜话(Fenni)、丰城话(Fungcen)、黎川话（Tiqien）、新余话（Sinyi）、上高话（Songau）、宿松话（Seusong）、吉安话（Jingon）、弋阳话-横峰话（Yikyan-Henfeng）、吉水八都话（Jisuibaedu）、遂川话（Xyucuênn）**，更多地区等你来接入，已有地区也等你来增补！
@@ -16,16 +18,18 @@
 
 上方按钮列出已发布的 Rime 方案仓库。其他安装方案请在下方[安装方法](#安装方法)小节找到对应平台内容下载并且安装。
 
-## 正式版本 1.1.2
+## 正式版本 1.2.0
 
-- fix(dict): 南昌、新余词典整理。
-- fix(pinyin): 拼音规则整理。
-- perf: 安卓、macOS 性能优化。
+- feat(dict): 新增吉水八都话、遂川话，补充多地词典与发音。
+- feat(input): 完善遂川鼻化韵输入兼容，增加丰城 `ing` 到 `en` 的单向模糊输入。
+- perf(rime): 压缩候选注音索引，降低 Rime 资源占用。
+- fix(rime): 修复会话重置、候选读取和资源清理问题。
+- fix(platforms): 更新 Android、macOS 构建流程，并修复 Windows、Linux/Fcitx5 与 Rime 支持。
 
 ## 目录
 
 - [赣语通用输入法 GonnyuGeneralIME](#赣语通用输入法-gonnyugeneralime)
-  - [正式版本 1.1.2](#正式版本-112)
+  - [正式版本 1.2.0](#正式版本-120)
   - [目录](#目录)
   - [简介](#简介)
     - [特色](#特色)
