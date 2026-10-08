@@ -225,10 +225,14 @@ bool StartSessionLocked(GannyuPipelineHandle* handle) {
   return true;
 }
 
-void StopSessionLocked(GannyuPipelineHandle* handle) {
-  if (handle->session == 0) return;
-  Api()->destroy_session(handle->session);
+bool StopSessionLocked(GannyuPipelineHandle* handle) {
+  if (handle->session == 0) return true;
+  if (!Api()->destroy_session(handle->session)) {
+    SetError("failed to destroy Rime session");
+    return false;
+  }
   handle->session = 0;
+  return true;
 }
 
 std::optional<std::string> TakeCommit(RimeSessionId session) {
@@ -578,7 +582,23 @@ int gannyu_engine_reset_user_data(GannyuPipelineHandle* handle, int scope, char*
     for (GannyuPipelineHandle* candidate : runtime.handles) {
       if (candidate->schema_id == handle->schema_id) affected.push_back(candidate);
     }
-    for (GannyuPipelineHandle* candidate : affected) StopSessionLocked(candidate);
+    std::vector<GannyuPipelineHandle*> stopped;
+    stopped.reserve(affected.size());
+    for (GannyuPipelineHandle* candidate : affected) {
+      if (StopSessionLocked(candidate)) stopped.push_back(candidate);
+    }
+    if (stopped.size() != affected.size()) {
+      bool sessions_restored = true;
+      for (GannyuPipelineHandle* candidate : stopped) {
+        if (!StartSessionLocked(candidate)) sessions_restored = false;
+      }
+      if (!sessions_restored) {
+        SetError("failed to destroy all Rime sessions; some stopped sessions could not be restored; userdb was not removed");
+      } else {
+        SetError("failed to destroy all Rime sessions; userdb was not removed");
+      }
+      return kLoadFailure;
+    }
 
     std::error_code remove_error;
     const std::filesystem::path userdb =
@@ -606,7 +626,7 @@ void gannyu_pipeline_destroy(GannyuPipelineHandle* handle) {
   try {
     Runtime& runtime = GlobalRuntime();
     std::lock_guard<std::mutex> lock(runtime.mutex);
-    if (Api() != nullptr) StopSessionLocked(handle);
+    if (Api() != nullptr) (void)StopSessionLocked(handle);
     runtime.handles.erase(std::remove(runtime.handles.begin(), runtime.handles.end(), handle),
                           runtime.handles.end());
     delete handle;
