@@ -53,3 +53,9 @@ id = "yikyan-henfeng"
 name_zh = "弋阳-横峰"
 status = "active"
 path = "regions/yikyan-henfeng/region.toml"
+
+[[regions]]
+id = "jisuibaedu"
+name_zh = "吉水八都"
+status = "active"
+path = "regions/jisuibaedu/region.toml"

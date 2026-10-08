@@ -87,4 +87,4 @@ common	rime	iuek	yuek	iuəʔ		syllable-final	false	false	primary	iuek	零声母 
 common	rime	iuok	yuok	iuɔʔ		syllable-final	false	false	primary	iuok	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
 yikyan-henfeng	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 yikyan-henfeng	rime	oi	uoi			syllable-initial	true	true	primary		
-yikyan-henfeng	rime	oi	ui			syllable-initial	true	true	primary		
+yikyan-henfeng	rime	oi	ui			syllable-initial	true	true	primary
