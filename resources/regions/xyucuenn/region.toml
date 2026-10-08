@@ -83,13 +83,16 @@ status = "active"
 "ã" = "ann"
 "æ" = "ae"
 "ĩ" = "inn"
-"ũɛ̃" = "uênn"
+"ũɛ̃" = "unn"
 "ɔ" = "o"
 "ɔŋ" = "ong"
 "ɛ" = "ê"
 "ɤ" = "e"
 "ɤŋ" = "eng"
 "ɿ" = "ï"
+
+[ipa_zero_final_map]
+"ũɛ̃" = "wênn"
 
 [phonology]
 syllables = "phonology/syllables.jsonl"

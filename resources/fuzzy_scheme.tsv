@@ -92,14 +92,11 @@ yikyan-henfeng	rime	oi	ui			syllable-initial	true	true	primary
 xyucuenn	rime	an	ann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
 xyucuenn	rime	ian	iann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
 xyucuenn	rime	in	inn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
-xyucuenn	rime	iên	iênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
 xyucuenn	rime	uan	uann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
-xyucuenn	rime	uên	uênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
 xyucuenn	rime	yuin	yuinn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
-xyucuenn	rime	yuên	yuênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
-xyucuenn	rime	ên	ênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
 xyucuenn	rime	ien	iênn			syllable-final	false	false	primary		鼻化韵普通 e 输入兼容 ê 拼写
-xyucuenn	rime	uen	uênn			syllable-final	false	false	primary		鼻化韵普通 e 输入兼容 ê 拼写
 xyucuenn	rime	yuen	yuênn			syllable-final	false	false	primary		鼻化韵普通 e 输入兼容 ê 拼写
 xyucuenn	rime	en	ênn			syllable-final	false	false	primary		鼻化韵普通 e 输入兼容 ê 拼写
+xyucuenn	rime	uenn	un			syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	鼻化韵旧式输入归并到 un 后继续匹配规范写法
+xyucuenn	rime	un	unn			syllable-final	false	false	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后 un 匹配规范鼻化韵 unn
 xyucuenn	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式

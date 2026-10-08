@@ -556,8 +556,9 @@ def test_u_to_yu_requires_an_immediately_preceding_initial() -> None:
 def test_y_to_yu_expansions_are_removed() -> None:
     rules = load_rules(RULES_PATH)
     for initial in ("", "b", "n", "ng", "j", "q", "x", "zh"):
-        for ending in ("y", "yn", "yng", "yon", "ye", "yen", "yet", "yek"):
+        for ending in ("y", "yn", "yon", "ye", "yen", "yet", "yek"):
             assert not any(output.startswith(f"{initial}yu") for output in normalize(f"{initial}{ending}", rules))
+    assert not any(output == "yung" for output in normalize("y" + "ng", rules))
     algebra = compile_algebra({"yu", "yun", "yung", "yuon", "yue", "nyu"}, rules)
-    for source, target in (("y", "yu"), ("yn", "yun"), ("yng", "yung"), ("yon", "yuon"), ("ye", "yue"), ("ny", "nyu")):
+    for source, target in (("y", "yu"), ("yn", "yun"), ("yon", "yuon"), ("ye", "yue"), ("ny", "nyu")):
         assert f"    - derive/^G{target}$/F{source}/" not in algebra

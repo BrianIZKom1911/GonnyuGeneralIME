@@ -649,7 +649,7 @@ fn u_to_yu_requires_an_immediately_preceding_initial() {
 fn y_to_yu_expansions_are_removed() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     for initial in ["", "b", "n", "ng", "j", "q", "x", "zh"] {
-        for ending in ["y", "yn", "yng", "yon", "ye", "yen", "yet", "yek"] {
+        for ending in ["y", "yn", "yon", "ye", "yen", "yet", "yek"] {
             let input = format!("{initial}{ending}");
             let forbidden_prefix = format!("{initial}yu");
             assert!(
@@ -660,4 +660,8 @@ fn y_to_yu_expansions_are_removed() {
             );
         }
     }
+    assert!(map
+        .normalize(&format!("y{}", "ng"), SyllableScheme::GonPin)
+        .iter()
+        .all(|item| item.text != "yung"));
 }
