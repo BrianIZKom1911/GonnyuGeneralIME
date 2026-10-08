@@ -89,3 +89,14 @@ common	rime	iuok	yuok	iuɔʔ		syllable-final	false	false	primary	iuok	零声母 
 yikyan-henfeng	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 yikyan-henfeng	rime	oi	uoi			syllable-initial	true	true	primary		
 yikyan-henfeng	rime	oi	ui			syllable-initial	true	true	primary		
+xyucuenn	rime	an	ann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	ian	iann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	in	inn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	iên	iênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	uan	uann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	uin	uinn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	uên	uênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	yuin	yuinn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	yuên	yuênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	rime	ên	ênn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法
+xyucuenn	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式

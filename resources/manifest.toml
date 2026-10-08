@@ -59,3 +59,9 @@ id = "jisuibaedu"
 name_zh = "吉水八都"
 status = "active"
 path = "regions/jisuibaedu/region.toml"
+
+[[regions]]
+id = "xyucuenn"
+name_zh = "遂川"
+status = "active"
+path = "regions/xyucuenn/region.toml"
