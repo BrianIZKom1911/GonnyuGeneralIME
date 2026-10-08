@@ -8,7 +8,7 @@ Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Ti
 
 **An easy-to-install Gon(Gan) input method for everyday use. Users familiar with Pinyin can get started with compatible support for Gon(Gan) romanisation and Mandarin Pinyin. Even users who do not speak Gon(Gan) can explore it, and Gon(Gan) expressions can also be used to write extended passages in Mandarin, including text like this document.**
 
-**Native installation is available on macOS, Android, Windows, and Linux, alongside Rime resource packages.**
+**Now available on the iOS App Store as 赣语输入法. Native installation is available on macOS, Android, Windows, and Linux, alongside Rime resource packages.**
 
 [![Rime Lancong (Nanchang)](https://img.shields.io/badge/Rime-Lancong%20%28Nanchang%29-0969da?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Lancong)
 [![Rime Fenni (Fenyi)](https://img.shields.io/badge/Rime-Fenni%20%28Fenyi%29-8250df?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Fenni)
@@ -43,6 +43,7 @@ Rime schema repositories for Lancong (Nanchang), Fenni (Fenyi), and Fungcen. Oth
     - [Windows](#windows)
     - [Linux Fcitx5](#linux-fcitx5)
     - [Rime](#rime)
+  - [Dictionary search with Dict Studio](#dictionary-search-with-dict-studio)
   - [The Gon-pin Romanisation](#the-gon-pin-romanisation)
     - [Initials](#initials)
     - [Finals](#finals)
@@ -175,6 +176,12 @@ Restart Fcitx5 with `fcitx5 -r`, or sign out and back in. Then add **Gannyu Gan 
 Download `GonnyuGeneralIME-version-rime-region.zip` for the required locality. The archive works with Rime front ends on every platform.
 
 For Windows Weasel, copy the archive contents into `%APPDATA%\Rime` and redeploy from the input-method menu. For Linux Fcitx5 Rime, copy the contents into `~/.local/share/fcitx5/rime/`, redeploy, then select the locality from the schema menu. For iOS and Android, import or deploy the ZIP in the installed Rime front end.
+
+## Dictionary search with Dict Studio
+
+![Example of Yikyan dictionary data in the Gon(Gan) Dictionary Studio](resources/images/contribution/dict-studio-yikyan-henfeng.png)
+
+Enter a headword and its Gon(Gan) pronunciation in the first two fields, then click **Filter**. **Advanced Search** supports additional fields such as IPA, Mandarin Pinyin, frequency, prefixes, and suffixes. The full contribution guide is currently available in Chinese: [Contribution guide](CONTRIBUTION.md).
 
 ## The Gon-pin Romanisation
 
@@ -588,6 +595,6 @@ We believe our work is an important part of protecting Sinitic linguistic divers
 1. Dongche Xiye Editorial Department. Project planning and the Fenni (Fenyi) dictionary. <https://github.com/ComeRainOrComeShine>
 2. Doohaey. Input-method framework and the Lancong (Nanchang) dictionary. Email: doohaey@gmail.com
 3. Hialex. App icon design.
-4. AstroChung. Yikyan (Yiyang) romanisation.
+4. AstroChung. Yikyan (Yiyang) dictionary maintenance.
 5. 江南西道客. Fungcen (Fengcheng) dictionary resources. Email: yunmoqingchen@qq.com.
 6. 剑邑 Jason. Fungcen (Fengcheng) testing and feedback.
