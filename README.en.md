@@ -299,7 +299,7 @@ With no initial consonant:
 | ieu | [iɛu] | [iəu] | - | [iəu] | - | [iəu] | - | [iəu] | - | eu (after g, k, ng) |  |
 | im | - | [im] | [im] | - | - | - | - | - | - | - |  |
 | iam | - | - | [iam] | - | - | - | - | - | - | - |  |
-| in | [in] | [iŋ] | - | - | - | - | - | - | - | — |  |
+| in | [in] | [iŋ] | - | - | - | - | - | - | - | ing (Fungcen) |  |
 | iaen | - | - | - | - | [iæn] | - | - | - | - |  |  |
 | ian | - | [ian] | - | [ian] | [ian] | - | - | [ian] | - | - |  |
 | ion | - | - | - | [ion] or [iɔn] | [iɔn] | - | - | - | - |  |  |
@@ -329,6 +329,8 @@ With no initial consonant:
 \* `i`: Some regions use `ï` for IPA [ɿ], including [ɿ] in other finals. Input uses `i`, which can match `ï` through one-way fuzzy matching.
 
 \* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]; this distinction is omitted when a coda is present.
+
+Fungcen uses `in` and `en` as the final spellings, including readings with IPA [iŋ] and [əŋ]. Input ending in `ing` can match `in` in one direction; for example, `jing1` can retrieve entries written as `jin1`. This compatibility applies to Fungcen only.
 
 #### Rounded finals
 
@@ -437,8 +439,6 @@ The Lancong (Nanchang) dictionary uses seven tone markers:
 | 7 | yang checked | 1 or 2 |
 
 #### Fungcen (Fengcheng)
-
-Fungcen uses `in` and `en` as the final spellings, including readings with IPA [iŋ] and [əŋ]. Input ending in `ing` can match `in` in one direction; for example, `jing1` can retrieve entries written as `jin1`. This compatibility applies to Fungcen only.
 
 The Fungcen (Fengcheng) dictionary uses six tone markers:
 
