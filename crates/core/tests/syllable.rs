@@ -17,18 +17,18 @@ fn fuzzy_map_loads() {
 }
 
 #[test]
-fn fungcen_ing_input_matches_in_only_in_one_direction() {
+fn fungcen_ing_input_matches_en_only_in_one_direction() {
     let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "fungcen").expect("load fungcen rules");
-    for (input, expected) in [("jing1", "jin"), ("ning2", "nin"), ("ying3", "yin")] {
+    for (input, expected) in [("jing1", "jen"), ("ning2", "nen"), ("ying3", "yen")] {
         let outputs = map.normalize(input, SyllableScheme::GonPin);
         assert!(outputs.iter().any(|item| item.text == expected));
     }
     assert!(!map
-        .normalize("jin1", SyllableScheme::GonPin)
+        .normalize("jen1", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "jing"));
     assert!(!map
-        .normalize("jin1", SyllableScheme::GonFuzzy)
+        .normalize("jen1", SyllableScheme::GonFuzzy)
         .iter()
         .any(|item| item.text == "jing"));
     for region in ["lancong", "jingon", "jisuibaedu", "tiqien"] {
@@ -37,7 +37,7 @@ fn fungcen_ing_input_matches_in_only_in_one_direction() {
         assert!(!other
             .normalize("jing1", SyllableScheme::GonPin)
             .iter()
-            .any(|item| item.text == "jin"));
+            .any(|item| item.text == "jen"));
     }
 }
 

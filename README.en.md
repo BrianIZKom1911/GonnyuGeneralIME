@@ -249,7 +249,7 @@ Checked-tone codas follow these spelling and input rules.
 | an | [an] | - | - | - | - | - | - | - | - | — |  |
 | on | [on] | - | [ɔn] | [ɔn] | [ɔn] | - | [ɔn] | - | - | — |  |
 | oen | - | - | - | [øn] | - | - | - | - | - | — |  |
-| en | [ɛn]  or  [ɨn] | [ən] or [əŋ] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | — |  |
+| en | [ɛn]  or  [ɨn] | [ən] or [əŋ] or [ɨn] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | ing (Fungcen) |  |
 | ang | [ɑŋ] | - | [aŋ] | [aŋ] | - | - | - | - | - | — |  |
 | ong | [ɔŋ] | [oŋ] | - | [oŋ] | - | [oŋ] | - | - | [oŋ] | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
 | eng | - | - | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | - | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
@@ -299,7 +299,7 @@ With no initial consonant:
 | ieu | [iɛu] | [iəu] | - | [iəu] | - | [iəu] | - | [iəu] | - | eu (after g, k, ng) |  |
 | im | - | [im] | [im] | - | - | - | - | - | - | - |  |
 | iam | - | - | [iam] | - | - | - | - | - | - | - |  |
-| in | [in] | [iŋ] | - | - | - | - | - | - | - | ing (Fungcen) |  |
+| in | [in] | - | - | - | - | - | - | - | - | — |  |
 | iaen | - | - | - | - | [iæn] | - | - | - | - |  |  |
 | ian | - | [ian] | - | [ian] | [ian] | - | - | [ian] | - | - |  |
 | ion | - | - | - | [ion] or [iɔn] | [iɔn] | - | - | - | - |  |  |
@@ -330,7 +330,7 @@ With no initial consonant:
 
 \* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]; this distinction is omitted when a coda is present.
 
-Fungcen uses `in` and `en` as the final spellings, including readings with IPA [iŋ] and [əŋ]. Input ending in `ing` can match `in` in one direction; for example, `jing1` can retrieve entries written as `jin1`. This compatibility applies to Fungcen only.
+Fungcen writes IPA [ɨn] as `en`. Input ending in `ing` can match `en` in one direction; for example, `jing1` can retrieve `jen1`. Zero-initial `ying` input matches entries written as `yen`. This compatibility applies to Fungcen only.
 
 #### Rounded finals
 

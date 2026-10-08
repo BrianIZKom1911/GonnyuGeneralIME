@@ -12,8 +12,11 @@ status = "active"
 6 = { name = "阳入", value = "5" }
 
 [ipa_final_map]
-"iŋ" = "in"
+"ɨn" = "en"
 "əŋ" = "en"
+
+[ipa_zero_final_map]
+"ɨn" = "yen"
 
 [phonology]
 syllables = "phonology/syllables.jsonl"

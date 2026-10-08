@@ -41,7 +41,7 @@ common	rime	yueng	yuen			syllable-final	false	true	primary
 lancong	coda		t		客	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带尾（za→zat）
 lancong	coda		k		学	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带 k 形式（lok）
 lancong	coda	t	k		客/学	syllable-final	true	false	secondary		入声尾互相模糊
-fungcen	rime	ing	in			syllable-final	false	false	primary		丰城 ing 输入单向兼容 in
+fungcen	rime	ing	en	ɨn		syllable-final	false	false	primary		丰城 ing 输入单向兼容 en
 fungcen	coda		t		八	syllable-final	false	false	fallback		
 fungcen	coda		p		煠	syllable-final	false	false	fallback		
 fungcen	coda		k		插	syllable-final	false	false	fallback		
