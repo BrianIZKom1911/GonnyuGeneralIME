@@ -330,8 +330,6 @@ With no initial consonant:
 
 \* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]; this distinction is omitted when a coda is present.
 
-Fungcen writes IPA [ɨn] as `en`. Input ending in `ing` can match `en` in one direction; for example, `jing1` can retrieve `jen1`. Zero-initial `ying` input matches entries written as `yen`. This compatibility applies to Fungcen only.
-
 #### Rounded finals
 
 With no initial consonant:
