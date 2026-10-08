@@ -17,6 +17,31 @@ fn fuzzy_map_loads() {
 }
 
 #[test]
+fn fungcen_ing_input_matches_in_only_in_one_direction() {
+    let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "fungcen").expect("load fungcen rules");
+    for (input, expected) in [("jing1", "jin"), ("ning2", "nin"), ("ying3", "yin")] {
+        let outputs = map.normalize(input, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == expected));
+    }
+    assert!(!map
+        .normalize("jin1", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "jing"));
+    assert!(!map
+        .normalize("jin1", SyllableScheme::GonFuzzy)
+        .iter()
+        .any(|item| item.text == "jing"));
+    for region in ["lancong", "jingon", "jisuibaedu", "tiqien"] {
+        let other =
+            FuzzyMap::load_tsv_for_region(fuzzy_path(), region).expect("load regional rules");
+        assert!(!other
+            .normalize("jing1", SyllableScheme::GonPin)
+            .iter()
+            .any(|item| item.text == "jin"));
+    }
+}
+
+#[test]
 fn zero_initial_ui_compatibility_preserves_onset_ui() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     for spelling in ["ui4", "wui4"] {

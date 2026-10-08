@@ -249,10 +249,10 @@ Checked-tone codas follow these spelling and input rules.
 | an | [an] | - | - | - | - | - | - | - | - | — |  |
 | on | [on] | - | [ɔn] | [ɔn] | [ɔn] | - | [ɔn] | - | - | — |  |
 | oen | - | - | - | [øn] | - | - | - | - | - | — |  |
-| en | [ɛn]  or  [ɨn] | [ən] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | — |  |
+| en | [ɛn]  or  [ɨn] | [ən] or [əŋ] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | — |  |
 | ang | [ɑŋ] | - | [aŋ] | [aŋ] | - | - | - | - | - | — |  |
 | ong | [ɔŋ] | [oŋ] | - | [oŋ] | - | [oŋ] | - | - | [oŋ] | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | [əŋ] | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | - | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
+| eng | - | - | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | - | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | [æt] | - | - | [æt] | - | - | - | - | — |  |
 | at | [at] | - | - | - | - | - | - | - | - | — |  |
 | ait | - | - | - | [ait] | - | - | - | - | - | — |  |
@@ -299,13 +299,13 @@ With no initial consonant:
 | ieu | [iɛu] | [iəu] | - | [iəu] | - | [iəu] | - | [iəu] | - | eu (after g, k, ng) |  |
 | im | - | [im] | [im] | - | - | - | - | - | - | - |  |
 | iam | - | - | [iam] | - | - | - | - | - | - | - |  |
-| in | [in] | - | - | - | - | - | - | - | - | — |  |
+| in | [in] | [iŋ] | - | - | - | - | - | - | - | — |  |
 | iaen | - | - | - | - | [iæn] | - | - | - | - |  |  |
 | ian | - | [ian] | - | [ian] | [ian] | - | - | [ian] | - | - |  |
 | ion | - | - | - | [ion] or [iɔn] | [iɔn] | - | - | - | - |  |  |
 | ien | [iɛn] | - | - | [ien] | - | - | - | [ien] | - | en (after g, k, ng) |  |
 | iun | - | - | - | [iun] | - | - | - | - | - | - |  |
-| ing | - | [iŋ] | [iŋ] | - | - | - | - | - | - | - |  |
+| ing | - | - | [iŋ] | - | - | - | - | - | - | - |  |
 | iang | [iɑŋ] | - | [iaŋ] | [iaŋ] | - | - | - | - | - | - |  |
 | iong | [iɔŋ] | [ioŋ] | - | [ioŋ] | - | [ioŋ] | - | - | [ioŋ] | - |  |
 | iung | [iuŋ] | - | - | - | - | - | - | - | - | - |  |
@@ -437,6 +437,8 @@ The Lancong (Nanchang) dictionary uses seven tone markers:
 | 7 | yang checked | 1 or 2 |
 
 #### Fungcen (Fengcheng)
+
+Fungcen uses `in` and `en` as the final spellings, including readings with IPA [iŋ] and [əŋ]. Input ending in `ing` can match `in` in one direction; for example, `jing1` can retrieve entries written as `jin1`. This compatibility applies to Fungcen only.
 
 The Fungcen (Fengcheng) dictionary uses six tone markers:
 

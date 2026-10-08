@@ -41,6 +41,7 @@ common	rime	yueng	yuen			syllable-final	false	true	primary
 lancong	coda		t		客	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带尾（za→zat）
 lancong	coda		k		学	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带 k 形式（lok）
 lancong	coda	t	k		客/学	syllable-final	true	false	secondary		入声尾互相模糊
+fungcen	rime	ing	in			syllable-final	false	false	primary		丰城 ing 输入单向兼容 in
 fungcen	coda		t		八	syllable-final	false	false	fallback		
 fungcen	coda		p		煠	syllable-final	false	false	fallback		
 fungcen	coda		k		插	syllable-final	false	false	fallback		
@@ -87,4 +88,4 @@ common	rime	iuek	yuek	iuəʔ		syllable-final	false	false	primary	iuek	零声母 
 common	rime	iuok	yuok	iuɔʔ		syllable-final	false	false	primary	iuok	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写
 yikyan-henfeng	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 yikyan-henfeng	rime	oi	uoi			syllable-initial	true	true	primary		
-yikyan-henfeng	rime	oi	ui			syllable-initial	true	true	primary
+yikyan-henfeng	rime	oi	ui			syllable-initial	true	true	primary		
