@@ -275,7 +275,7 @@ Checked-tone codas follow these spelling and input rules.
 | eok | - | [ɵʔ] | - | - | - | - | - | - | - | - | — |  |
 | euk | - | - | - | [ɪuʔ] | - | - | - | - | - | - | — |  |
 
-\* Nasalized finals are marked with `nn` at the end; a final single `n` can be typed as a one-way alias for `nn`, e.g. `an`→`ann`. The other nasalized finals in the tables follow the same rule.
+\* Nasalized finals are marked with `nn` at the end; a final single `n` can be typed as a one-way alias for `nn`, e.g. `an`→`ann`. The other nasalized finals in the tables follow the same rule. Omit `nn` when a coda follows.
 
 \* Some regions use `ê` for IPA [ɛ] or [e]; input uses `e`. The same input spelling applies to `ê` in other finals and to ordinary `e`. Input `e` can match `ê` through one-way fuzzy matching.
 
