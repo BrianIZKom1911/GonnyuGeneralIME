@@ -95,6 +95,54 @@ def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     assert "    - derive/^Ggui$/Fguêi/" in algebra
 
 
+def test_ueik_rules_follow_uei_with_checked_coda() -> None:
+    rules = load_rules(RULES_PATH)
+    for source, target in (("uei", "wei"), ("uei", "wêi"), ("uêi", "wêi"),
+                           ("uei", "ui"), ("uêi", "ui")):
+        plain = [rule for rule in rules if rule.source == source and rule.target == target]
+        checked = [rule for rule in rules if rule.source == source + "k" and rule.target == target + "k"]
+        assert len(plain) == len(checked) == 1
+        plain, checked = plain[0], checked[0]
+        assert checked.applies == plain.applies
+        assert checked.bidirectional == plain.bidirectional
+        assert checked.chainable == plain.chainable
+        assert checked.tier == plain.tier
+        expected_starts = tuple(value + "k" for value in plain.starts_with) if plain.starts_with == (source,) else plain.starts_with
+        assert checked.starts_with == expected_starts
+
+
+def test_ueik_zero_initial_and_shortened_forms_compile_to_stored_codes() -> None:
+    rules = load_rules(RULES_PATH)
+    assert {"weik", "wêik"}.issubset(normalize("ueik", rules))
+    assert "wêik" in normalize("uêik", rules)
+    assert "weik" not in normalize("wêik", rules)
+    for spelling in ("ueik", "uêik", "weik", "wêik"):
+        assert "uik" not in normalize(spelling, rules)
+    for initial in ("g", "n", "ng", "zh"):
+        for final in ("ueik", "uêik"):
+            assert initial + "uik" in normalize(initial + final, rules)
+    algebra = compile_algebra({"weik", "wêik", "guik"}, rules)
+    assert "    - derive/^Gweik$/Fueik/" in algebra
+    assert "    - derive/^Gwêik$/Fueik/" in algebra
+    assert "    - derive/^Gwêik$/Fuêik/" in algebra
+    assert "    - derive/^Gguik$/Fgueik/" in algebra
+    assert "    - derive/^Gguik$/Fguêik/" in algebra
+
+
+def test_zero_initial_weik_never_becomes_uik() -> None:
+    for region in active_regions():
+        rules = load_rules(RULES_PATH, region)
+        for spelling in ("weik", "wêik"):
+            for reverse in (False, True):
+                assert "uik" not in normalize(spelling, rules, reverse=reverse), (region, spelling, reverse)
+        algebra = compile_algebra({"uik", "guik"}, rules)
+        for spelling in ("weik", "wêik"):
+            assert not any(
+                "/^Guik$/" in rule and rule.endswith(f"/F{spelling}/")
+                for rule in algebra
+            ), (region, spelling)
+
+
 def test_eo_accepts_only_standalone_o_one_way() -> None:
     for region in ("lancong", "fenni", "fungcen", "tiqien", "sinyi", "songau", "seusong", "jingon", "yikyan-henfeng"):
         rules = load_rules(RULES_PATH, region)

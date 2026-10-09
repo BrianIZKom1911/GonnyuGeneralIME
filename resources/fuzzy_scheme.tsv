@@ -11,8 +11,9 @@ common	rime	ung	wung	uŋ	翁	syllable-final	false	false	primary	ung	零声母 un
 common	rime	uei	wei	uei	为	syllable-final	false	false	primary	uei	零声母 uei→wei；e 可单向匹配 ê，覆盖 wêi
 common	rime	uei	wêi	uɛi	为	syllable-final	false	false	primary	uei	零声母 uei 输入单向兼容 wêi；独立于 ui→wi
 common	rime	uêi	wêi	uɛi	为	syllable-final	false	true	primary	uêi	零声母 uêi→wêi，独立于 ui→wi
+common	rime	ueik	weik			syllable-final	false	false	primary	ueik	入声形式同 uei
 common	rime	uêik	wêik	uɛiʔ	为	syllable-final	false	true	primary	uêik	零声母 uei 的 k 尾输入兼容独立 wêik
-common	rime	ueik	wêik	uɛiʔ	为	syllable-final	false	true	primary	ueik	零声母 uei 的 k 尾输入兼容独立 wêik
+common	rime	ueik	wêik	uɛiʔ	为	syllable-final	false	false	primary	ueik	零声母 uei 的 k 尾输入兼容独立 wêik
 common	rime	ve	yue	ye	月	anywhere	false	true	primary	ve,jve,lve,nve,qve,xve	ve 系专用桥接，须先于通用 v→yu
 common	rime	ue	yue	ye	月	anywhere	false	true	primary	ue,jue,lue,nue,que,xue	ue 系专用桥接，须先于通用 u→yu
 common	rime	v	yu	y	与	anywhere	false	false	primary	b,p,m,f,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh,w	仅已有声母后的 v→yu

@@ -257,7 +257,6 @@ Checked-tone codas follow these spelling and input rules.
 | eng | - | - | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | - | [ɤŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | [æt] | - | - | [æt] | - | - | - | - | - | — |  |
 | at | [at] | - | - | - | - | - | - | - | - | - | — |  |
-| ait | - | - | - | [ait] | - | - | - | - | - | - | — |  |
 | ot | [ot] | - | - | [ɔt] | [ɔt] | - | - | - | - | - | — |  |
 | oet | - | - | - | [øt] | - | - | - | - | - | - | — |  |
 | et | [ɛt]  or  [ɨt] | - | - | [ət] | - | - | - | - | - | - | — |  |
@@ -318,7 +317,6 @@ With no initial consonant:
 | iung | [iuŋ] | - | - | - | - | - | - | - | - | - | - |  |
 | it | [it] | - | - | - | - | - | - | - | - | - | — |  |
 | iat | - | [iat] | - | [iat] | - | - | - | - | - | - | - |  |
-| iait | - | - | - | [iait] | - | - | - | - | - | - | — |  |
 | iet | [iet] | [iɛt] | - | [iət] or [iɛt] | [iɛt] | - | - | - | - | - | et (after ng) |  |
 | ip | - | [ip] | [ip] | - | - | - | - | - | - | - | - |  |
 | iap | - | [iap] | [iap] | - | - | - | - | - | - | - | - |  |
@@ -379,11 +377,11 @@ With no initial consonant:
 | uok | [uoʔ] | [uɔʔ] | [uɔʔ] | [uɔʔ] | - | - | - | [uɔʔ] | - | - | - |  |
 | uoik | - | - | [uɔiʔ] | - | - | - | - | - | - | - | - |  |
 | uek | — | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | - | - | - | [uəʔ] or [uɛʔ] or [uɤʔ] or [uɪʔ] | - | [ueʔ] | — |  |
-| uik | - | [uɛiʔ] | [uiʔ] | [uəiʔ] | - | - | - | - | - | - | ueik, weik (no initial) |  |
+| uik | - | [uɛiʔ] | [uiʔ] | [uəiʔ] | - | - | - | - | - | - | ueik |  |
 
 \* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling.
 
-\* `uei`: `uei` and `uêi` are shortened to `ui` after an initial consonant and grouped under `ui` in this table. With no initial, the forms are `wei` and `wêi`; [ui] has the form `wi`.
+\* `uei`: `uei` and `uêi` are shortened to `ui` after an initial consonant and grouped under `ui` in this table. With no initial, the forms are `wei` and `wêi`; [ui] has the form `wi`. The same applies to checked-tone forms.
 
 \* `uen` and `uên` shorten to `un` after an initial and are grouped under `un`; zero-initial forms are `wen` and `wên`. Nasalized forms follow the same pattern.
 
