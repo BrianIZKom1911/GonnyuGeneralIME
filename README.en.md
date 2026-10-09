@@ -584,6 +584,7 @@ The project compiles its regional dictionaries from participants’ everyday lan
 12. Yang Shifeng. *Nanchang Phonology* (南昌音系) [J]. Bulletin of the Institute of History and Philology, 1969, 39(1): 125–204. Includes material from the 1935 survey. [Full text](https://www11.ihp.sinica.edu.tw/storage/w2_file/3942MsWGVpd.pdf).
 13. Li Rulong and Zhang Shuangqing, editors. *Survey Report on Hakka and Gan Dialects* (客赣方言调查报告) [M]. Xiamen: Xiamen University Press, 1992. ISBN 7-5615-0385-7. [Catalogue](https://books.google.com/books?id=ApAtAQAAIAAJ).
 14. Jiangxi Provincial Local Gazetteer Compilation Committee; Chen Changyi, editor. *Gazetteer of the Dialects of Jiangxi Province* (江西省方言志) [M]. Beijing: Fangzhi Press, 2005. *Jiangxi Provincial Gazetteer*, vol. 96. ISBN 7-80192-490-8. [Catalogue](https://search.worldcat.org/title/70105497).
+15. Xiao Jiugen. *A Study of the Badu Dialect* (八都方言研究) [D]. Master's thesis, Guangxi University, 2001.
 
 ### Dependency declarations
 
