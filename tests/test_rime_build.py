@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -94,6 +95,54 @@ def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     assert "    - derive/^Ggui$/Fguêi/" in algebra
 
 
+def test_ueik_rules_follow_uei_with_checked_coda() -> None:
+    rules = load_rules(RULES_PATH)
+    for source, target in (("uei", "wei"), ("uei", "wêi"), ("uêi", "wêi"),
+                           ("uei", "ui"), ("uêi", "ui")):
+        plain = [rule for rule in rules if rule.source == source and rule.target == target]
+        checked = [rule for rule in rules if rule.source == source + "k" and rule.target == target + "k"]
+        assert len(plain) == len(checked) == 1
+        plain, checked = plain[0], checked[0]
+        assert checked.applies == plain.applies
+        assert checked.bidirectional == plain.bidirectional
+        assert checked.chainable == plain.chainable
+        assert checked.tier == plain.tier
+        expected_starts = tuple(value + "k" for value in plain.starts_with) if plain.starts_with == (source,) else plain.starts_with
+        assert checked.starts_with == expected_starts
+
+
+def test_ueik_zero_initial_and_shortened_forms_compile_to_stored_codes() -> None:
+    rules = load_rules(RULES_PATH)
+    assert {"weik", "wêik"}.issubset(normalize("ueik", rules))
+    assert "wêik" in normalize("uêik", rules)
+    assert "weik" not in normalize("wêik", rules)
+    for spelling in ("ueik", "uêik", "weik", "wêik"):
+        assert "uik" not in normalize(spelling, rules)
+    for initial in ("g", "n", "ng", "zh"):
+        for final in ("ueik", "uêik"):
+            assert initial + "uik" in normalize(initial + final, rules)
+    algebra = compile_algebra({"weik", "wêik", "guik"}, rules)
+    assert "    - derive/^Gweik$/Fueik/" in algebra
+    assert "    - derive/^Gwêik$/Fueik/" in algebra
+    assert "    - derive/^Gwêik$/Fuêik/" in algebra
+    assert "    - derive/^Gguik$/Fgueik/" in algebra
+    assert "    - derive/^Gguik$/Fguêik/" in algebra
+
+
+def test_zero_initial_weik_never_becomes_uik() -> None:
+    for region in active_regions():
+        rules = load_rules(RULES_PATH, region)
+        for spelling in ("weik", "wêik"):
+            for reverse in (False, True):
+                assert "uik" not in normalize(spelling, rules, reverse=reverse), (region, spelling, reverse)
+        algebra = compile_algebra({"uik", "guik"}, rules)
+        for spelling in ("weik", "wêik"):
+            assert not any(
+                "/^Guik$/" in rule and rule.endswith(f"/F{spelling}/")
+                for rule in algebra
+            ), (region, spelling)
+
+
 def test_eo_accepts_only_standalone_o_one_way() -> None:
     for region in ("lancong", "fenni", "fungcen", "tiqien", "sinyi", "songau", "seusong", "jingon", "yikyan-henfeng"):
         rules = load_rules(RULES_PATH, region)
@@ -152,7 +201,9 @@ def test_builds_rime_dictionary_annotations_and_relations(tmp_path: Path) -> Non
     assert counts["fuzzy_spellings"] > 0
     assert "䁐牛\tGyang Gniu\t156320" in dictionary
     assert "䁐牛\tying niu\t156320" in dictionary
-    assert '["䁐牛"] = "yang4 niu4 [义]放牛"' in data
+    annotations = (tmp_path / "lua/gannyu_lancong_annotations.bin").read_bytes()
+    assert "䁐牛yang4 niu4 [义]放牛".encode() in annotations
+    assert 'require("gannyu_annotation_store").open("gannyu_lancong")' in data
     assert '  ["我"] = "ngo3",' in data
     assert '  ["们"] = "men4",' in data
     assert '  ["嗰"] = "go0",' in data
@@ -210,6 +261,14 @@ def test_rime_build_writes_resource_manifest(tmp_path: Path) -> None:
     ]
     assert any(file["path"] == "gannyu_lancong.schema.yaml" for file in manifest["files"])
     assert any(file["path"] == "lua/gannyu_lancong_data.lua" for file in manifest["files"])
+    assert any(file["path"] == "lua/gannyu_lancong_annotations.bin" for file in manifest["files"])
+    assert any(file["path"] == "lua/gannyu_annotation_store.lua" for file in manifest["files"])
+    reader = (tmp_path / "lua/gannyu_annotation_store.lua").read_bytes()
+    source = Path(__file__).resolve().parents[1] / "platforms/rime/gannyu_annotation_store.lua"
+    assert reader == source.read_bytes()
+    record = next(file for file in manifest["files"] if file["path"] == "lua/gannyu_annotation_store.lua")
+    assert record["size"] == len(reader)
+    assert record["sha256"] == hashlib.sha256(reader).hexdigest()
 
 
 def test_rime_mandarin_only_annotation_includes_dialect_reading() -> None:
@@ -545,8 +604,9 @@ def test_u_to_yu_requires_an_immediately_preceding_initial() -> None:
 def test_y_to_yu_expansions_are_removed() -> None:
     rules = load_rules(RULES_PATH)
     for initial in ("", "b", "n", "ng", "j", "q", "x", "zh"):
-        for ending in ("y", "yn", "yng", "yon", "ye", "yen", "yet", "yek"):
+        for ending in ("y", "yn", "yon", "ye", "yen", "yet", "yek"):
             assert not any(output.startswith(f"{initial}yu") for output in normalize(f"{initial}{ending}", rules))
+    assert not any(output == "yung" for output in normalize("y" + "ng", rules))
     algebra = compile_algebra({"yu", "yun", "yung", "yuon", "yue", "nyu"}, rules)
-    for source, target in (("y", "yu"), ("yn", "yun"), ("yng", "yung"), ("yon", "yuon"), ("ye", "yue"), ("ny", "nyu")):
+    for source, target in (("y", "yu"), ("yn", "yun"), ("yon", "yuon"), ("ye", "yue"), ("ny", "nyu")):
         assert f"    - derive/^G{target}$/F{source}/" not in algebra

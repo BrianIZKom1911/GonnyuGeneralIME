@@ -17,6 +17,31 @@ fn fuzzy_map_loads() {
 }
 
 #[test]
+fn fungcen_ing_input_matches_en_only_in_one_direction() {
+    let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "fungcen").expect("load fungcen rules");
+    for (input, expected) in [("jing1", "jen"), ("ning2", "nen"), ("ying3", "yen")] {
+        let outputs = map.normalize(input, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == expected));
+    }
+    assert!(!map
+        .normalize("jen1", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "jing"));
+    assert!(!map
+        .normalize("jen1", SyllableScheme::GonFuzzy)
+        .iter()
+        .any(|item| item.text == "jing"));
+    for region in ["lancong", "jingon", "jisuibaedu", "tiqien"] {
+        let other =
+            FuzzyMap::load_tsv_for_region(fuzzy_path(), region).expect("load regional rules");
+        assert!(!other
+            .normalize("jing1", SyllableScheme::GonPin)
+            .iter()
+            .any(|item| item.text == "jen"));
+    }
+}
+
+#[test]
 fn zero_initial_ui_compatibility_preserves_onset_ui() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     for spelling in ["ui4", "wui4"] {
@@ -624,7 +649,7 @@ fn u_to_yu_requires_an_immediately_preceding_initial() {
 fn y_to_yu_expansions_are_removed() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     for initial in ["", "b", "n", "ng", "j", "q", "x", "zh"] {
-        for ending in ["y", "yn", "yng", "yon", "ye", "yen", "yet", "yek"] {
+        for ending in ["y", "yn", "yon", "ye", "yen", "yet", "yek"] {
             let input = format!("{initial}{ending}");
             let forbidden_prefix = format!("{initial}yu");
             assert!(
@@ -635,4 +660,8 @@ fn y_to_yu_expansions_are_removed() {
             );
         }
     }
+    assert!(map
+        .normalize(&format!("y{}", "ng"), SyllableScheme::GonPin)
+        .iter()
+        .all(|item| item.text != "yung"));
 }

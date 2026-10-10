@@ -1,0 +1,97 @@
+[region]
+id = "jisuibaedu"
+name_zh = "吉水八都"
+status = "active"
+
+[tone_classes]
+1 = { name = "阴平", value = "44" }
+2 = { name = "阳平", value = "53" }
+3 = { name = "上声", value = "213" }
+4 = { name = "去声", value = "31" }
+
+[ipa_tone_map]
+0 = 0
+1 = 1
+2 = 2
+3 = 3
+5 = 4
+
+[ipa_initial_map]
+"f" = "f"
+"k" = "g"
+"kʰ" = "k"
+"l" = "l"
+"m" = "m"
+"p" = "b"
+"pʰ" = "p"
+"s" = "s"
+"t" = "d"
+"ts" = "z"
+"tsʰ" = "c"
+"tɕ" = "j"
+"tɕʰ" = "q"
+"tʰ" = "t"
+"x" = "h"
+"ŋ" = "ng"
+"ɕ" = "x"
+"ɳ" = "n"
+
+[ipa_final_map]
+"a" = "a"
+"ai" = "ai"
+"an" = "an"
+"au" = "au"
+"aŋ" = "ang"
+"i" = "i"
+"ia" = "ia"
+"iau" = "iau"
+"iaŋ" = "iang"
+"in" = "in"
+"io" = "io"
+"iou" = "iou"
+"ioŋ" = "iong"
+"iu" = "iu"
+"iuŋ" = "iung"
+"iɛ" = "iê"
+"iɛn" = "iên"
+"m̩" = "m"
+"o" = "o"
+"on" = "on"
+"oŋ" = "ong"
+"u" = "u"
+"ua" = "ua"
+"uai" = "uai"
+"uan" = "uan"
+"uaŋ" = "uang"
+"uei" = "uêi"
+"ui" = "ui"
+"un" = "un"
+"uo" = "uo"
+"uon" = "uon"
+"uoŋ" = "uong"
+"uæ" = "uae"
+"uŋ" = "ung"
+"uɛ" = "uê"
+"uɛn" = "uên"
+"y" = "yu"
+"yn" = "yun"
+"yon" = "yuon"
+"yə" = "yue"
+"æ" = "ae"
+"ŋ̍" = "ng"
+"ə" = "e"
+"ɛ" = "ê"
+"ɛn" = "ên"
+"ɛu" = "êu"
+"ɿ" = "ï"
+
+[phonology]
+syllables = "phonology/syllables.jsonl"
+fuzzy_map = "../../fuzzy_scheme.tsv"
+entering_codas = []
+
+[language]
+chars = "dictionaries/chars.tsv"
+words = "dictionaries/words.tsv"
+gan_chars = "dictionaries/gan_chars.tsv"
+gan_words = "dictionaries/gan_words.tsv"

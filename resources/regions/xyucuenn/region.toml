@@ -1,0 +1,106 @@
+[region]
+id = "xyucuenn"
+name_zh = "遂川"
+status = "active"
+
+[tone_classes]
+1 = { name = "阴平", value = "52" }
+2 = { name = "阳平", value = "22" }
+3 = { name = "阴上", value = "21" }
+4 = { name = "阳上", value = "25" }
+5 = { name = "去声甲", value = "215" }
+"5*" = { name = "去声乙", value = "55" }
+6 = { name = "入声", value = "5" }
+
+[ipa_tone_map]
+0 = 0
+1 = 1
+2 = 2
+3 = 3
+4 = 4
+5 = 5
+6 = 6
+
+[ipa_initial_map]
+"f" = "f"
+"h" = "h"
+"k" = "g"
+"kʰ" = "k"
+"l" = "l"
+"m" = "m"
+"n" = "n"
+"p" = "b"
+"pʰ" = "p"
+"s" = "s"
+"t" = "d"
+"ts" = "z"
+"tsʰ" = "c"
+"tɕ" = "j"
+"tɕʰ" = "q"
+"tʰ" = "t"
+"ŋ" = "ng"
+"ȵ" = "n"
+"ɕ" = "x"
+
+[ipa_final_map]
+"a" = "a"
+"ai" = "ai"
+"aʔ" = "ak"
+"e" = "ê"
+"eʔ" = "êk"
+"i" = "i"
+"ia" = "ia"
+"iaʔ" = "iak"
+"ie" = "iê"
+"ieʔ" = "iêk"
+"io" = "io"
+"ioʔ" = "iok"
+"iu" = "iu"
+"iã" = "iann"
+"iãŋ" = "iang"
+"iæ" = "iae"
+"iɔ" = "io"
+"iɔŋ" = "iong"
+"iɛ̃" = "iênn"
+"o" = "o"
+"oʔ" = "ok"
+"u" = "u"
+"ua" = "ua"
+"uaʔ" = "uak"
+"ue" = "uê"
+"ueʔ" = "uêk"
+"ui" = "ui"
+"uo" = "uo"
+"uoʔ" = "uok"
+"uã" = "uann"
+"uãŋ" = "uang"
+"uɔ̃ŋ" = "uong"
+"y" = "yu"
+"ye" = "yuê"
+"yeʔ" = "yuêk"
+"yĩ" = "yuinn"
+"yɛ̃" = "yuênn"
+"ã" = "ann"
+"æ" = "ae"
+"ĩ" = "inn"
+"ũɛ̃" = "unn"
+"ɔ" = "o"
+"ɔŋ" = "ong"
+"ɛ" = "ê"
+"ɤ" = "e"
+"ɤŋ" = "eng"
+"ɿ" = "ï"
+
+[ipa_zero_final_map]
+"ũɛ̃" = "wênn"
+
+[phonology]
+syllables = "phonology/syllables.jsonl"
+fuzzy_map = "../../fuzzy_scheme.tsv"
+entering_codas = ["k"]
+
+[language]
+chars = "dictionaries/chars.tsv"
+words = "dictionaries/words.tsv"
+gan_chars = "dictionaries/gan_chars.tsv"
+gan_words = "dictionaries/gan_words.tsv"

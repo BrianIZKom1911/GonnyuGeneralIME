@@ -20,7 +20,7 @@ on:
     paths:
       - Cargo.toml
       - platforms/macos/**
-      - platforms/rime/mobile/**
+      - platforms/rime/**
       - engines/rime/**
       - resources/**
       - tests/test_macos_platform.py

@@ -79,7 +79,6 @@
 
   - 然后在拼音表添加ipa，仅添加与默认ipa不同个ipa声明。如对应拼音不存在，新建一行，但需要分类正确。韵腹排序（a,o,e,i,u,yu）以及韵尾排序（i,u,m,n,ng,t,p,k）；
 
-
 － 然后在`resource/tutorial`教程当中参考别地区添加本地调值。
 
 - 如果本地区有入声，参考别地区在`resource/fuzzy_shceme.tsv`中参考别地区，仅为本地有个入声韵尾添加入声互相兼容跟到不输入入声个兼容。
@@ -94,13 +93,28 @@
 python3 tools/dict_studio
 ```
 
+各系统环境不同，如Macos系统分享tools给windows时，文件夹里就多出一个垃圾。总之在windows里最后形成的文件结构是这样的:
+
+    GonnyuGeneralIME-main├share #原来main文件夹里的东西
+                         └tools -dict_studio#等
+
 如果python环境缺失，请向LLM或者互联网寻求帮助。
 
 ## 检索
 
+![赣语词典工作台中的弋阳词典数据示例](resources/images/contribution/dict-studio-yikyan-henfeng.png)
+
+在顶部的两个输入框中可以输入本词和方言读音，按“筛选”进行检索。
+
+在“高级检索”里，可以对国际音标、官话拼音、词频，开头、结尾等更多信息进行检索。
+
 
 
 ## 添加与修改字词
+
+在“词条”“字音”里可以添加、修改字词。要注意有无勾选。
+
+注意输入读音时是写赣拼而不是国际音标。
 
 ## 字管理
 
