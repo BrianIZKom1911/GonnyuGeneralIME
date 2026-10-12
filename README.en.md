@@ -318,6 +318,7 @@ With no initial consonant:
 | it | [it] | - | - | - | - | - | - | - | - | - | — |  |
 | iat | - | [iat] | - | [iat] | - | - | - | - | - | - | - |  |
 | iet | [iet] | [iɛt] | - | [iət] or [iɛt] | [iɛt] | - | - | - | - | - | et (after ng) |  |
+| iut | - | - | - | [iut] | - | - | - | - | - | - | - |  |
 | ip | - | [ip] | [ip] | - | - | - | - | - | - | - | - |  |
 | iap | - | [iap] | [iap] | - | - | - | - | - | - | - | - |  |
 | iep | - | [iɛp] | - | - | - | - | - | - | - | - | — |  |
@@ -333,7 +334,7 @@ With no initial consonant:
 
 \* `i`: Some regions use `ï` for IPA [ɿ], including [ɿ] in other finals. Input uses `i`, which can match `ï` through one-way fuzzy matching.
 
-\* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]; this distinction is omitted when a coda is present.
+\* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]. The same spelling rule applies to forms with entering-tone codas. Forms with nasal codas are an exception.
 
 #### Rounded finals
 
