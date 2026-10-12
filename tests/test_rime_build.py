@@ -176,6 +176,18 @@ def test_open_e_input_matches_circumflex_one_way() -> None:
     assert "    - derive/^Ge$/Fê/" not in algebra
 
 
+def test_yun_to_yung_compatibility_is_yikyan_only_and_one_way() -> None:
+    regions = [None, "fenni", "fungcen", "jingon", "jisuibaedu", "lancong",
+               "seusong", "sinyi", "songau", "tiqien", "xyucuenn", "yikyan-henfeng"]
+    for region in regions:
+        rules = load_rules(RULES_PATH, region)
+        for source, target in (("yun2", "yung"), ("jyun1", "jyung"),
+                               ("qyun5", "qyung"), ("xyun1", "xyung")):
+            assert (target in normalize(source, rules)) == (region == "yikyan-henfeng")
+            assert source[:-1] not in normalize(target, rules)
+            assert source[:-1] not in normalize(target, rules, reverse=True)
+
+
 def test_zero_initial_iu_input_keeps_yiu_distinct_from_yu() -> None:
     rules = load_rules(RULES_PATH)
     for spelling in ("iu", "you", "yiu"):

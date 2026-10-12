@@ -37,7 +37,7 @@ common	rime	yoin	yuon	yon	袁	syllable-final	false	false	secondary	yoin	零声�
 yikyan-henfeng	rime	on	ong			syllable-final	false	true	primary		
 yikyan-henfeng	rime	en	eng			syllable-final	false	true	primary		
 yikyan-henfeng	rime	uon	uong			syllable-final	false	true	primary		
-common	rime	yun	yung			syllable-final	false	true	primary		
+yikyan-henfeng	rime	yun	yung			syllable-final	false	true	primary		
 common	rime	yueng	yuen			syllable-final	false	true	primary		
 lancong	coda		t		客	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带尾（za→zat）
 lancong	coda		k		学	syllable-final	false	false	fallback		入声尾：输入不带尾可模糊匹配带 k 形式（lok）
