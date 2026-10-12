@@ -13,7 +13,6 @@ status = "active"
 
 [ipa_final_map]
 "ɨn" = "en"
-"əŋ" = "en"
 
 [ipa_zero_final_map]
 "ɨn" = "yen"

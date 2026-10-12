@@ -250,11 +250,11 @@ Checked-tone codas follow these spelling and input rules.
 | an | [an] | - | - | - | - | - | - | - | - | - | — |  |
 | on | [on] | - | [ɔn] | [ɔn] | [ɔn] | - | [ɔn] | - | - | - | — |  |
 | oen | - | - | - | [øn] | - | - | - | - | - | - | — |  |
-| en | [ɛn]  or  [ɨn] | [ən] or [əŋ] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | - | ing (Fungcen) |  |
+| en | [ɛn]  or  [ɨn] | [ən] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | - | ing (Fungcen) |  |
 | ann* | - | - | - | - | - | - | - | - | - | [ã] | an |  |
 | ang | [ɑŋ] | - | [aŋ] | [aŋ] | - | - | - | - | - | - | — |  |
 | ong | [ɔŋ] | [oŋ] | - | [oŋ] | - | [oŋ] | - | - | [oŋ] | - | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | - | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | - | [ɤŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
+| eng | - | - | [ɛŋ] | - | - | - | - | [əŋ] | - | [ɤŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | [æt] | - | - | [æt] | - | - | - | - | - | — |  |
 | at | [at] | - | - | - | - | - | - | - | - | - | — |  |
 | ot | [ot] | - | - | [ɔt] | [ɔt] | - | - | - | - | - | — |  |
