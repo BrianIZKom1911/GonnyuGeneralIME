@@ -250,11 +250,11 @@ Checked-tone codas follow these spelling and input rules.
 | an | [an] | - | - | - | - | - | - | - | - | - | — |  |
 | on | [on] | - | [ɔn] | [ɔn] | [ɔn] | - | [ɔn] | - | - | - | — |  |
 | oen | - | - | - | [øn] | - | - | - | - | - | - | — |  |
-| en | [ɛn]  or  [ɨn] | [ən] or [əŋ] or [ɨn] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | - | ing (Fungcen) |  |
+| en | [ɛn]  or  [ɨn] | [ən] | [ən] | [en] or [ɪn] | [ən] | [ən] | [ən] | [en] or [ɛen] | - | - | ing (Fungcen) |  |
 | ann* | - | - | - | - | - | - | - | - | - | [ã] | an |  |
 | ang | [ɑŋ] | - | [aŋ] | [aŋ] | - | - | - | - | - | - | — |  |
 | ong | [ɔŋ] | [oŋ] | - | [oŋ] | - | [oŋ] | - | - | [oŋ] | - | on (Yikyan) | Yikyan does not distinguish front and back variants of ong. |
-| eng | - | - | [ɛŋ] | - | - | - | [əŋ] | [əŋ] or [ən] | - | [ɤŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
+| eng | - | - | [ɛŋ] | - | - | - | - | [əŋ] | - | [ɤŋ] | en (Yikyan) | Most speakers no longer distinguish en and eng in Yikyan. |
 | aet | - | [æt] | - | - | [æt] | - | - | - | - | - | — |  |
 | at | [at] | - | - | - | - | - | - | - | - | - | — |  |
 | ot | [ot] | - | - | [ɔt] | [ɔt] | - | - | - | - | - | — |  |
@@ -269,9 +269,10 @@ Checked-tone codas follow these spelling and input rules.
 | aek | - | [æʔ] or [æk] | - | - | [æʔ] | - | - | - | - | - | — |  |
 | ak | [aʔ] | - | - | - | - | - | - | - | - | - | — |  |
 | aik | - | - | [aiʔ] | [aiʔ] | - | - | - | - | - | - | - |  |
-| ok | [ɔʔ] | [oʔ] | - | [oʔ] | - | - | - | - | - | [oʔ] | — |  |
+| ok | [ɔʔ] | [oʔ] | - | [oʔ] or [ɔk] | - | - | - | - | - | [oʔ] | — |  |
+| oek | - | - | - | [øʔ] | - | - | - | - | - | - | — |  |
 | oik | - | - | [ɔiʔ] | - | - | - | - | - | - | - | - |  |
-| ek | - | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | - | - | [ɛʔ] or [ɤʔ] or [ɪʔ] | - | [eʔ] | — | [ɤʔ] can be written ek or uk. |
+| ek | - | [ɛʔ] or [ɨʔ] | [ɛʔ] | [əʔ] or [ɛʔ] | - | - | - | [ɛʔ] or [ɪʔ] | - | [eʔ] | — |  |
 | eok | - | [ɵʔ] | - | - | - | - | - | - | - | - | — |  |
 | euk | - | - | - | [ɪuʔ] | - | - | - | - | - | - | — |  |
 
@@ -317,11 +318,13 @@ With no initial consonant:
 | iung | [iuŋ] | - | - | - | - | - | - | - | - | - | - |  |
 | it | [it] | - | - | - | - | - | - | - | - | - | — |  |
 | iat | - | [iat] | - | [iat] | - | - | - | - | - | - | - |  |
+| iot | - | - | - | [iɔt] | - | - | - | - | - | - | — |  |
 | iet | [iet] | [iɛt] | - | [iət] or [iɛt] | [iɛt] | - | - | - | - | - | et (after ng) |  |
+| iut | - | - | - | [iut] | - | - | - | - | - | - | - |  |
 | ip | - | [ip] | [ip] | - | - | - | - | - | - | - | - |  |
 | iap | - | [iap] | [iap] | - | - | - | - | - | - | - | - |  |
 | iep | - | [iɛp] | - | - | - | - | - | - | - | - | — |  |
-| ik | - | [iʔ] | [iʔ] | [ɿʔ] | - | - | - | [iʔ] | - | - |  |  |
+| ik | [iʔ] | - | - | [ɿʔ] | - | - | - | - | - | - |  |  |
 | iaek | - | - | - | - | [iæʔ] | - | - | - | - | - |  |  |
 | iak | [iaʔ] | - | - | [iɑʔ] | - | - | - | - | - | - | - |  |
 | iaik | - | - | - | [iaiʔ] | - | - | - | - | - | - | - |  |
@@ -333,7 +336,7 @@ With no initial consonant:
 
 \* `i`: Some regions use `ï` for IPA [ɿ], including [ɿ] in other finals. Input uses `i`, which can match `ï` through one-way fuzzy matching.
 
-\* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]; this distinction is omitted when a coda is present.
+\* `iu`: Bare iu without an initial consonant is written yiu, distinct from yu for [y]. The same spelling rule applies to forms with entering-tone codas. Forms with nasal codas are an exception.
 
 #### Rounded finals
 
@@ -348,35 +351,40 @@ With no initial consonant:
 | uae | - | - | - | - | - | [uæ] or [ʯæ] | - | - | [uæ] | - |  |  |
 | ua | [ua] | - | - | - | - | - | - | - | - | - | - |  |
 | uo | [uo] | - | [uɔ] | - | - | - | - | - | - | - | - |  |
-| ue | [ue] | [uɛ] | [uɛ] | - | - | - | [uɛ] | [uɛ] | [uɛ] | - | - |  |
+| ue | [ue] | [uɛ] | [uɛ] | [uɛ] | - | - | [uɛ] | [uɛ] | [uɛ] | - | - |  |
 | uie | - | [uiɛ] | - | - | - | - | - | - | - | - | wie (no initial) |  |
 | ui* | [ui] or [uei] | [uɛi] | - | [uəi] | - | [ʯei] | - | - | - | - | uei, ui, wui (no initial), wei (no initial) |  |
 | uai | [uai] | - | - | - | - | [ʯai] | - | - | - | - | - |  |
 | uoi | - | - | [uɔi] | [uoi] or [uɔi] | - | - | - | [uoi] | - | - | — |  |
-| ueu | - | - | - | [uəu] | - | - | - | - | - | - | - |  |
+| ueu | - | - | - | [uəu] or [ueu] | - | - | - | - | - | - | - |  |
 | un* | [un] or [uen] | [uɛn] | [uɛn] | - | - | [uən] or [ʯən] or [ʯɛn] | [uɛn] | [uɛn] | [uɛn] | - | uen |  |
 | uan | [uan] | - | - | [uɑn] | - | - | - | - | - | - | - |  |
 | uon | [uon] | - | [uɔn] | [uɔn] | - | - | [uɔn] | - | - | - | uen, wen (no initial) |  |
-| uin | - | [uin] | - | - | - | - | - | - | - | - | - |  |
+| uin | - | [uin] | - | [uin] | - | - | - | - | - | - | - |  |
 | uien | - | [uiɛn] | - | - | - | - | - | - | - | - | - |  |
 | unn | - | - | - | - | - | - | - | - | - | [ũɛ̃] | un, uen, uenn |  |
 | uann | - | - | - | - | - | - | - | - | - | [uã] | uan |  |
 | ung | [uŋ] | - | - | - | - | - | - | - | - | - | — |  |
 | uang | [uɑŋ] | - | [uaŋ] | [uaŋ] | - | - | - | - | - | [uãŋ] | - |  |
 | uong | [uɔŋ] | [uoŋ] | - | [uoŋ] | - | - | - | - | [uoŋ] | [uɔ̃ŋ] | uon (Yikyan) |  |
+| ueng | - | - | - | - | - | - | - | [ueŋ] | - | - | — |  |
 | ut | [ut] | - | - | - | - | - | - | - | - | - | - |  |
 | uaet | - | [uæt] | - | - | - | - | - | - | - | - | - |  |
 | uat | [uat] | - | - | - | - | - | - | - | - | - | - |  |
 | uot | [uot] | - | - | [uɔt] | - | - | - | - | - | - | - |  |
 | uet | [uɛt] | [uɨt] | - | [uət] | - | - | - | - | - | - | - |  |
 | uep | - | [uɛp] | - | - | - | - | - | - | - | - | - |  |
-| uk | [uʔ] | - | - | - | - | - | - | [ɤʔ] | - | - | - |  |
+| uk | [uʔ] | - | - | - | - | - | - | - | - | - | - |  |
 | uaek | - | [uæʔ] | - | - | - | - | - | - | - | - | - |  |
 | uak | [uaʔ] | - | - | - | - | - | - | - | - | - | - |  |
-| uaik | - | - | [uaiʔ] | - | - | - | - | - | - | - | - |  |
+| uaik | - | - | [uaiʔ] | [uaiʔ] | - | - | - | - | - | - | - |  |
 | uok | [uoʔ] | [uɔʔ] | [uɔʔ] | [uɔʔ] | - | - | - | [uɔʔ] | - | - | - |  |
 | uoik | - | - | [uɔiʔ] | - | - | - | - | - | - | - | - |  |
+<<<<<<< HEAD
 | uek | - | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] or [uəʔ] | - | - | - | [uəʔ] or [uɛʔ] or [uɤʔ] or [uɪʔ] | - | [ueʔ] | — |  |
+=======
+| uek | — | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | - | - | - | [uəʔ] or [uɛʔ] or [uɪʔ] | - | [ueʔ] | — |  |
+>>>>>>> 3950a075b92d534cf8238932528f0f72596d9508
 | uik | - | [uɛiʔ] | [uiʔ] | [uəiʔ] | - | - | - | - | - | - | ueik |  |
 
 \* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling.
@@ -398,19 +406,21 @@ With no initial consonant:
 | yue | [ye] | - | - | - | - | - | [yɛ] | [yɛ] | [yə] | - | - |  |
 | yueo | - | [yɵ] | - | - | - | - | - | - | - | - | — |  |
 | yun | [yn] | - | - | - | - | - | - | - | - | - | — |  |
-| yuon | [yon] | - | - | - | - | - | [yɔn] | - | - | - | yoin (without an initial), yuen |  |
+| yuon | [yon] | - | - | [yɔn] | - | - | [yɔn] | - | - | - | yoin (without an initial), yuen |  |
 | yuen | - | - | - | - | - | - | [yɛn] | [yɛn] or [yɛŋ] | - | - | yueng |  |
 | yuenn | - | - | - | - | - | - | - | - | - | [yɛ̃] | yuen |  |
 | yuinn | - | - | - | - | - | - | - | - | - | [yĩ] | yuin |  |
-| yung | - | [yŋ] | - | - | - | - | - | [yn] or [yŋ] | - | - | yun |  |
+| yung | [yŋ] | - | - | - | - | - | - | - | - | - | yun (Yikyan) |  |
 | yuong | - | - | - | - | - | - | - | [yɔŋ] | - | - |  |  |
+| yueng | - | - | - | - | - | - | - | [yeŋ] | - | - | — |  |
 | yut | [yt] | - | - | - | - | - | - | - | - | - | - |  |
-| yuot | [yot] | - | - | - | - | - | - | - | - | - | yue, yuet, yuek |  |
-| yuet | - | [yet] | - | - | - | - | - | - | - | - | - |  |
-| yuk | - | [yʔ] | [yʔ] | - | - | - | - | - | - | - | - |  |
+| yuot | [yot] | - | - | [yɔt] | - | - | - | - | - | - | yue, yuet, yuek |  |
+| yuet | - | [yet] | - | [yət] | - | - | - | - | - | - | - |  |
+| yuep | - | [yep] | - | - | - | - | - | - | - | - | — |  |
+| yuk | - | [yʔ] | [yʔ] | [yʔ] | - | - | - | [yʔ] | - | - | - |  |
 | yuak | - | - | - | - | - | - | - | [yaʔ] | - | - | - |  |
-| yuok | - | - | - | - | - | - | - | [yɔʔ] | - | - | - |  |
-| yuek | - | - | - | - | - | - | - | [yəʔ] or [yɛʔ] or [yɪʔ] | - | [yeʔ] | — |  |
+| yuok | - | - | - | [yɔʔ] | - | - | - | [yɔʔ] | - | - | - |  |
+| yuek | - | [yeʔ] | - | [yəʔ] | - | - | - | [yəʔ] or [yɛʔ] or [yɪʔ] | - | [yeʔ] | — |  |
 | yueok | - | [yɵʔ] | - | - | - | - | - | - | - | - | — |  |
 
 #### Syllabic laterals and nasals

@@ -17,6 +17,49 @@ fn fuzzy_map_loads() {
 }
 
 #[test]
+fn yun_to_yung_compatibility_is_yikyan_only_and_one_way() {
+    for region in [
+        "common",
+        "fenni",
+        "fungcen",
+        "jingon",
+        "jisuibaedu",
+        "lancong",
+        "seusong",
+        "sinyi",
+        "songau",
+        "tiqien",
+        "xyucuenn",
+        "yikyan-henfeng",
+    ] {
+        let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), region).expect("load regional rules");
+        for (input, target) in [
+            ("yun2", "yung"),
+            ("jyun1", "jyung"),
+            ("qyun5", "qyung"),
+            ("xyun1", "xyung"),
+        ] {
+            assert_eq!(
+                map.normalize(input, SyllableScheme::GonPin)
+                    .iter()
+                    .any(|item| item.text == target),
+                region == "yikyan-henfeng",
+                "{region}: {input}"
+            );
+            let source = &input[..input.len() - 1];
+            for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+                assert!(
+                    !map.normalize(target, scheme)
+                        .iter()
+                        .any(|item| item.text == source),
+                    "{region}: {target}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn fungcen_ing_input_matches_en_only_in_one_direction() {
     let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "fungcen").expect("load fungcen rules");
     for (input, expected) in [("jing1", "jen"), ("ning2", "nen"), ("ying3", "yen")] {
