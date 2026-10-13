@@ -39,7 +39,7 @@ fn sinyi_starred_tone_classes_load() {
         load_region_from_manifest(MANIFEST_PATH, "sinyi").expect("sinyi resource should load");
     assert_eq!(resource.config.tone_classes["1*"].name, "阴平乙");
     assert_eq!(resource.config.tone_classes["4*"].name, "去声乙");
-    assert_eq!(resource.config.tone_classes["5*"].name, "入声乙");
+    assert_eq!(resource.config.tone_classes["5*"].name, "阴入乙");
     assert_eq!(resource.config.tone_classes["2"].name, "阳平");
     assert_eq!(resource.config.tone_classes["3"].name, "上声");
 }
