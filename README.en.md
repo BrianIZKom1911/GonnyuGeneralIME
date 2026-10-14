@@ -50,7 +50,7 @@ Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fu
     - [Windows](#windows)
     - [Linux Fcitx5](#linux-fcitx5)
     - [Rime](#rime)
-  - [The Gon-pin Romanisation](#the-gon-pin-romanisation)
+  - [The General Gon-pin Romanisation](#the-general-gon-pin-romanisation)
     - [Initials](#initials)
     - [Finals](#finals)
       - [Open finals](#open-finals)
@@ -186,9 +186,11 @@ Download `GonnyuGeneralIME-version-rime-region.zip` for the required locality. T
 
 For Windows Weasel, copy the archive contents into `%APPDATA%\Rime` and redeploy from the input-method menu. For Linux Fcitx5 Rime, copy the contents into `~/.local/share/fcitx5/rime/`, redeploy, then select the locality from the schema menu. For iOS and Android, import or deploy the ZIP in the installed Rime front end.
 
-## The Gon-pin Romanisation
+## The General Gon-pin Romanisation
 
-The spelling system is intended to represent Gon(Gan) pronunciation while remaining as close as practical to the conventions of Hanyu Pinyin. To make typing easier and to accommodate mergers in newer varieties, some spellings deliberately accept more than one phoneme in a strict phonological sense.
+The general Gon(Gan) romanisation (gon-pin) used by this project represents Gon(Gan) pronunciation while keeping its spellings as close as practical to Hanyu Pinyin for everyday input.
+
+The system aims to cover phonemes across localities, represents necessary phonemic contrasts, and provides consistent notation for nasalised finals and voiced consonants in some Gon(Gan) varieties. To accommodate mergers in newer varieties and facilitate input, it does not attempt to transcribe every phonetic detail, such as breathy or slack phonation, and merges sound values that are not contrastive within a locality or occur as alternative pronunciations.
 
 ### Initials
 
