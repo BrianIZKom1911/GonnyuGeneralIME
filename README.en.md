@@ -202,7 +202,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 | l | [l] | - | - | - | - | - | - | - | - | - | - |  |
 | z | [ts] | - | - | - | - | - | - | - | - | - |  |  |
 | c | [tsʰ] | - | - | - | - | - | - | - | - | - |  |  |
-| s | [s] | - | - | [θ] | - | - | - | - | - | - |  |  |
+| s | [s] | - | - | [s] or [θ] | - | - | - | - | - | - |  |  |
 | j | [tɕ] | - | - | - | - | - | - | [tʃ] | - | - |  |  |
 | q | [tɕʰ] | - | - | - | - | - | - | [tʃʰ] | - | - |  |  |
 | n | [ȵ] | - | [n] | [n] | - | [n] or [ɳ] | - | [n] | [ɳ] | [n] | - |  |
@@ -242,7 +242,7 @@ Checked-tone codas follow these spelling and input rules.
 | aeu | - | - | - | - | [æu] | - | - | - | - | - |  |  |
 | au | [au] | [ɑu] | - | - | - | [ɑu] | - | - | - | - | ao |  |
 | ou | - | - | [ɔu] | - | - | - | - | - | - | - | - |  |
-| eu | [ɛu] or  [ɨu] | [əu] | - | [əu] or [ɪu] | - | [əu] | - | [əu] | - | - | ou (after some initials), ieu (after h) |  |
+| eu | [ɛu] or  [ɨu] | [əu] | - | [ɛu] or [əu~ɪu] | - | [əu] | - | [əu] | - | - | ou (after some initials), ieu (after h) |  |
 | am | - | [am] | [am] | - | - | - | - | - | - | - | — |  |
 | om | - | - | [ɔm] | - | - | - | - | - | - | - | - |  |
 | em | - | - | [ɛm] | - | - | - | - | - | - | - | - |  |
@@ -380,14 +380,18 @@ With no initial consonant:
 | uaik | - | - | [uaiʔ] | [uaiʔ] | - | - | - | - | - | - | - |  |
 | uok | [uoʔ] | [uɔʔ] | [uɔʔ] | [uɔʔ] | - | - | - | [uɔʔ] | - | - | - |  |
 | uoik | - | - | [uɔiʔ] | - | - | - | - | - | - | - | - |  |
+<<<<<<< HEAD
+| uek | - | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] or [uəʔ] | - | - | - | [uəʔ] or [uɛʔ] or [uɤʔ] or [uɪʔ] | - | [ueʔ] | — |  |
+=======
 | uek | — | [uɛʔ] or [uɨʔ] | [uɛʔ] | [uɛʔ] | - | - | - | [uəʔ] or [uɛʔ] or [uɪʔ] | - | [ueʔ] | — |  |
+>>>>>>> 3950a075b92d534cf8238932528f0f72596d9508
 | uik | - | [uɛiʔ] | [uiʔ] | [uəiʔ] | - | - | - | - | - | - | ueik |  |
 
 \* `u`: The rounded postalveolar apical vowel [ʯ] is written u; finals beginning with [ʯ] also use u-series spellings. The vowel and its medial forms correspond to the front rounded series and are listed under rounded finals by spelling.
 
 \* `uei`: `uei` and `uêi` are shortened to `ui` after an initial consonant and grouped under `ui` in this table. With no initial, the forms are `wei` and `wêi`; [ui] has the form `wi`. The same applies to checked-tone forms.
 
-\* `uen` and `uên` shorten to `un` after an initial and are grouped under `un`; zero-initial forms are `wen` and `wên`. Nasalized forms follow the same pattern.
+\* `uen` and `uên` are shorten to `un` after an initial and are grouped under `un`; zero-initial forms are `wen` and `wên`. Nasalized forms follow the same pattern.
 
 
 #### Rounded front-vowel finals
@@ -489,10 +493,11 @@ The Sinyi (Xinyu City) dictionary uses the following tone markers:
 | 3 | rising | 213 |
 | 4 | departing A | 11 |
 | 4* | departing B | 33 |
-| 5 | checked A | 5 |
-| 5* | checked B | 24 |
+| 5 | yin checked A | 5 |
+| 5* | yin checked B | 24 |
+| 6 | yang checked | 3 |
 
-Departing B occurs around Shuibei; it has merged with departing A in the urban area.
+Departing B occurs around Shuibei; it has merged with yang level in the urban area.
 
 #### Songau (Shanggao)
 
