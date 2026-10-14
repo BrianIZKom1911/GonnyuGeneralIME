@@ -61,6 +61,8 @@ def substitute(
     text: str, source: str, target: str, applies: str, initials: tuple[str, ...] = ()
 ) -> list[str]:
     if applies == "syllable-initial":
+        if len(target) > len(source) and text.startswith(target):
+            return []
         return [target + text[len(source) :]] if text.startswith(source) else []
     if applies == "syllable-final":
         if source == "o" and target == "eo" and text != source:

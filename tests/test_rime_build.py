@@ -176,6 +176,18 @@ def test_open_e_input_matches_circumflex_one_way() -> None:
     assert "    - derive/^Ge$/Fê/" not in algebra
 
 
+def test_voiced_initial_compatibility_composes_with_special_vowels():
+    rules = load_rules(RULES_PATH, "singzi")
+    for source, target in (("jien", "jjiên"), ("jieen", "jjiên"), ("zi", "zzï")):
+        assert target in normalize(source, rules)
+    assert not any(form.startswith("jjj") for form in normalize("jjiên", rules))
+    algebra = compile_algebra({"jjiên", "zzï"}, rules)
+    assert "    - derive/^Gjjiên$/Fjien/" in algebra
+    assert "    - derive/^Gjjiên$/Fjieen/" in algebra
+    assert "    - derive/^Gzzï$/Fzi/" in algebra
+    assert "    - derive/^Gjjiên$/Fjjjien/" not in algebra
+
+
 def test_double_e_input_matches_only_circumflex() -> None:
     rules = load_rules(RULES_PATH)
     for source, target, plain in (("ee", "ê", "e"), ("een", "ên", "en"),

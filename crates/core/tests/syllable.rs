@@ -64,6 +64,21 @@ fn voiced_initial_inputs_are_common_and_one_way() {
 }
 
 #[test]
+fn voiced_initial_compatibility_composes_with_special_vowels() {
+    let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "singzi").unwrap();
+    for (source, target) in [("jien", "jjiên"), ("jieen", "jjiên"), ("zi", "zzï")] {
+        assert!(map
+            .normalize(source, SyllableScheme::GonPin)
+            .iter()
+            .any(|s| s.text == target));
+    }
+    let outputs = map.normalize("jjiên", SyllableScheme::GonPin);
+    assert!(!outputs
+        .iter()
+        .any(|s| s.text.starts_with("jjj") || s.text == "jiên"));
+}
+
+#[test]
 fn yun_to_yung_compatibility_is_yikyan_only_and_one_way() {
     for region in [
         "common",

@@ -102,11 +102,11 @@ xyucuenn	rime	en	ênn			syllable-final	false	false	primary		鼻化韵普通 e �
 xyucuenn	rime	uenn	un			syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	鼻化韵旧式输入归并到 un 后继续匹配规范写法
 xyucuenn	rime	un	unn			syllable-final	false	false	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后 un 匹配规范鼻化韵 unn
 xyucuenn	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
-common	onset	b	bb			syllable-initial	false	false	primary		
-common	onset	d	dd			syllable-initial	false	false	primary		
-common	onset	g	gg			syllable-initial	false	false	primary		
-common	onset	z	zz			syllable-initial	false	false	primary		
-common	onset	j	jj			syllable-initial	false	false	primary		
-common	onset	zr	zzr			syllable-initial	false	false	primary		
-common	onset	zh	zzr			syllable-initial	false	false	primary		
-common	onset	zzh	zzr			syllable-initial	false	false	primary		
+common	onset	b	bb			syllable-initial	false	true	primary		
+common	onset	d	dd			syllable-initial	false	true	primary		
+common	onset	g	gg			syllable-initial	false	true	primary		
+common	onset	z	zz			syllable-initial	false	true	primary		
+common	onset	j	jj			syllable-initial	false	true	primary		
+common	onset	zr	zzr			syllable-initial	false	true	primary		
+common	onset	zh	zzr			syllable-initial	false	true	primary		
+common	onset	zzh	zzr			syllable-initial	false	true	primary		

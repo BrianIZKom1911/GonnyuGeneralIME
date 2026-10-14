@@ -20,19 +20,19 @@ Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Ti
 
 Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fungcen, Yikyan-Henfeng, and Sinyi (Xinyu). Other installation options are available in the [Installation](#installation) section below.
 
-## Release 1.2.0
+## Release 1.2.1
 
-- feat(dict): Add Jishuibadou and Xyucuênn, and expand regional dictionaries and readings.
-- feat(input): Improve Xyucuênn nasal-vowel input aliases and add one-way `ing` to `en` fuzzy input for Fungcen.
-- perf(rime): Compact candidate annotation indexes to reduce Rime resource usage.
-- fix(rime): Correct session reset, candidate reads, and resource cleanup.
-- fix(platforms): Update Android and macOS build workflows and fix Windows, Linux/Fcitx5, and Rime support.
+- feat(dict): Add the Singzï dictionary with one-way input aliases for voiced initials.
+- fix(dict): Correct Lancong e vowels and related entries, distinguish vowel values with ê, and add paired alternative readings.
+- fix(phonology): Update readings in Sinyi and other localities, and correct Fenni spelling and checked-tone coda mappings.
+- fix(input): Add one-way ee input for ê and fix combinations of voiced-initial and special-vowel aliases, including jien input for jjiên.
+- docs: Update the romanisation reference and tutorial, distinguishing zero initials [] or [ʔ] from checked-tone codas.
 
 
 ## Contents
 
 - [GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method](#gonnyugeneralime--a-general-gongan-chinese-input-method)
-  - [Release 1.2.0](#release-120)
+  - [Release 1.2.1](#release-121)
   - [Contents](#contents)
   - [Overview](#overview)
     - [What it provides](#what-it-provides)
@@ -194,6 +194,7 @@ The spelling system is intended to represent Gon(Gan) pronunciation while remain
 
 | gon-pin | Default IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Jingon IPA | Yikyan-Henfeng IPA | Jisuibaedu IPA | Xyucuênn IPA | Singzï IPA | Accepted alternative input | Notes |
 | --- | --- | --- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | --- | --- |
+| ∅ | [] or [ʔ] | - | - | - | - | - | - | - | - | - | - |  | Zero initial |
 | b | [p] | - | - | - | - | - | - | - | - | - | - |  |  |
 | p | [pʰ] | - | - | - | - | - | - | - | - | - | - |  |  |
 | m | [m] | - | - | - | - | - | - | - | - | - | - | - |  |

@@ -411,7 +411,7 @@ fn substitute_any(text: &str, from: &str, to: &str, initials: &[String]) -> Vec<
 }
 
 fn substitute_initial(text: &str, from: &str, to: &str) -> Vec<String> {
-    if !text.starts_with(from) {
+    if !text.starts_with(from) || (to.len() > from.len() && text.starts_with(to)) {
         return Vec::new();
     }
     let mut next = String::with_capacity(text.len() + to.len());
