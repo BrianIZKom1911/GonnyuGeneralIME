@@ -65,3 +65,9 @@ id = "xyucuenn"
 name_zh = "遂川"
 status = "active"
 path = "regions/xyucuenn/region.toml"
+
+[[regions]]
+id = "singzi"
+name_zh = "星子"
+status = "active"
+path = "regions/singzi/region.toml"

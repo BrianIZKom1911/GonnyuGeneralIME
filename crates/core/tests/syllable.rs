@@ -17,6 +17,53 @@ fn fuzzy_map_loads() {
 }
 
 #[test]
+fn voiced_initial_inputs_are_common_and_one_way() {
+    let mut maps = vec![FuzzyMap::load_tsv(fuzzy_path()).expect("load common rules")];
+    let regions = PathBuf::from(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../resources/regions"
+    ));
+    for directory in std::fs::read_dir(regions).expect("read regions") {
+        let directory = directory.expect("region directory");
+        if directory.path().join("region.toml").is_file() {
+            maps.push(
+                FuzzyMap::load_tsv_for_region(
+                    fuzzy_path(),
+                    directory.file_name().to_str().expect("region ID"),
+                )
+                .expect("load regional rules"),
+            );
+        }
+    }
+    assert!(maps.len() > 1);
+    for map in maps {
+        for (input, target) in [
+            ("bon5", "bbon"),
+            ("dai5", "ddai"),
+            ("gong5", "ggong"),
+            ("zong5", "zzong"),
+            ("jiau2", "jjiau"),
+            ("zrong5", "zzrong"),
+            ("zhong5", "zzrong"),
+            ("zzhong5", "zzrong"),
+        ] {
+            let source = &input[..input.len() - 1];
+            let outputs = map.normalize(input, SyllableScheme::GonPin);
+            assert!(outputs.iter().any(|item| item.text == target), "{input}");
+            assert!(outputs.iter().any(|item| item.text == source), "{input}");
+            for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+                assert!(
+                    !map.normalize(target, scheme)
+                        .iter()
+                        .any(|item| item.text == source),
+                    "{target} → {source}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn yun_to_yung_compatibility_is_yikyan_only_and_one_way() {
     for region in [
         "common",

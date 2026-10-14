@@ -1,0 +1,123 @@
+[region]
+id = "singzi"
+name_zh = "星子"
+status = "active"
+
+[tone_classes]
+1 = { name = "阴平", value = "33" }
+2 = { name = "阳平", value = "213" }
+3 = { name = "上声", value = "42" }
+4 = { name = "阴去甲", value = "34" }
+"4*" = { name = "阴去乙", value = "324" }
+5 = { name = "阳去", value = "21" }
+6 = { name = "入声", value = "35" }
+
+[ipa_tone_map]
+0 = 0
+1 = 1
+2 = 2
+3 = 3
+4 = 4
+5 = 5
+6 = 6
+
+[ipa_initial_map]
+"b" = "bb"
+"d" = "dd"
+"dz" = "zz"
+"dʐ" = "zzr"
+"dʑ" = "jj"
+"f" = "f"
+"h" = "h"
+"k" = "g"
+"kʰ" = "k"
+"l" = "l"
+"m" = "m"
+"n" = "n"
+"p" = "b"
+"pʰ" = "p"
+"s" = "s"
+"t" = "d"
+"ts" = "z"
+"tsʰ" = "c"
+"tɕ" = "j"
+"tɕʰ" = "q"
+"tʂ" = "zh"
+"tʂʰ" = "ch"
+"tʃ" = "j"
+"tʃʰ" = "q"
+"tʰ" = "t"
+"v" = "v"
+"x" = "h"
+"ŋ" = "ng"
+"ȵ" = "n"
+"ɕ" = "x"
+"ɡ" = "gg"
+"ɳ" = "n"
+"ɸ" = "f"
+"ʂ" = "sh"
+"ʃ" = "x"
+"ʈʂ" = "zh"
+"ʈʂʰ" = "ch"
+"ʐ" = "r"
+"θ" = "s"
+
+[ipa_final_map]
+"a" = "a"
+"ai" = "ai"
+"an" = "an"
+"au" = "au"
+"aŋ" = "ang"
+"ei" = "êi"
+"en" = "ên"
+"eu" = "êu"
+"eŋ" = "êng"
+"i" = "i"
+"ia" = "ia"
+"iau" = "iau"
+"iaŋ" = "iang"
+"in" = "in"
+"io" = "io"
+"iu" = "iu"
+"iŋ" = "ing"
+"iɔŋ" = "iong"
+"iɛ" = "iê"
+"iɛn" = "iên"
+"m̩" = "m"
+"n̩" = "n"
+"o" = "o"
+"on" = "on"
+"u" = "u"
+"ua" = "ua"
+"uai" = "uai"
+"uan" = "uan"
+"uaŋ" = "uang"
+"uei" = "uêi"
+"uen" = "uên"
+"ueŋ" = "uêng"
+"uia" = "uia"
+"uin" = "uin"
+"uiɛn" = "uiên"
+"uo" = "uo"
+"uon" = "uon"
+"uɔŋ" = "uong"
+"uɛ" = "uê"
+"ɔ" = "o"
+"ɔŋ" = "ong"
+"ɛ" = "ê"
+"ɛn" = "ên"
+"ɛu" = "êu"
+"ɿ" = "ï"
+"ʅ" = "i"
+
+[phonology]
+jqx_u_to_yu = false
+syllables = "phonology/syllables.jsonl"
+fuzzy_map = "../../fuzzy_scheme.tsv"
+entering_codas = []
+
+[language]
+chars = "dictionaries/chars.tsv"
+words = "dictionaries/words.tsv"
+gan_chars = "dictionaries/gan_chars.tsv"
+gan_words = "dictionaries/gan_words.tsv"
