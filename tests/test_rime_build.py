@@ -176,6 +176,21 @@ def test_open_e_input_matches_circumflex_one_way() -> None:
     assert "    - derive/^Ge$/Fê/" not in algebra
 
 
+def test_double_e_input_matches_only_circumflex() -> None:
+    rules = load_rules(RULES_PATH)
+    for source, target, plain in (("ee", "ê", "e"), ("een", "ên", "en"),
+                                  ("geek", "gêk", "gek"), ("geen1", "gên", "gen")):
+        assert target in normalize(source, rules)
+        assert plain not in normalize(source, rules)
+        for reverse in (False, True):
+            assert source.rstrip("1") not in normalize(target, rules, reverse=reverse)
+    algebra = compile_algebra({"e", "ê", "gêk", "gek"}, rules)
+    assert "    - derive/^Gê$/Fee/" in algebra
+    assert "    - derive/^Ggêk$/Fgeek/" in algebra
+    assert "    - derive/^Ge$/Fee/" not in algebra
+    assert "    - derive/^Ggek$/Fgeek/" not in algebra
+
+
 def test_yun_to_yung_compatibility_is_yikyan_only_and_one_way() -> None:
     regions = [None, "fenni", "fungcen", "jingon", "jisuibaedu", "lancong",
                "seusong", "sinyi", "songau", "tiqien", "xyucuenn", "yikyan-henfeng"]

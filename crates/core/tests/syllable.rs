@@ -226,6 +226,27 @@ fn open_e_input_matches_circumflex_one_way() {
 }
 
 #[test]
+fn double_e_input_matches_only_circumflex() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    for (source, target, plain) in [
+        ("ee", "ê", "e"),
+        ("een", "ên", "en"),
+        ("geek", "gêk", "gek"),
+        ("geen1", "gên", "gen"),
+    ] {
+        let outputs = map.normalize(source, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == target));
+        assert!(!outputs.iter().any(|item| item.text == plain));
+        for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+            assert!(!map
+                .normalize(target, scheme)
+                .iter()
+                .any(|item| item.text == source.trim_end_matches('1')));
+        }
+    }
+}
+
+#[test]
 fn zero_initial_iu_input_keeps_yiu_distinct_from_yu() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     for spelling in ["iu", "you", "yiu"] {

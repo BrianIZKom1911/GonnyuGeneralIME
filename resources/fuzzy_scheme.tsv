@@ -26,6 +26,7 @@ common	rime	uen	won	uon	碗	syllable-final	false	false	primary	uen	零声母 won
 common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon 可从 uen 模糊输入
 common	rime	yan	yen	ian	烟	syllable-final	false	false	primary	yan	仅保留输入 yan→yen 的模糊，不改写现有 yan
 common	rime	i	ï	ɿ		anywhere	false	false	primary		i 可单向模糊匹配 ï
+common	rime	ee	ê	ɛ	额	anywhere	false	false	primary		ee 可单向模糊匹配 ê
 common	rime	e	ê	ɛ	额	anywhere	false	false	primary		e 可单向模糊匹配 ê
 common	rime	o	eo	ɵ	儿	syllable-final	false	false	primary	o	独立音节 o 单向兼容 eo
 common	rime	eu	ieu	iɛu	够	syllable-final	false	true	secondary	ng,g,k	g/k/ng 后可省略 i
