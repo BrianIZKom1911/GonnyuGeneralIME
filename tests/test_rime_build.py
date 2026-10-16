@@ -99,13 +99,11 @@ def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     for spelling in ("ui", "wui", "wei"):
         assert f"    - derive/^Gwi$/F{spelling}/" in algebra
     assert "    - derive/^Ggui$/Fguei/" in algebra
-    assert "    - derive/^Ggui$/Fguêi/" in algebra
 
 
 def test_ueik_rules_follow_uei_with_checked_coda() -> None:
     rules = load_rules(RULES_PATH)
-    for source, target in (("uei", "wei"), ("uêi", "wêi"),
-                           ("uei", "ui"), ("uêi", "ui")):
+    for source, target in (("uei", "wei"), ("uei", "ui")):
         plain = [rule for rule in rules if rule.source == source and rule.target == target]
         checked = [rule for rule in rules if rule.source == source + "k" and rule.target == target + "k"]
         assert len(plain) == len(checked) == 1
@@ -117,6 +115,9 @@ def test_ueik_rules_follow_uei_with_checked_coda() -> None:
         assert prefix + target + "k" in normalize(prefix + source + "k", rules)
         expected_starts = tuple(value + "k" for value in plain.starts_with) if plain.starts_with == (source,) else plain.starts_with
         assert checked.starts_with == expected_starts
+    # hat-e forms work via u→w initial chain, not direct rules
+    assert "wêi" in normalize("uêi", rules)
+    assert "wêik" in normalize("uêik", rules)
 
 
 def test_ueik_zero_initial_and_shortened_forms_compile_to_stored_codes() -> None:
@@ -127,14 +128,13 @@ def test_ueik_zero_initial_and_shortened_forms_compile_to_stored_codes() -> None
     for spelling in ("ueik", "uêik", "weik", "wêik"):
         assert "uik" not in normalize(spelling, rules)
     for initial in ("g", "n", "ng", "zh"):
-        for final in ("ueik", "uêik"):
+        for final in ("ueik",):
             assert initial + "uik" in normalize(initial + final, rules)
     algebra = compile_algebra({"weik", "wêik", "guik"}, rules)
     assert "    - derive/^Gweik$/Fueik/" in algebra
     assert "    - derive/^Gwêik$/Fueik/" in algebra
     assert "    - derive/^Gwêik$/Fuêik/" in algebra
     assert "    - derive/^Gguik$/Fgueik/" in algebra
-    assert "    - derive/^Gguik$/Fguêik/" in algebra
 
 
 def test_zero_initial_weik_never_becomes_uik() -> None:
@@ -693,7 +693,7 @@ def test_rime_installers_discover_regions_from_build_output() -> None:
 
 def test_onset_contractions_preserve_zero_initial_circumflex_forms() -> None:
     rules = load_rules(RULES_PATH)
-    for source, target in (("guei", "gui"), ("guêi", "gui"), ("guen", "gun"), ("guên", "gun"), ("vuei", "vui")):
+    for source, target in (("guei", "gui"), ("guen", "gun"), ("vuei", "vui")):
         assert target in normalize(source, rules)
     for source in ("uen", "uên", "wen", "wên"):
         assert "wên" in normalize(source, rules)

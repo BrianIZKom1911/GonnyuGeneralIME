@@ -14,7 +14,7 @@
             "i",
             "y"
           ],
-          "intent": "零声母 i 系旧写兼容；ia→ya、ieu→yeu、ion→yon、iou→you",
+          "intent": "零声母 i 系旧写兼容；ia→ya、ieu→yeu、ion→yon、iou→you，可接续匹配ê形式",
           "origin": {
             "kind": "explicit"
           }
@@ -26,7 +26,7 @@
             "u",
             "w"
           ],
-          "intent": "零声母 u 系旧写兼容；ua→wa、uen→wen、uon→won",
+          "intent": "零声母 u 系旧写兼容；ua→wa、uen→wen、uon→won，可接续匹配ê形式",
           "origin": {
             "kind": "explicit"
           }
@@ -131,7 +131,7 @@
           "id": "F011",
           "match": [
             "common",
-            "uêi",
+            "uei",
             "wêi"
           ],
           "intent": "零声母 ueei 输入单向兼容 wêi",
@@ -155,7 +155,7 @@
           "id": "F014",
           "match": [
             "common",
-            "uêik",
+            "ueik",
             "wêik"
           ],
           "intent": "零声母 uei 的 k 尾输入兼容独立 wêik",
@@ -167,7 +167,7 @@
           "id": "F028",
           "match": [
             "common",
-            "iên",
+            "ien",
             "yên"
           ],
           "intent": "ee 输入 ien 匹配 yên",
@@ -179,7 +179,7 @@
           "id": "F029",
           "match": [
             "common",
-            "iêp",
+            "iep",
             "yêp"
           ],
           "intent": "ee 输入 iep 匹配 yêp",
@@ -191,7 +191,7 @@
           "id": "F030",
           "match": [
             "common",
-            "iêt",
+            "iet",
             "yêt"
           ],
           "intent": "ee 输入 iet 匹配 yêt",
@@ -203,7 +203,7 @@
           "id": "F031",
           "match": [
             "common",
-            "iêk",
+            "iek",
             "yêk"
           ],
           "intent": "ee 输入 iek 匹配 yêk",
@@ -251,7 +251,7 @@
           "id": "F035",
           "match": [
             "common",
-            "iênn",
+            "ienn",
             "yênn"
           ],
           "intent": "零声母 ienn 匹配 yênn",
@@ -275,7 +275,7 @@
           "id": "F037",
           "match": [
             "common",
-            "iê",
+            "ie",
             "yê"
           ],
           "intent": "零声母 ie 匹配 yê",
@@ -311,7 +311,7 @@
           "id": "F040",
           "match": [
             "common",
-            "uiê",
+            "uie",
             "wiê"
           ],
           "intent": "零声母 uie 匹配 wiê",
@@ -323,7 +323,7 @@
           "id": "F041",
           "match": [
             "common",
-            "uiên",
+            "uien",
             "wiên"
           ],
           "intent": "零声母 uien 匹配 wiên",
@@ -359,7 +359,7 @@
           "id": "F098",
           "match": [
             "common",
-            "iêu",
+            "ieu",
             "yêu"
           ],
           "intent": "ee 输入 ieu 匹配 yêu",
@@ -380,18 +380,6 @@
           }
         },
         {
-          "id": "F120",
-          "match": [
-            "common",
-            "uêi",
-            "ui"
-          ],
-          "intent": "声母后省写；零声母保留 w 系拼写",
-          "origin": {
-            "kind": "explicit"
-          }
-        },
-        {
           "id": "F121",
           "match": [
             "common",
@@ -404,34 +392,10 @@
           }
         },
         {
-          "id": "F122",
-          "match": [
-            "common",
-            "uên",
-            "un"
-          ],
-          "intent": "声母后省写；零声母保留 w 系拼写",
-          "origin": {
-            "kind": "explicit"
-          }
-        },
-        {
           "id": "F123",
           "match": [
             "common",
             "ueik",
-            "uik"
-          ],
-          "intent": "声母后省写；零声母保留 w 系拼写",
-          "origin": {
-            "kind": "explicit"
-          }
-        },
-        {
-          "id": "F124",
-          "match": [
-            "common",
-            "uêik",
             "uik"
           ],
           "intent": "声母后省写；零声母保留 w 系拼写",
@@ -455,7 +419,7 @@
           "id": "F126",
           "match": [
             "common",
-            "uên",
+            "uen",
             "wên"
           ],
           "intent": "零声母 un/uen 同组；帽子 e 使用 ee 输入",
@@ -515,7 +479,7 @@
           "id": "F132",
           "match": [
             "common",
-            "iuê",
+            "iue",
             "yuê"
           ],
           "intent": "零声母 iue 匹配 yuê",
@@ -527,7 +491,7 @@
           "id": "F133",
           "match": [
             "common",
-            "iuêk",
+            "iuek",
             "yuêk"
           ],
           "intent": "零声母 iuek 匹配 yuêk",
@@ -539,7 +503,7 @@
           "id": "F134",
           "match": [
             "common",
-            "iuên",
+            "iuen",
             "yuên"
           ],
           "intent": "零声母 iuen 匹配 yuên",
@@ -551,7 +515,7 @@
           "id": "F135",
           "match": [
             "common",
-            "iuênn",
+            "iuenn",
             "yuênn"
           ],
           "intent": "零声母 iuenn 匹配 yuênn",
@@ -623,7 +587,7 @@
           "id": "F141",
           "match": [
             "common",
-            "iuêt",
+            "iuet",
             "yuêt"
           ],
           "intent": "零声母 iuet 匹配 yuêt",
@@ -635,7 +599,7 @@
           "id": "F142",
           "match": [
             "common",
-            "uê",
+            "ue",
             "wê"
           ],
           "intent": "零声母 ue 匹配 wê",
@@ -647,7 +611,7 @@
           "id": "F143",
           "match": [
             "common",
-            "uêng",
+            "ueng",
             "wêng"
           ],
           "intent": "零声母 ueng 匹配 wêng",
@@ -659,7 +623,7 @@
           "id": "F144",
           "match": [
             "common",
-            "uênn",
+            "uenn",
             "wênn"
           ],
           "intent": "零声母 uenn 匹配 wênn",
@@ -683,7 +647,7 @@
           "id": "F146",
           "match": [
             "common",
-            "uêt",
+            "uet",
             "wêt"
           ],
           "intent": "零声母 uet 输入匹配 wêt",
@@ -695,7 +659,7 @@
           "id": "F147",
           "match": [
             "common",
-            "uêk",
+            "uek",
             "wêk"
           ],
           "intent": "零声母 uek 输入匹配 wêk",
@@ -707,7 +671,7 @@
           "id": "F148",
           "match": [
             "common",
-            "uêu",
+            "ueu",
             "wêu"
           ],
           "intent": "零声母 ueu 输入匹配 wêu",
@@ -1318,7 +1282,7 @@
           "id": "F097",
           "match": [
             "common",
-            "iêu",
+            "ieu",
             "êu"
           ],
           "intent": "限定 hieu→hêu",
@@ -1330,7 +1294,7 @@
           "id": "F106",
           "match": [
             "common",
-            "ên",
+            "en",
             "iên"
           ],
           "intent": "各地仅匹配带帽 iên 目标",
@@ -1342,10 +1306,10 @@
           "id": "F107",
           "match": [
             "common",
-            "êt",
+            "et",
             "iêt"
           ],
-          "intent": "ee 输入 nget 匹配 ngiêt",
+          "intent": "普通 e 输入 nget 匹配 ngiêt",
           "origin": {
             "kind": "explicit"
           }
@@ -1457,7 +1421,7 @@
           "id": "F162",
           "match": [
             "xyucuenn",
-            "iên",
+            "ien",
             "iênn"
           ],
           "intent": "鼻化韵帽子 e 使用 ee 输入兼容",
@@ -1469,7 +1433,7 @@
           "id": "F163",
           "match": [
             "xyucuenn",
-            "yuên",
+            "yuen",
             "yuênn"
           ],
           "intent": "鼻化韵帽子 e 使用 ee 输入兼容",
@@ -1481,10 +1445,10 @@
           "id": "F164",
           "match": [
             "xyucuenn",
-            "ên",
+            "en",
             "ênn"
           ],
-          "intent": "鼻化韵帽子 e 使用 ee 输入兼容",
+          "intent": "普通 e 输入兼容帽子 e 鼻化韵",
           "origin": {
             "kind": "explicit"
           }
@@ -1493,7 +1457,7 @@
           "id": "F165",
           "match": [
             "xyucuenn",
-            "uên",
+            "uen",
             "wênn"
           ],
           "intent": "零声母 uen 匹配遂川规范 wênn",
@@ -2105,10 +2069,10 @@
           "id": "F108",
           "match": [
             "common",
-            "ngê",
+            "nge",
             "ngiêt"
           ],
-          "intent": "ee 输入 nge 匹配 ngiêt",
+          "intent": "普通 e 输入 nge 匹配 ngiêt",
           "origin": {
             "kind": "explicit"
           }
