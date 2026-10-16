@@ -200,7 +200,7 @@ The system aims to cover phonemes across localities, represents necessary phonem
 | b | [p] | - | - | - | - | - | - | - | - | - | - |  |  |
 | p | [pʰ] | - | - | - | - | - | - | - | - | - | - |  |  |
 | m | [m] | - | - | - | - | - | - | - | - | - | - | - |  |
-| f | [f] | - | - | - | - | - | - | - | - | - | - | — | May differ from Mandarin *f*; some descriptions use [ɸ]. |
+| f | [f] or [ɸ] | - | - | - | - | - | - | - | - | - | - | — | Usually transcribed as [f]; some consider it closer to [ɸ], a bilabial sound. |
 | d | [t] | - | - | - | - | - | - | - | - | - | - |  |  |
 | t | [tʰ] | - | - | - | - | - | - | - | - | - | - |  |  |
 | l | [l] | - | - | - | - | - | - | - | - | - | - | - |  |
