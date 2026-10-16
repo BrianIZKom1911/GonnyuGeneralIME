@@ -29,6 +29,18 @@ common	rime	ien	yên	ian	烟	syllable-final	false	false	primary	ien	输入 ien �
 common	rime	iep	yêp			syllable-final	false	false	primary	iep	输入 iep 匹配 yêp
 common	rime	iet	yêt			syllable-final	false	false	primary	iet	输入 iet 匹配 yêt
 common	rime	iek	yêk			syllable-final	false	false	primary	iek	输入 iek 匹配 yêk
+common	rime	im	yim			syllable-final	false	false	primary	im	零声母 im 匹配 yim
+common	rime	ing	ying			syllable-final	false	false	primary	ing	零声母 ing 匹配 ying
+common	rime	inn	yinn			syllable-final	false	false	primary	inn	零声母 inn 匹配 yinn
+common	rime	ienn	yênn			syllable-final	false	false	primary	ienn	零声母 ienn 匹配 yênn
+common	rime	ip	yip			syllable-final	false	false	primary	ip	零声母 ip 匹配 yip
+common	rime	ie	yê			syllable-final	false	false	primary	ie	零声母 ie 匹配 yê
+common	rime	ik	yik			syllable-final	false	false	primary	ik	零声母 ik 匹配 yik
+common	rime	iuk	yiuk			syllable-final	false	false	primary	iuk	零声母 iuk 匹配 yiuk
+common	rime	uie	wiê			syllable-final	false	false	primary	uie	零声母 uie 匹配 wiê
+common	rime	uien	wiên			syllable-final	false	false	primary	uien	零声母 uien 匹配 wiên
+common	rime	uin	win			syllable-final	false	false	primary	uin	零声母 uin 匹配 win
+common	rime	uk	wuk			syllable-final	false	false	primary	uk	零声母 uk 匹配 wuk
 common	rime	i	ï	ɿ		anywhere	false	false	primary		i 可单向模糊匹配 ï
 common	rime	ea	ê	ɛ	额	anywhere	false	false	primary		ea 可单向模糊匹配 ê
 common	rime	ee	e			anywhere	false	false	primary		ee 可单向匹配普通 e
@@ -116,6 +128,22 @@ common	rime	uên	wên	uɛn	文	syllable-final	false	true	primary	uên	零声母 
 common	rime	un	wun	un		syllable-final	false	true	primary	un		零声母 un 单向匹配 wun
 common	rime	ut	wut			syllable-final	false	true	primary	ut		零声母 ut 单向匹配 wut
 common	rime	it	yit			syllable-final	false	true	primary	it		零声母 it 单向匹配 yit
+common	rime	iue	yue			syllable-final	false	false	primary	iue	零声母 iue 匹配 yue
+common	rime	iue	yuê			syllable-final	false	false	primary	iue	零声母 iue 匹配 yuê
+common	rime	iuek	yuêk			syllable-final	false	false	primary	iuek	零声母 iuek 匹配 yuêk
+common	rime	iuen	yuên			syllable-final	false	false	primary	iuen	零声母 iuen 匹配 yuên
+common	rime	iuenn	yuênn			syllable-final	false	false	primary	iuenn	零声母 iuenn 匹配 yuênn
+common	rime	iuinn	yuinn			syllable-final	false	false	primary	iuinn	零声母 iuinn 匹配 yuinn
+common	rime	iuon	yuon			syllable-final	false	false	primary	iuon	零声母 iuon 匹配 yuon
+common	rime	iuong	yuong			syllable-final	false	false	primary	iuong	零声母 iuong 匹配 yuong
+common	rime	iuot	yuot			syllable-final	false	false	primary	iuot	零声母 iuot 匹配 yuot
+common	rime	iut	yut			syllable-final	false	false	primary	iut	零声母 iut 匹配 yut
+common	rime	iueok	yueok			syllable-final	false	false	primary	iueok	零声母 iueok 匹配 yueok
+common	rime	iuet	yuêt			syllable-final	false	false	primary	iuet	零声母 iuet 匹配 yuêt
+common	rime	ue	wê			syllable-final	false	false	primary	ue	零声母 ue 匹配 wê
+common	rime	ueng	wêng			syllable-final	false	false	primary	ueng	零声母 ueng 匹配 wêng
+common	rime	uenn	wênn			syllable-final	false	false	primary	uenn	零声母 uenn 匹配 wênn
+common	rime	uik	wik			syllable-final	false	false	primary	uik	零声母 uik 匹配 wik
 common	rime	uet	wêt			syllable-final	false	false	primary	uet	零声母 uet 输入匹配 wêt
 common	rime	uek	wêk			syllable-final	false	false	primary	uek	零声母 uek 输入匹配 wêk
 common	rime	ueu	wêu			syllable-final	false	false	primary	ueu	零声母 ueu 输入匹配 wêu
