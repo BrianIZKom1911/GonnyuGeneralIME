@@ -28,6 +28,7 @@ yikyan-henfeng	coda		k			syllable-final	false	true	fallback		自动生成：完�
 yikyan-henfeng	rime	en	eng			syllable-final	false	true	primary			none
 common	rime	iuen	yuên			syllable-final	false	true	primary	iuen	零声母 iuen 匹配 yuên	none
 common	rime	nge	ngiêt		额	syllable-final	false	true	primary	nge	输入 nge 匹配 ngiêt	none
+common	rime	ngee	ngiêt		额	syllable-final	false	false	primary	ngee	输入 ngee 匹配 ngiêt	none
 common	rime	wen	won	uon	碗	syllable-final	false	false	primary	wen	won 可从 wen 模糊输入	none
 yikyan-henfeng	rime	uon	uong			syllable-final	false	true	primary			none
 common	rime	iuk	yiuk			syllable-final	false	true	primary	iuk	零声母 iuk 匹配 yiuk	none
@@ -74,6 +75,7 @@ common	rime	v	yu	y	与	anywhere	false	false	primary	b,p,m,f,d,t,n,l,g,k,h,j,q,x,
 common	rime	ung	wung	uŋ	翁	syllable-final	false	true	primary	ung	零声母 ung→wung，与 ueng→weng 区分	none
 common	rime	uen	won	uon	碗	syllable-final	false	true	primary	uen	零声母 won 可从 uen 模糊输入	none
 common	rime	ieu	êu	ɛu	后	syllable-final	false	false	secondary	h	限定 hieu→hêu	none
+common	rime	ieeu	êu	ɛu	后	syllable-final	false	false	secondary	h	限定 hieeu→hêu	none
 common	rime	iuet	yuêt			syllable-final	false	true	primary	iuet	零声母 iuet 匹配 yuêt	none
 common	rime	yao	yêu	iɛu	妖	syllable-final	false	false	primary	yao	普通话 yao 输入匹配 yêu	none
 common	rime	uen	wên	uɛn	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽 ê 可由 e 或 ee 输入	none
