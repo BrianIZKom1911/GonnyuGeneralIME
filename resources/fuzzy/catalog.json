@@ -1291,6 +1291,18 @@
           }
         },
         {
+          "id": "F195",
+          "match": [
+            "common",
+            "ieeu",
+            "êu"
+          ],
+          "intent": "限定 hieeu→hêu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
           "id": "F106",
           "match": [
             "common",
@@ -2097,6 +2109,18 @@
             "ngiêt"
           ],
           "intent": "普通 e 输入 nge 匹配 ngiêt",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F196",
+          "match": [
+            "common",
+            "ngee",
+            "ngiêt"
+          ],
+          "intent": "双 e 输入 ngee 匹配 ngiêt",
           "origin": {
             "kind": "explicit"
           }
