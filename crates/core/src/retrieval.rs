@@ -296,9 +296,7 @@ mod tests {
         ]);
         let result = retrieve_inner_limited(
             &dictionary,
-            &FuzzyMap {
-                entries: Vec::new(),
-            },
+            &FuzzyMap::empty(),
             &HashMap::new(),
             "ben",
             false,
@@ -313,9 +311,7 @@ mod tests {
 
     #[test]
     fn dictionary_cache_identity_isolated_between_instances() {
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tones = HashMap::new();
         let mut first = Dictionary::empty();
         first.extend_from_entries([gan_entry("甲词", "ga", 100)]);
@@ -333,9 +329,7 @@ mod tests {
         let mut dictionary = Dictionary::empty();
         dictionary
             .extend_from_entries([gan_entry("甲词", "ga", 100), gan_entry("乙词", "ga", 100)]);
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tones = HashMap::new();
         let result = retrieve_inner_limited(&dictionary, &fuzzy, &tones, "ga", false, 2);
         assert_eq!(
@@ -350,9 +344,7 @@ mod tests {
     #[test]
     fn alternate_reading_spelled_out_input_is_gannyu_exact() {
         let dictionary = multi_reading_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let stored = retrieve(&dictionary, &fuzzy, &tone_values, "nyu nien");
@@ -370,9 +362,7 @@ mod tests {
     #[test]
     fn alternate_reading_continuous_input_is_gannyu_exact() {
         let dictionary = multi_reading_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let stored = retrieve(&dictionary, &fuzzy, &tone_values, "nyunien");
@@ -390,9 +380,7 @@ mod tests {
     #[test]
     fn alternate_reading_sentence_input_is_gannyu_exact() {
         let dictionary = multi_reading_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let stored = retrieve_sentence_input(&dictionary, &fuzzy, &tone_values, "nyunien", None);
@@ -479,9 +467,7 @@ mod tests {
     #[test]
     fn heteronym_retrieval_stays_within_matched_pair_only() {
         let dictionary = multi_heteronym_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
         assert!(retrieve(&dictionary, &fuzzy, &tone_values, "hatyiu")
             .iter()
@@ -531,9 +517,7 @@ mod tests {
     #[test]
     fn sentence_input_prunes_only_overcombined_sentence_candidates() {
         let dictionary = sentence_suffix_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let candidates = retrieve_sentence_input(
@@ -567,9 +551,7 @@ mod tests {
     #[test]
     fn sentence_input_keeps_candidates_when_suffix_completes_them() {
         let dictionary = sentence_suffix_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let candidates = retrieve_sentence_input(
@@ -597,9 +579,7 @@ mod tests {
     #[test]
     fn sentence_input_keeps_standalone_completion_for_shorter_prefix() {
         let dictionary = sentence_suffix_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let candidates =
@@ -616,9 +596,7 @@ mod tests {
     #[test]
     fn sentence_input_preserves_decremental_prefix_groups_at_first_position() {
         let dictionary = sentence_prefix_groups_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let tone_values = HashMap::new();
 
         let candidates =
@@ -679,9 +657,7 @@ mod tests {
     #[test]
     fn ngomengo_prefers_open_go_suffix() {
         let dictionary = ngomengo_dictionary();
-        let fuzzy = FuzzyMap {
-            entries: Vec::new(),
-        };
+        let fuzzy = FuzzyMap::empty();
         let candidates =
             retrieve_sentence_input(&dictionary, &fuzzy, &HashMap::new(), "ngomengo", None);
         assert_eq!(
@@ -725,9 +701,7 @@ mod tests {
         let mut path_cache = HashMap::new();
         assert!(no_tail_entering_alternative_path(
             &Dictionary::empty(),
-            &FuzzyMap {
-                entries: Vec::new()
-            },
+            &FuzzyMap::empty(),
             "pa",
             &path,
             &mut segmentation_cache,

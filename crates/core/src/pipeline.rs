@@ -205,9 +205,7 @@ impl InputPipeline {
             pronunciation: PronunciationBook::empty(),
             dictionary: Dictionary::empty(),
             default_words: Vec::new(),
-            fuzzy: FuzzyMap {
-                entries: Vec::new(),
-            },
+            fuzzy: FuzzyMap::empty(),
             tone_values: HashMap::new(),
             user_dict,
             frequency_boosts: HashMap::new(),

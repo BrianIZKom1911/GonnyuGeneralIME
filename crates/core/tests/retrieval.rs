@@ -92,7 +92,7 @@ fn diaeresis_i_readings_accept_plain_input_and_manual_segments() {
         let results = retrieve(&dictionary, &fuzzy, &tones, input);
         assert!(results.iter().any(|item| item.text == "叔头"), "{input}");
     }
-    for input in ["ee", "êê", "e'e", "ê'ê"] {
+    for input in ["ee", "êê", "ir'ir", "ir ir", "e'e", "ê'ê"] {
         let results = retrieve_with_manual_segments(&dictionary, &fuzzy, &tones, input, None);
         assert!(results.iter().any(|item| item.text == "额额"), "{input}");
     }
@@ -858,9 +858,7 @@ fn manual_segment_returns_candidates_at_all_prefix_lengths() {
     );
     let path = write_fixture("dict_manual.tsv", &body);
     let dict = Dictionary::load_tsv(&path).expect("load");
-    let fuzzy = FuzzyMap {
-        entries: Vec::new(),
-    };
+    let fuzzy = FuzzyMap::empty();
     let tone_values = HashMap::new();
 
     let candidates = retrieve_with_manual_segments(&dict, &fuzzy, &tone_values, "go'li", None);
@@ -902,9 +900,7 @@ fn manual_segment_with_space_separator() {
     );
     let path = write_fixture("dict_space.tsv", &body);
     let dict = Dictionary::load_tsv(&path).expect("load");
-    let fuzzy = FuzzyMap {
-        entries: Vec::new(),
-    };
+    let fuzzy = FuzzyMap::empty();
     let tone_values = HashMap::new();
 
     // Space-separated input "go li" should behave identically to "go'li".
@@ -993,9 +989,7 @@ fn manual_segment_partial_combination_keeps_consumed_bytes_at_last_valid_chunk()
     );
     let path = write_fixture("dict-manual-partial-consumed.tsv", &body);
     let dictionary = Dictionary::load_tsv(&path).expect("load");
-    let fuzzy = FuzzyMap {
-        entries: Vec::new(),
-    };
+    let fuzzy = FuzzyMap::empty();
     let tone_values = HashMap::new();
 
     let candidates =

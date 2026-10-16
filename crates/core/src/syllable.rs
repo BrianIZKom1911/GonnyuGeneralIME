@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::fs;
@@ -96,6 +96,10 @@ fn fuzzy_region_applies(entry_region: &str, region_id: Option<&str>) -> bool {
 #[derive(Debug, Clone)]
 pub struct FuzzyMap {
     pub entries: Vec<FuzzyEntry>,
+    gon_fuzzy_index: HashMap<char, Vec<usize>>,
+    gon_pin_index: HashMap<char, Vec<usize>>,
+    gon_fuzzy_empty_source: Vec<usize>,
+    gon_pin_empty_source: Vec<usize>,
 }
 
 #[derive(Debug)]
@@ -124,6 +128,38 @@ impl From<std::io::Error> for SyllableError {
 }
 
 impl FuzzyMap {
+    fn from_entries(entries: Vec<FuzzyEntry>) -> FuzzyMap {
+        let mut gon_fuzzy_index: HashMap<char, Vec<usize>> = HashMap::new();
+        let mut gon_pin_index: HashMap<char, Vec<usize>> = HashMap::new();
+        let mut gon_fuzzy_empty_source = Vec::new();
+        let mut gon_pin_empty_source = Vec::new();
+        for (index, entry) in entries.iter().enumerate() {
+            if let Some(first) = entry.gon_fuzzy.chars().next() {
+                gon_fuzzy_index.entry(first).or_default().push(index);
+            } else {
+                gon_fuzzy_empty_source.push(index);
+            }
+            if entry.bidirectional {
+                if let Some(first) = entry.gon_pin.chars().next() {
+                    gon_pin_index.entry(first).or_default().push(index);
+                } else {
+                    gon_pin_empty_source.push(index);
+                }
+            }
+        }
+        FuzzyMap {
+            entries,
+            gon_fuzzy_index,
+            gon_pin_index,
+            gon_fuzzy_empty_source,
+            gon_pin_empty_source,
+        }
+    }
+
+    pub fn empty() -> FuzzyMap {
+        Self::from_entries(Vec::new())
+    }
+
     pub fn load(path: impl AsRef<Path>) -> Result<FuzzyMap, SyllableError> {
         Self::load_scoped(path, None)
     }
@@ -158,7 +194,7 @@ impl FuzzyMap {
                 entries.push(entry);
             }
         }
-        Ok(FuzzyMap { entries })
+        Ok(FuzzyMap::from_entries(entries))
     }
 
     pub fn load_tsv(path: impl AsRef<Path>) -> Result<FuzzyMap, SyllableError> {
@@ -257,7 +293,7 @@ impl FuzzyMap {
                 entries.push(entry);
             }
         }
-        Ok(FuzzyMap { entries })
+        Ok(FuzzyMap::from_entries(entries))
     }
 
     pub fn normalize(&self, input: &str, target: SyllableScheme) -> Vec<NormalizedSyllable> {
@@ -281,7 +317,20 @@ impl FuzzyMap {
                 cursor += 1;
                 continue;
             }
-            for entry in &self.entries {
+            let (index, empty_source) = match target {
+                SyllableScheme::GonPin => (&self.gon_fuzzy_index, &self.gon_fuzzy_empty_source),
+                SyllableScheme::GonFuzzy => (&self.gon_pin_index, &self.gon_pin_empty_source),
+            };
+            let mut candidate_indices = empty_source.clone();
+            for character in base.text.chars() {
+                if let Some(indices) = index.get(&character) {
+                    candidate_indices.extend(indices);
+                }
+            }
+            candidate_indices.sort_unstable();
+            candidate_indices.dedup();
+            for index in candidate_indices {
+                let entry = &self.entries[index];
                 if !entry.starts_with.is_empty()
                     && !entry
                         .starts_with
