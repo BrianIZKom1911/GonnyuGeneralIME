@@ -66,7 +66,7 @@ fn voiced_initial_inputs_are_common_and_one_way() {
 #[test]
 fn voiced_initial_compatibility_composes_with_special_vowels() {
     let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "singzi").unwrap();
-    for (source, target) in [("jien", "jjiên"), ("jiean", "jjiên"), ("zi", "zzï")] {
+    for (source, target) in [("jieen", "jjiên"), ("zi", "zzï")] {
         assert!(map
             .normalize(source, SyllableScheme::GonPin)
             .iter()
@@ -149,7 +149,7 @@ fn fungcen_ing_input_matches_en_only_in_one_direction() {
 #[test]
 fn zero_initial_ui_compatibility_preserves_onset_ui() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    for spelling in ["ui4", "wui4"] {
+    for spelling in ["ui4", "wui4", "wei4"] {
         let outputs = map.normalize(spelling, SyllableScheme::GonPin);
         assert!(outputs
             .iter()
@@ -163,10 +163,13 @@ fn zero_initial_ui_compatibility_preserves_onset_ui() {
         .normalize("guei", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "gui"));
-    for spelling in ["uei4", "wei4", "uêi4", "wêi4"] {
+    for spelling in ["uei4", "ueei4", "uêi4", "wêi4"] {
         let outputs = map.normalize(spelling, SyllableScheme::GonPin);
         assert!(outputs.iter().any(|item| item.text == "wêi"));
-        assert!(!outputs.iter().any(|item| item.text == "wi"));
+        assert_eq!(
+            outputs.iter().any(|item| item.text == "wi"),
+            spelling == "uei4"
+        );
     }
     assert!(map
         .normalize("guei", SyllableScheme::GonPin)
@@ -225,47 +228,47 @@ fn eo_accepts_only_standalone_o_one_way() {
 }
 
 #[test]
-fn open_e_input_matches_circumflex_one_way() {
+fn e_ir_and_double_e_inputs_preserve_and_extend_circumflex_e() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    for (plain, circumflex) in [("e", "ê"), ("en", "ên"), ("gek", "gêk")] {
-        let outputs = map.normalize(plain, SyllableScheme::GonPin);
-        assert!(outputs.iter().any(|item| item.text == plain));
-        assert!(outputs.iter().any(|item| item.text == circumflex));
-        for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
-            assert!(!map
-                .normalize(circumflex, scheme)
-                .iter()
-                .any(|item| item.text == plain));
-        }
-    }
-}
-
-#[test]
-fn ea_and_double_e_inputs_select_circumflex_and_plain_e() {
-    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    for (plain_input, hat_input, plain, circumflex) in [
-        ("ee", "ea", "e", "ê"),
-        ("een", "ean", "en", "ên"),
-        ("geek", "geak", "gek", "gêk"),
-        ("geen1", "gean1", "gen", "gên"),
+    for (plain_input, alias_input, hat_input, plain, circumflex) in [
+        ("e", "ir", "ee", "e", "ê"),
+        ("en", "irn", "een", "en", "ên"),
+        ("gen", "girn", "geen", "gen", "gên"),
+        ("be", "bir", "bee", "be", "bê"),
     ] {
         let outputs = map.normalize(plain_input, SyllableScheme::GonPin);
         assert!(outputs.iter().any(|item| item.text == plain));
-        assert!(!outputs.iter().any(|item| item.text == circumflex));
+        assert!(outputs.iter().any(|item| item.text == circumflex));
         let outputs = map.normalize(hat_input, SyllableScheme::GonPin);
         assert!(outputs.iter().any(|item| item.text == circumflex));
         assert!(!outputs.iter().any(|item| item.text == plain));
+        assert!(map
+            .normalize(alias_input, SyllableScheme::GonPin)
+            .iter()
+            .any(|item| item.text == plain));
         for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
-            assert!(!map
-                .normalize(plain, scheme)
-                .iter()
-                .any(|item| item.text == plain_input.trim_end_matches('1')));
             assert!(!map
                 .normalize(circumflex, scheme)
                 .iter()
-                .any(|item| item.text == hat_input.trim_end_matches('1')));
+                .any(|item| item.text == hat_input));
         }
     }
+    assert!(map
+        .normalize("ir", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "e"));
+    assert!(!map
+        .normalize("ir", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "ê"));
+    assert!(map
+        .normalize("e", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "ê"));
+    assert!(!map
+        .normalize("ea", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "ê"));
 }
 
 #[test]
@@ -273,9 +276,8 @@ fn plain_e_combinations_are_common_terminal_and_preserve_tiers() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     let additions: Vec<_> = map
         .iter()
-        .filter(|rule| rule.gon_fuzzy.contains("ee") && rule.gon_pin != "e")
+        .filter(|rule| rule.gon_fuzzy.contains("ir") && rule.gon_pin != "e")
         .collect();
-    assert_eq!(additions.len(), 19);
     for rule in additions {
         assert_eq!(rule.region, "common");
         assert!(!rule.bidirectional && !rule.chainable);
@@ -286,9 +288,6 @@ fn plain_e_combinations_are_common_terminal_and_preserve_tiers() {
             assert!(outputs
                 .iter()
                 .any(|item| item.text == target && item.tier == rule.priority_tier));
-            assert!(!outputs
-                .iter()
-                .any(|item| item.text == target.replace('e', "ê")));
         }
     }
 }
@@ -540,6 +539,7 @@ fn all_regional_entering_codas_preserve_omission_and_interchange() {
     ] {
         let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), region).expect("load regional rules");
         let bare = map.normalize("bae", SyllableScheme::GonPin);
+        let bare_iu = map.normalize("iu", SyllableScheme::GonPin);
         for coda in ['p', 't', 'k'] {
             let spelling = format!("bae{coda}");
             assert_eq!(
@@ -547,6 +547,12 @@ fn all_regional_entering_codas_preserve_omission_and_interchange() {
                 codas.contains(coda),
                 "{region}"
             );
+            assert_eq!(
+                bare_iu.iter().any(|item| item.text == format!("yiu{coda}")),
+                codas.contains(coda),
+                "{region}: iu"
+            );
+            assert!(!bare_iu.iter().any(|item| item.text == format!("yu{coda}")));
         }
         for coda in codas.chars() {
             let spelling = format!("bae{coda}");
@@ -658,19 +664,29 @@ fn added_theoretical_spellings_normalize_to_stored_forms() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     for (input, expected) in [
         ("hieu", "hêu"),
+        ("hieeu", "hêu"),
         ("yan", "yên"),
         ("ien", "yên"),
+        ("ieen", "yên"),
         ("iep", "yêp"),
+        ("ieep", "yêp"),
         ("iet", "yêt"),
+        ("ieet", "yêt"),
         ("iek", "yêk"),
+        ("ieek", "yêk"),
         ("ieu", "yêu"),
+        ("ieeu", "yêu"),
         ("iau", "yêu"),
         ("yao", "yêu"),
         ("hou", "hêu"),
         ("uet", "wêt"),
+        ("ueet", "wêt"),
         ("uek", "wêk"),
+        ("ueek", "wêk"),
         ("ueu", "wêu"),
+        ("ueeu", "wêu"),
         ("nge", "ngiêt"),
+        ("ngee", "ngiêt"),
         ("fi", "fêi"),
         ("zuon", "zon"),
         ("cuon", "con"),
@@ -707,8 +723,8 @@ fn u_v_to_yu_bridges_require_an_onset() {
     for (source, expected) in [
         ("jue", "jyue"),
         ("jve", "jyue"),
-        ("juee", "jyuek"),
-        ("jvee", "jyuek"),
+        ("juir", "jyuek"),
+        ("jvir", "jyuek"),
     ] {
         assert!(map
             .normalize(source, SyllableScheme::GonPin)
@@ -722,6 +738,10 @@ fn xyucuenn_zero_onset_uen_matches_wenn() {
     let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "xyucuenn").unwrap();
     assert!(map
         .normalize("uen", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "wênn"));
+    assert!(map
+        .normalize("ueen", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "wênn"));
 }
@@ -816,12 +836,12 @@ fn neutral_tone_marker_is_preserved() {
 }
 
 #[test]
-fn zero_initial_iu_suffixes_share_yu_spellings() {
+fn zero_initial_iu_suffixes_follow_documented_spelling() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
     for (source, target) in [
         ("iung1", "yung"),
         ("iun1", "yun"),
-        ("iuk1", "yuk"),
+        ("iuk1", "yiuk"),
         ("iuek1", "yuek"),
         ("iuok1", "yuok"),
     ] {
@@ -842,10 +862,12 @@ fn zero_initial_iu_suffixes_share_yu_spellings() {
             .iter()
             .any(|item| item.text == target));
     }
-    assert!(!map
-        .normalize("iu1", SyllableScheme::GonPin)
-        .iter()
-        .any(|item| item.text == "yu"));
+    for source in ["iu1", "iuk1", "iut1"] {
+        assert!(!map
+            .normalize(source, SyllableScheme::GonPin)
+            .iter()
+            .any(|item| matches!(item.text.as_str(), "yu" | "yup" | "yut" | "yuk")));
+    }
 }
 
 #[test]

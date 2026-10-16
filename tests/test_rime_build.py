@@ -68,6 +68,13 @@ def test_all_regional_entering_codas_preserve_omission_and_interchange() -> None
         rules = load_rules(RULES_PATH, region)
         expected = {"bae" + coda for coda in codas}
         assert {"baet", "baep", "baek"}.intersection(normalize("bae", rules)) == expected
+        bare_iu = normalize("iu", rules)
+        iu_expected = {"yiu" + coda for coda in codas}
+        assert {"yiup", "yiut", "yiuk"}.intersection(bare_iu) == iu_expected
+        assert not {"yup", "yut", "yuk"}.intersection(bare_iu)
+        iu_algebra = compile_algebra(iu_expected, rules)
+        for target in iu_expected:
+            assert any(line.endswith(f"/^G{target}$/Fiu/") for line in iu_algebra)
         algebra = compile_algebra(expected, rules)
         for coda in codas:
             spelling = "bae" + coda
@@ -79,17 +86,17 @@ def test_all_regional_entering_codas_preserve_omission_and_interchange() -> None
 
 def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
     rules = load_rules(RULES_PATH)
-    for spelling in ("ui", "wui"):
+    for spelling in ("ui", "wui", "wei"):
         assert "wi" in normalize(spelling, rules)
     assert "wui" not in normalize("wi", rules)
     assert "gui" in normalize("guei", rules)
-    assert "guêi" in normalize("guei", rules)
+    assert "guêi" in normalize("gueei", rules)
     for spelling in ("uei", "wei", "uêi", "wêi"):
         assert "wêi" in normalize(spelling, rules)
-        assert "wi" not in normalize(spelling, rules)
+        assert ("wi" in normalize(spelling, rules)) == (spelling in {"uei", "wei"})
     assert "gwi" not in normalize("gui", rules)
     algebra = compile_algebra({"wi", "gui", "wêi"}, rules)
-    for spelling in ("ui", "wui"):
+    for spelling in ("ui", "wui", "wei"):
         assert f"    - derive/^Gwi$/F{spelling}/" in algebra
     assert "    - derive/^Ggui$/Fguei/" in algebra
     assert "    - derive/^Ggui$/Fguêi/" in algebra
@@ -97,7 +104,7 @@ def test_zero_initial_ui_compatibility_preserves_onset_ui() -> None:
 
 def test_ueik_rules_follow_uei_with_checked_coda() -> None:
     rules = load_rules(RULES_PATH)
-    for source, target in (("uei", "wei"), ("uei", "wêi"), ("uêi", "wêi"),
+    for source, target in (("uei", "wei"), ("uêi", "wêi"),
                            ("uei", "ui"), ("uêi", "ui")):
         plain = [rule for rule in rules if rule.source == source and rule.target == target]
         checked = [rule for rule in rules if rule.source == source + "k" and rule.target == target + "k"]
@@ -105,8 +112,9 @@ def test_ueik_rules_follow_uei_with_checked_coda() -> None:
         plain, checked = plain[0], checked[0]
         assert checked.applies == plain.applies
         assert checked.bidirectional == plain.bidirectional
-        assert checked.chainable == plain.chainable
         assert checked.tier == plain.tier
+        prefix = "" if checked.starts_with == (source + "k",) else "g"
+        assert prefix + target + "k" in normalize(prefix + source + "k", rules)
         expected_starts = tuple(value + "k" for value in plain.starts_with) if plain.starts_with == (source,) else plain.starts_with
         assert checked.starts_with == expected_starts
 
@@ -163,47 +171,47 @@ def test_eo_accepts_only_standalone_o_one_way() -> None:
             assert f"    - derive/^G{target}$/F{source}/" not in algebra
 
 
-def test_open_e_input_matches_circumflex_one_way() -> None:
+def test_ir_matches_plain_e_and_double_e_matches_circumflex_one_way() -> None:
     rules = load_rules(RULES_PATH)
-    rule = next(rule for rule in rules if rule.source == "e" and rule.target == "ê")
-    assert rule.chainable
-    for plain, circumflex in (("e", "ê"), ("en", "ên"), ("gek", "gêk")):
+    rule = next(rule for rule in rules if rule.source == "ir" and rule.target == "e")
+    assert not rule.chainable
+    for plain, circumflex in (("ir", "ee"), ("irn", "een"), ("gen", "geen")):
         assert plain in normalize(plain, rules)
-        assert circumflex in normalize(plain, rules)
-        assert plain not in normalize(circumflex, rules)
+        assert circumflex in normalize(circumflex, rules)
+        assert "ê" not in normalize(plain, rules)
         assert plain not in normalize(circumflex, rules, reverse=True)
     algebra = compile_algebra({"e", "ê", "gêk"}, rules)
-    assert "    - derive/^Gê$/Fe/" in algebra
-    assert "    - derive/^Ggêk$/Fgek/" in algebra
+    assert "    - derive/^Ge$/Fir/" in algebra
+    assert "    - derive/^Ggêk$/Fgeek/" in algebra
+    assert "    - derive/^Gê$/Fee/" in algebra
     assert "    - derive/^Ge$/Fê/" not in algebra
 
 
 def test_open_e_compatibility_can_chain_without_chaining_double_e() -> None:
     rules = load_rules(RULES_PATH, "lancong")
-    assert "guêt" in normalize("gue", rules)
-    assert "ê" not in normalize("ee", rules)
-    assert "gêk" not in normalize("geek", rules)
+    assert "guê" in normalize("guee", rules)
+    assert "ê" in normalize("ee", rules)
+    assert "gêk" in normalize("geek", rules)
 
 
 def test_voiced_initial_compatibility_composes_with_special_vowels():
     rules = load_rules(RULES_PATH, "singzi")
-    for source, target in (("jien", "jjiên"), ("jiean", "jjiên"), ("zi", "zzï")):
+    for source, target in (("jieen", "jjiên"), ("zi", "zzï")):
         assert target in normalize(source, rules)
     assert not any(form.startswith("jjj") for form in normalize("jjiên", rules))
     algebra = compile_algebra({"jjiên", "zzï"}, rules)
-    assert "    - derive/^Gjjiên$/Fjien/" in algebra
-    assert "    - derive/^Gjjiên$/Fjiean/" in algebra
+    assert "    - derive/^Gjjiên$/Fjieen/" in algebra
     assert "    - derive/^Gzzï$/Fzi/" in algebra
     assert "    - derive/^Gjjiên$/Fjjjien/" not in algebra
 
 
-def test_ea_and_double_e_inputs_select_circumflex_and_plain_e() -> None:
+def test_ir_and_double_e_inputs_select_plain_and_circumflex_e() -> None:
     rules = load_rules(RULES_PATH)
     for plain_input, hat_input, plain, circumflex in (
-        ("ee", "ea", "e", "ê"),
-        ("een", "ean", "en", "ên"),
-        ("geek", "geak", "gek", "gêk"),
-        ("geen1", "gean1", "gen", "gên"),
+        ("ir", "ee", "e", "ê"),
+        ("irn", "een", "en", "ên"),
+        ("girn", "geen", "gen", "gên"),
+        ("bir", "beek", "be", "bêk"),
     ):
         assert plain in normalize(plain_input, rules)
         assert circumflex not in normalize(plain_input, rules)
@@ -213,19 +221,16 @@ def test_ea_and_double_e_inputs_select_circumflex_and_plain_e() -> None:
             assert plain_input.rstrip("1") not in normalize(plain, rules, reverse=reverse)
             assert hat_input.rstrip("1") not in normalize(circumflex, rules, reverse=reverse)
     algebra = compile_algebra({"e", "ê", "gêk", "gek"}, rules)
-    assert "    - derive/^Gê$/Fea/" in algebra
-    assert "    - derive/^Ggêk$/Fgeak/" in algebra
-    assert "    - derive/^Ge$/Fee/" in algebra
-    assert "    - derive/^Ggek$/Fgeek/" in algebra
-    assert "    - derive/^Gê$/Fee/" not in algebra
-    assert "    - derive/^Ggêk$/Fgeek/" not in algebra
+    assert "    - derive/^Gê$/Fee/" in algebra
+    assert "    - derive/^Ggêk$/Fgeek/" in algebra
+    assert "    - derive/^Ge$/Fir/" in algebra
+    assert "    - derive/^Ggek$/Fgirk/" in algebra
 
 
 def test_plain_e_combinations_are_common_terminal_and_preserve_tiers() -> None:
     rules = load_rules(RULES_PATH)
-    additions = [rule for rule in rules if "ee" in rule.source and rule.source != "ee" or
-                 rule.source == "ee" and rule.target != "e"]
-    assert len(additions) == 19
+    additions = [rule for rule in rules if "ir" in rule.source and rule.source != "ir" or
+                 rule.source == "ir" and rule.target not in {"e", "ê"}]
     for rule in additions:
         assert rule.region == "common"
         assert not rule.bidirectional and not rule.chainable
@@ -233,7 +238,7 @@ def test_plain_e_combinations_are_common_terminal_and_preserve_tiers() -> None:
             assert source.endswith(rule.source)
             target = source[:-len(rule.source)] + rule.target
             assert normalize(source, rules)[target] == {"primary": 0, "secondary": 1, "fallback": 2}[rule.tier]
-            assert not any(part in source.replace("ee", "e") or part in target
+            assert not any(part in source.replace("ir", "e") or part in target
                            for part in ("ae", "eo", "oe", "ie"))
             assert target.replace("e", "ê") not in normalize(source, rules)
 
@@ -615,9 +620,9 @@ def test_added_theoretical_spellings_normalize_to_stored_forms() -> None:
 
 def test_u_v_to_yu_bridges_require_an_onset() -> None:
     rules = load_rules(RULES_PATH)
-    for source, forbidden in (("ue", "yue"), ("ve", "yue"), ("uee", "yuek"), ("vee", "yuek")):
+    for source, forbidden in (("ue", "yue"), ("ve", "yue"), ("uir", "yuek"), ("vir", "yuek")):
         assert forbidden not in normalize(source, rules)
-    for source, expected in (("jue", "jyue"), ("jve", "jyue"), ("juee", "jyuek"), ("jvee", "jyuek")):
+    for source, expected in (("jue", "jyue"), ("jve", "jyue"), ("juir", "jyuek"), ("jvir", "jyuek")):
         assert expected in normalize(source, rules)
     assert "heu" in normalize("hieu", rules)
 
@@ -692,17 +697,19 @@ def test_onset_contractions_preserve_zero_initial_circumflex_forms() -> None:
         assert target in normalize(source, rules)
     for source in ("uen", "uên", "wen", "wên"):
         assert "wên" in normalize(source, rules)
-    for source, forbidden in (("uei", "wi"), ("uêi", "wi"), ("uen", "un"), ("uên", "un")):
+    for source, forbidden in (("uêi", "wi"), ("uen", "un"), ("uên", "un")):
         assert forbidden not in normalize(source, rules)
 
 
-def test_zero_initial_iu_suffixes_share_yu_spellings() -> None:
+def test_zero_initial_iu_suffixes_follow_documented_spelling() -> None:
     rules = load_rules(RULES_PATH)
-    for source, legacy, target in (("iung", "yiung", "yung"), ("iun", "yiun", "yun"), ("iuk", "yiuk", "yuk"), ("iuek", "yiuek", "yuek"), ("iuok", "yiuok", "yuok")):
+    for source, legacy, target in (("iung", "yiung", "yung"), ("iun", "yiun", "yun"), ("iuek", "yiuek", "yuek"), ("iuok", "yiuok", "yuok")):
         assert target in normalize(source, rules)
         assert target not in normalize(legacy, rules)
     assert "yiu" in normalize("iu", rules)
-    assert "yu" not in normalize("iu", rules)
+    assert "yiuk" in normalize("iuk", rules)
+    for source in ("iu", "iuk", "iut"):
+        assert not {"yu", "yup", "yut", "yuk"}.intersection(normalize(source, rules))
     algebra = compile_algebra({"yung", "yiu", "yu"}, rules)
     assert "    - derive/^Gyung$/Fiung/" in algebra
     assert "    - derive/^Gyung$/Fyiung/" not in algebra

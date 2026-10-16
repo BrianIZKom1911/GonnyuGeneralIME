@@ -1,0 +1,2348 @@
+{
+  "version": 1,
+  "runtime_source": "../fuzzy_scheme.tsv",
+  "purpose_groups": [
+    {
+      "id": "canonical_spelling",
+      "label": "规范转写兼容",
+      "description": "零声母转写、声母后省写及其输入形式。",
+      "rules": [
+        {
+          "id": "F001",
+          "match": [
+            "common",
+            "i",
+            "y"
+          ],
+          "intent": "零声母 i 系旧写兼容；ia→ya、ieu→yeu、ion→yon、iou→you",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F002",
+          "match": [
+            "common",
+            "u",
+            "w"
+          ],
+          "intent": "零声母 u 系旧写兼容；ua→wa、uen→wen、uon→won",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F003",
+          "match": [
+            "common",
+            "i",
+            "yi"
+          ],
+          "intent": "单写 i→yi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F004",
+          "match": [
+            "common",
+            "in",
+            "yin"
+          ],
+          "intent": "单写 in→yin",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F005",
+          "match": [
+            "common",
+            "iu",
+            "yiu"
+          ],
+          "intent": "单写 iu→yiu，可接续匹配入声韵尾",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F006",
+          "match": [
+            "common",
+            "iong",
+            "yong"
+          ],
+          "intent": "iong→yong",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F007",
+          "match": [
+            "common",
+            "u",
+            "wu"
+          ],
+          "intent": "单写 u→wu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F008",
+          "match": [
+            "common",
+            "ui",
+            "wi"
+          ],
+          "intent": "单写 ui→wi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F009",
+          "match": [
+            "common",
+            "ung",
+            "wung"
+          ],
+          "intent": "零声母 ung→wung，与 ueng→weng 区分",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F010",
+          "match": [
+            "common",
+            "uei",
+            "wei"
+          ],
+          "intent": "零声母 uei→wei；uei 可继续匹配 wi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F011",
+          "match": [
+            "common",
+            "uêi",
+            "wêi"
+          ],
+          "intent": "零声母 ueei 输入单向兼容 wêi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F013",
+          "match": [
+            "common",
+            "ueik",
+            "weik"
+          ],
+          "intent": "入声形式同 uei",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F014",
+          "match": [
+            "common",
+            "uêik",
+            "wêik"
+          ],
+          "intent": "零声母 uei 的 k 尾输入兼容独立 wêik",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F028",
+          "match": [
+            "common",
+            "iên",
+            "yên"
+          ],
+          "intent": "ee 输入 ien 匹配 yên",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F029",
+          "match": [
+            "common",
+            "iêp",
+            "yêp"
+          ],
+          "intent": "ee 输入 iep 匹配 yêp",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F030",
+          "match": [
+            "common",
+            "iêt",
+            "yêt"
+          ],
+          "intent": "ee 输入 iet 匹配 yêt",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F031",
+          "match": [
+            "common",
+            "iêk",
+            "yêk"
+          ],
+          "intent": "ee 输入 iek 匹配 yêk",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F032",
+          "match": [
+            "common",
+            "im",
+            "yim"
+          ],
+          "intent": "零声母 im 匹配 yim",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F033",
+          "match": [
+            "common",
+            "ing",
+            "ying"
+          ],
+          "intent": "零声母 ing 匹配 ying",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F034",
+          "match": [
+            "common",
+            "inn",
+            "yinn"
+          ],
+          "intent": "零声母 inn 匹配 yinn",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F035",
+          "match": [
+            "common",
+            "iênn",
+            "yênn"
+          ],
+          "intent": "零声母 ienn 匹配 yênn",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F036",
+          "match": [
+            "common",
+            "ip",
+            "yip"
+          ],
+          "intent": "零声母 ip 匹配 yip",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F037",
+          "match": [
+            "common",
+            "iê",
+            "yê"
+          ],
+          "intent": "零声母 ie 匹配 yê",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F038",
+          "match": [
+            "common",
+            "ik",
+            "yik"
+          ],
+          "intent": "零声母 ik 匹配 yik",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F039",
+          "match": [
+            "common",
+            "iuk",
+            "yiuk"
+          ],
+          "intent": "零声母 iuk 匹配 yiuk",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F040",
+          "match": [
+            "common",
+            "uiê",
+            "wiê"
+          ],
+          "intent": "零声母 uie 匹配 wiê",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F041",
+          "match": [
+            "common",
+            "uiên",
+            "wiên"
+          ],
+          "intent": "零声母 uien 匹配 wiên",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F042",
+          "match": [
+            "common",
+            "uin",
+            "win"
+          ],
+          "intent": "零声母 uin 匹配 win",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F043",
+          "match": [
+            "common",
+            "uk",
+            "wuk"
+          ],
+          "intent": "零声母 uk 匹配 wuk",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F053",
+          "match": [
+            "common",
+            "iuirk",
+            "yuek"
+          ],
+          "intent": "ir 输入普通 e与零声母转写组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F152"
+            ]
+          }
+        },
+        {
+          "id": "F056",
+          "match": [
+            "common",
+            "uiri",
+            "wei"
+          ],
+          "intent": "ir 输入普通 e与零声母转写组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F010"
+            ]
+          }
+        },
+        {
+          "id": "F057",
+          "match": [
+            "common",
+            "uirk",
+            "wek"
+          ],
+          "intent": "ir 输入普通 e与零声母转写组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F002"
+            ]
+          }
+        },
+        {
+          "id": "F059",
+          "match": [
+            "common",
+            "uirn",
+            "wen"
+          ],
+          "intent": "ir 输入普通 e与零声母转写组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F125"
+            ]
+          }
+        },
+        {
+          "id": "F060",
+          "match": [
+            "common",
+            "uirng",
+            "weng"
+          ],
+          "intent": "ir 输入普通 e与零声母转写组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F002"
+            ]
+          }
+        },
+        {
+          "id": "F098",
+          "match": [
+            "common",
+            "iêu",
+            "yêu"
+          ],
+          "intent": "ee 输入 ieu 匹配 yêu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F119",
+          "match": [
+            "common",
+            "uei",
+            "ui"
+          ],
+          "intent": "声母后省写；零声母保留 w 系拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F120",
+          "match": [
+            "common",
+            "uêi",
+            "ui"
+          ],
+          "intent": "声母后省写；零声母保留 w 系拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F121",
+          "match": [
+            "common",
+            "uen",
+            "un"
+          ],
+          "intent": "声母后省写；零声母保留 w 系拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F122",
+          "match": [
+            "common",
+            "uên",
+            "un"
+          ],
+          "intent": "声母后省写；零声母保留 w 系拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F123",
+          "match": [
+            "common",
+            "ueik",
+            "uik"
+          ],
+          "intent": "声母后省写；零声母保留 w 系拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F124",
+          "match": [
+            "common",
+            "uêik",
+            "uik"
+          ],
+          "intent": "声母后省写；零声母保留 w 系拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F125",
+          "match": [
+            "common",
+            "uen",
+            "wen"
+          ],
+          "intent": "零声母 un/uen 同组；帽子 e 由 ee 输入规则处理",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F126",
+          "match": [
+            "common",
+            "uên",
+            "wên"
+          ],
+          "intent": "零声母 un/uen 同组；帽子 e 使用 ee 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F128",
+          "match": [
+            "common",
+            "un",
+            "wun"
+          ],
+          "intent": "零声母 un 单向匹配 wun",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F129",
+          "match": [
+            "common",
+            "ut",
+            "wut"
+          ],
+          "intent": "零声母 ut 单向匹配 wut",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F130",
+          "match": [
+            "common",
+            "it",
+            "yit"
+          ],
+          "intent": "零声母 it 单向匹配 yit",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F131",
+          "match": [
+            "common",
+            "iue",
+            "yue"
+          ],
+          "intent": "零声母 iue 匹配 yue",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F132",
+          "match": [
+            "common",
+            "iuê",
+            "yuê"
+          ],
+          "intent": "零声母 iue 匹配 yuê",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F133",
+          "match": [
+            "common",
+            "iuêk",
+            "yuêk"
+          ],
+          "intent": "零声母 iuek 匹配 yuêk",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F134",
+          "match": [
+            "common",
+            "iuên",
+            "yuên"
+          ],
+          "intent": "零声母 iuen 匹配 yuên",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F135",
+          "match": [
+            "common",
+            "iuênn",
+            "yuênn"
+          ],
+          "intent": "零声母 iuenn 匹配 yuênn",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F136",
+          "match": [
+            "common",
+            "iuinn",
+            "yuinn"
+          ],
+          "intent": "零声母 iuinn 匹配 yuinn",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F137",
+          "match": [
+            "common",
+            "iuon",
+            "yuon"
+          ],
+          "intent": "零声母 iuon 匹配 yuon",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F138",
+          "match": [
+            "common",
+            "iuong",
+            "yuong"
+          ],
+          "intent": "零声母 iuong 匹配 yuong",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F139",
+          "match": [
+            "common",
+            "iuot",
+            "yuot"
+          ],
+          "intent": "零声母 iuot 匹配 yuot",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F140",
+          "match": [
+            "common",
+            "iueok",
+            "yueok"
+          ],
+          "intent": "零声母 iueok 匹配 yueok",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F141",
+          "match": [
+            "common",
+            "iuêt",
+            "yuêt"
+          ],
+          "intent": "零声母 iuet 匹配 yuêt",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F142",
+          "match": [
+            "common",
+            "uê",
+            "wê"
+          ],
+          "intent": "零声母 ue 匹配 wê",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F143",
+          "match": [
+            "common",
+            "uêng",
+            "wêng"
+          ],
+          "intent": "零声母 ueng 匹配 wêng",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F144",
+          "match": [
+            "common",
+            "uênn",
+            "wênn"
+          ],
+          "intent": "零声母 uenn 匹配 wênn",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F145",
+          "match": [
+            "common",
+            "uik",
+            "wik"
+          ],
+          "intent": "零声母 uik 匹配 wik",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F146",
+          "match": [
+            "common",
+            "uêt",
+            "wêt"
+          ],
+          "intent": "零声母 uet 输入匹配 wêt",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F147",
+          "match": [
+            "common",
+            "uêk",
+            "wêk"
+          ],
+          "intent": "零声母 uek 输入匹配 wêk",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F148",
+          "match": [
+            "common",
+            "uêu",
+            "wêu"
+          ],
+          "intent": "零声母 ueu 输入匹配 wêu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F150",
+          "match": [
+            "common",
+            "iung",
+            "yung"
+          ],
+          "intent": "零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F151",
+          "match": [
+            "common",
+            "iun",
+            "yun"
+          ],
+          "intent": "零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F152",
+          "match": [
+            "common",
+            "iuek",
+            "yuek"
+          ],
+          "intent": "零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F153",
+          "match": [
+            "common",
+            "iuok",
+            "yuok"
+          ],
+          "intent": "零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写",
+          "origin": {
+            "kind": "explicit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "symbol_input",
+      "label": "特殊符号输入",
+      "description": "ê、普通 e 与 ï 的输入表示。",
+      "rules": [
+        {
+          "id": "F044",
+          "match": [
+            "common",
+            "i",
+            "ï"
+          ],
+          "intent": "i 可单向模糊匹配 ï",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F045",
+          "match": [
+            "common",
+            "ee",
+            "ê"
+          ],
+          "intent": "ee 单向匹配帽子 e",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F046",
+          "match": [
+            "common",
+            "ir",
+            "e"
+          ],
+          "intent": "ir 单向匹配普通 e",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F192",
+          "match": [
+            "common",
+            "e",
+            "ê"
+          ],
+          "intent": "e 可单向模糊匹配 ê",
+          "origin": {
+            "kind": "explicit",
+            "basis": "单写 e 输入兼容 ê；ee 作为精确输入形式"
+          }
+        }
+      ]
+    },
+    {
+      "id": "legacy_input",
+      "label": "习惯及旧拼输入",
+      "description": "习惯拼写、旧拼写与声母后 u/v 省写输入。",
+      "rules": [
+        {
+          "id": "F016",
+          "match": [
+            "common",
+            "ve",
+            "yue"
+          ],
+          "intent": "ve 系专用桥接，须先于通用 v→yu；只接声母",
+          "origin": {
+            "kind": "bridge",
+            "parents": [
+              "F018"
+            ]
+          }
+        },
+        {
+          "id": "F017",
+          "match": [
+            "common",
+            "ue",
+            "yue"
+          ],
+          "intent": "ue 系专用桥接，须先于通用 u→yu；只接声母",
+          "origin": {
+            "kind": "bridge",
+            "parents": [
+              "F109"
+            ]
+          }
+        },
+        {
+          "id": "F018",
+          "match": [
+            "common",
+            "v",
+            "yu"
+          ],
+          "intent": "仅已有声母后的 v→yu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F021",
+          "match": [
+            "common",
+            "you",
+            "yiu"
+          ],
+          "intent": "yiu 可从 you 模糊输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F022",
+          "match": [
+            "common",
+            "wui",
+            "wi"
+          ],
+          "intent": "零声母 wui 旧写兼容 ui 的转写形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F023",
+          "match": [
+            "common",
+            "wei",
+            "wi"
+          ],
+          "intent": "零声母 wei 单向兼容 wi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F070",
+          "match": [
+            "common",
+            "yao",
+            "yeu"
+          ],
+          "intent": "普通话拼音习惯输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F072",
+          "match": [
+            "common",
+            "yao",
+            "yêu"
+          ],
+          "intent": "普通话 yao 输入匹配 yêu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F073",
+          "match": [
+            "common",
+            "ao",
+            "au"
+          ],
+          "intent": "旧 ao 写法兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F074",
+          "match": [
+            "common",
+            "ou",
+            "eu"
+          ],
+          "intent": "普通话 ou 输入兼容规范 eu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F075",
+          "match": [
+            "common",
+            "ou",
+            "êu"
+          ],
+          "intent": "普通话 ou 输入兼容带帽 ê 形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F076",
+          "match": [
+            "common",
+            "yoin",
+            "yuon"
+          ],
+          "intent": "零声母旧写向后兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F109",
+          "match": [
+            "common",
+            "u",
+            "yu"
+          ],
+          "intent": "yu 可从声母后的 u 输入，且 u 不接在 y 后",
+          "origin": {
+            "kind": "explicit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "onset_alias",
+      "label": "声母替代输入",
+      "description": "文档或既有条目登记的声母替代输入。",
+      "rules": [
+        {
+          "id": "F019",
+          "match": [
+            "common",
+            "w",
+            "v"
+          ],
+          "intent": "w 可单向兼容 v",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F020",
+          "match": [
+            "common",
+            "wu",
+            "v"
+          ],
+          "intent": "wu 可单向兼容 v",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F064",
+          "match": [
+            "common",
+            "wirn",
+            "ven"
+          ],
+          "intent": "ir 输入普通 e与声母替代组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F019"
+            ]
+          }
+        },
+        {
+          "id": "F065",
+          "match": [
+            "common",
+            "wuirn",
+            "ven"
+          ],
+          "intent": "ir 输入普通 e与声母替代组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F020"
+            ]
+          }
+        },
+        {
+          "id": "F169",
+          "match": [
+            "common",
+            "b",
+            "bb"
+          ],
+          "intent": "浊声母 bb 接受 b 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F170",
+          "match": [
+            "common",
+            "d",
+            "dd"
+          ],
+          "intent": "浊声母 dd 接受 d 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F171",
+          "match": [
+            "common",
+            "g",
+            "gg"
+          ],
+          "intent": "浊声母 gg 接受 g 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F172",
+          "match": [
+            "common",
+            "z",
+            "zz"
+          ],
+          "intent": "浊声母 zz 接受 z 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F173",
+          "match": [
+            "common",
+            "j",
+            "jj"
+          ],
+          "intent": "浊声母 jj 接受 j 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F174",
+          "match": [
+            "common",
+            "zr",
+            "zzr"
+          ],
+          "intent": "浊声母 zzr 接受 zr 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F175",
+          "match": [
+            "common",
+            "zh",
+            "zzr"
+          ],
+          "intent": "浊声母 zzr 接受 zh 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F176",
+          "match": [
+            "common",
+            "zzh",
+            "zzr"
+          ],
+          "intent": "浊声母 zzr 接受 zzh 输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rime_alias",
+      "label": "韵母替代输入",
+      "description": "限定范围内的韵母替代输入。",
+      "rules": [
+        {
+          "id": "F024",
+          "match": [
+            "common",
+            "wen",
+            "won"
+          ],
+          "intent": "won 可从 wen 模糊输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F025",
+          "match": [
+            "common",
+            "uen",
+            "won"
+          ],
+          "intent": "零声母 won 可从 uen 模糊输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F026",
+          "match": [
+            "common",
+            "uen",
+            "uon"
+          ],
+          "intent": "带声母 uon 可从 uen 模糊输入",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F027",
+          "match": [
+            "common",
+            "yan",
+            "yên"
+          ],
+          "intent": "仅保留输入 yan→yên 的模糊，不改写现有 yan",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F068",
+          "match": [
+            "common",
+            "eu",
+            "ieu"
+          ],
+          "intent": "g/k/ng 后可省略 i",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F077",
+          "match": [
+            "yikyan-henfeng",
+            "on",
+            "ong"
+          ],
+          "intent": "n 尾输入兼容 ng 尾",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F078",
+          "match": [
+            "yikyan-henfeng",
+            "en",
+            "eng"
+          ],
+          "intent": "n 尾输入兼容 ng 尾",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F079",
+          "match": [
+            "yikyan-henfeng",
+            "uon",
+            "uong"
+          ],
+          "intent": "n 尾输入兼容 ng 尾",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F080",
+          "match": [
+            "yikyan-henfeng",
+            "yun",
+            "yung"
+          ],
+          "intent": "n 尾输入兼容 ng 尾",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F081",
+          "match": [
+            "common",
+            "yueng",
+            "yuen"
+          ],
+          "intent": "ng 尾输入兼容 n 尾",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F085",
+          "match": [
+            "fungcen",
+            "ing",
+            "en"
+          ],
+          "intent": "丰城 ing 输入单向兼容 en",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F092",
+          "match": [
+            "common",
+            "yuen",
+            "yuon"
+          ],
+          "intent": "覆盖现有全部 yuon 规范音",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F093",
+          "match": [
+            "common",
+            "yue",
+            "yuot"
+          ],
+          "intent": "省略入声尾时兼容到 yuot",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F094",
+          "match": [
+            "common",
+            "yuet",
+            "yuot"
+          ],
+          "intent": "正确 t 尾兼容到 yuot",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F095",
+          "match": [
+            "common",
+            "yuek",
+            "yuot"
+          ],
+          "intent": "误写 k 尾仍兼容到 yuot",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F096",
+          "match": [
+            "common",
+            "ieu",
+            "eu"
+          ],
+          "intent": "限定 hieu→heu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F097",
+          "match": [
+            "common",
+            "iêu",
+            "êu"
+          ],
+          "intent": "限定 hieu→hêu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F106",
+          "match": [
+            "common",
+            "ên",
+            "iên"
+          ],
+          "intent": "各地仅匹配带帽 iên 目标",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F107",
+          "match": [
+            "common",
+            "êt",
+            "iêt"
+          ],
+          "intent": "ee 输入 nget 匹配 ngiêt",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F149",
+          "match": [
+            "common",
+            "un",
+            "wen"
+          ],
+          "intent": "零声母 un 输入匹配 wen",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F155",
+          "match": [
+            "yikyan-henfeng",
+            "oi",
+            "uoi"
+          ],
+          "intent": "oi 输入兼容 uoi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F156",
+          "match": [
+            "yikyan-henfeng",
+            "oi",
+            "ui"
+          ],
+          "intent": "oi 输入兼容 ui",
+          "origin": {
+            "kind": "explicit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "nasal_input",
+      "label": "鼻化输入",
+      "description": "单 n 输入、鼻化省写及转写后的鼻化形式。",
+      "rules": [
+        {
+          "id": "F157",
+          "match": [
+            "xyucuenn",
+            "an",
+            "ann"
+          ],
+          "intent": "遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F158",
+          "match": [
+            "xyucuenn",
+            "ian",
+            "iann"
+          ],
+          "intent": "遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F159",
+          "match": [
+            "xyucuenn",
+            "in",
+            "inn"
+          ],
+          "intent": "遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F160",
+          "match": [
+            "xyucuenn",
+            "uan",
+            "uann"
+          ],
+          "intent": "遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F161",
+          "match": [
+            "xyucuenn",
+            "yuin",
+            "yuinn"
+          ],
+          "intent": "遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F162",
+          "match": [
+            "xyucuenn",
+            "iên",
+            "iênn"
+          ],
+          "intent": "鼻化韵帽子 e 使用 ee 输入兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F163",
+          "match": [
+            "xyucuenn",
+            "yuên",
+            "yuênn"
+          ],
+          "intent": "鼻化韵帽子 e 使用 ee 输入兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F164",
+          "match": [
+            "xyucuenn",
+            "ên",
+            "ênn"
+          ],
+          "intent": "鼻化韵帽子 e 使用 ee 输入兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F165",
+          "match": [
+            "xyucuenn",
+            "uên",
+            "wênn"
+          ],
+          "intent": "零声母 uen 匹配遂川规范 wênn",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F166",
+          "match": [
+            "xyucuenn",
+            "uenn",
+            "un"
+          ],
+          "intent": "鼻化韵旧式输入归并到 un 后继续匹配规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F167",
+          "match": [
+            "xyucuenn",
+            "un",
+            "unn"
+          ],
+          "intent": "声母后 un 匹配规范鼻化韵 unn",
+          "origin": {
+            "kind": "explicit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "entering_input",
+      "label": "入声输入",
+      "description": "地区入声省尾和韵尾互兼容。",
+      "rules": [
+        {
+          "id": "F047",
+          "match": [
+            "common",
+            "ir",
+            "ek"
+          ],
+          "intent": "ir 输入普通 e与省尾输入组合",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F048",
+          "match": [
+            "common",
+            "ir",
+            "et"
+          ],
+          "intent": "ir 输入普通 e与省尾输入组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "entering.omit"
+            ]
+          }
+        },
+        {
+          "id": "F049",
+          "match": [
+            "common",
+            "irk",
+            "et"
+          ],
+          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "entering.mutual"
+            ]
+          }
+        },
+        {
+          "id": "F050",
+          "match": [
+            "common",
+            "irp",
+            "ek"
+          ],
+          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "entering.mutual"
+            ]
+          }
+        },
+        {
+          "id": "F051",
+          "match": [
+            "common",
+            "irp",
+            "et"
+          ],
+          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "entering.mutual"
+            ]
+          }
+        },
+        {
+          "id": "F052",
+          "match": [
+            "common",
+            "irt",
+            "ek"
+          ],
+          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "entering.mutual"
+            ]
+          }
+        },
+        {
+          "id": "F054",
+          "match": [
+            "common",
+            "uir",
+            "yuek"
+          ],
+          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F017",
+              "entering.omit"
+            ]
+          }
+        },
+        {
+          "id": "F055",
+          "match": [
+            "common",
+            "uir",
+            "yuet"
+          ],
+          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F017",
+              "entering.omit"
+            ]
+          }
+        },
+        {
+          "id": "F058",
+          "match": [
+            "common",
+            "uirk",
+            "yuet"
+          ],
+          "intent": "ir 输入普通 e、声母后 u/v 拼写与入声尾互兼容组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F017",
+              "entering.mutual"
+            ]
+          }
+        },
+        {
+          "id": "F061",
+          "match": [
+            "common",
+            "vir",
+            "yuek"
+          ],
+          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F016",
+              "entering.omit"
+            ]
+          }
+        },
+        {
+          "id": "F062",
+          "match": [
+            "common",
+            "vir",
+            "yuet"
+          ],
+          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F016",
+              "entering.omit"
+            ]
+          }
+        },
+        {
+          "id": "F063",
+          "match": [
+            "common",
+            "virk",
+            "yuet"
+          ],
+          "intent": "ir 输入普通 e、声母后 u/v 拼写与入声尾互兼容组合",
+          "origin": {
+            "kind": "composition",
+            "parents": [
+              "F046",
+              "F016",
+              "entering.mutual"
+            ]
+          }
+        },
+        {
+          "id": "F082",
+          "match": [
+            "lancong",
+            "",
+            "t"
+          ],
+          "intent": "省略入声 t 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F083",
+          "match": [
+            "lancong",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F084",
+          "match": [
+            "lancong",
+            "t",
+            "k"
+          ],
+          "intent": "入声 t/k 尾互兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F086",
+          "match": [
+            "fungcen",
+            "",
+            "t"
+          ],
+          "intent": "省略入声 t 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F087",
+          "match": [
+            "fungcen",
+            "",
+            "p"
+          ],
+          "intent": "省略入声 p 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F088",
+          "match": [
+            "fungcen",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F089",
+          "match": [
+            "fungcen",
+            "t",
+            "p"
+          ],
+          "intent": "入声 t/p 尾互兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F090",
+          "match": [
+            "fungcen",
+            "t",
+            "k"
+          ],
+          "intent": "入声 t/k 尾互兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F091",
+          "match": [
+            "fungcen",
+            "p",
+            "k"
+          ],
+          "intent": "入声 p/k 尾互兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F110",
+          "match": [
+            "tiqien",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F111",
+          "match": [
+            "tiqien",
+            "",
+            "p"
+          ],
+          "intent": "省略入声 p 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F112",
+          "match": [
+            "tiqien",
+            "k",
+            "p"
+          ],
+          "intent": "入声 k/p 尾互兼容",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F113",
+          "match": [
+            "sinyi",
+            "",
+            "t"
+          ],
+          "intent": "省略入声 t 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F114",
+          "match": [
+            "sinyi",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F115",
+          "match": [
+            "sinyi",
+            "k",
+            "t"
+          ],
+          "intent": "入声 k/t 尾互兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F116",
+          "match": [
+            "songau",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F117",
+          "match": [
+            "songau",
+            "",
+            "t"
+          ],
+          "intent": "省略入声 t 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F118",
+          "match": [
+            "songau",
+            "k",
+            "t"
+          ],
+          "intent": "入声 k/t 尾互兼容",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F154",
+          "match": [
+            "yikyan-henfeng",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F168",
+          "match": [
+            "xyucuenn",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        }
+      ]
+    },
+    {
+      "id": "syllable_alias",
+      "label": "整音节专用兼容",
+      "description": "特定音节的兼容输入，不扩展为通用声韵替换。",
+      "rules": [
+        {
+          "id": "F067",
+          "match": [
+            "common",
+            "o",
+            "eo"
+          ],
+          "intent": "独立音节 o 单向兼容 eo",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F069",
+          "match": [
+            "common",
+            "iau",
+            "yeu"
+          ],
+          "intent": "零声母 iau→yeu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F071",
+          "match": [
+            "common",
+            "iau",
+            "yêu"
+          ],
+          "intent": "零声母 iau 输入匹配 yêu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F099",
+          "match": [
+            "common",
+            "fi",
+            "fêi"
+          ],
+          "intent": "整音节 fi→fêi",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F100",
+          "match": [
+            "lancong",
+            "fi",
+            "fui"
+          ],
+          "intent": "南昌整音节 fi→fui，单向兼容",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F101",
+          "match": [
+            "common",
+            "zuon",
+            "zon"
+          ],
+          "intent": "整音节 zuon→zon",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F102",
+          "match": [
+            "common",
+            "cuon",
+            "con"
+          ],
+          "intent": "整音节 cuon→con",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F103",
+          "match": [
+            "common",
+            "ciu",
+            "ceu"
+          ],
+          "intent": "整音节 ciu→ceu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F104",
+          "match": [
+            "common",
+            "suon",
+            "son"
+          ],
+          "intent": "专用音节 suon 输入兼容 son",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F105",
+          "match": [
+            "common",
+            "siu",
+            "seu"
+          ],
+          "intent": "专用音节 siu 输入兼容 seu",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F108",
+          "match": [
+            "common",
+            "ngê",
+            "ngiêt"
+          ],
+          "intent": "ee 输入 nge 匹配 ngiêt",
+          "origin": {
+            "kind": "explicit"
+          }
+        }
+      ]
+    }
+  ],
+  "origin_kinds": {
+    "explicit": "现有显式表项",
+    "bridge": "用于接续的显式桥接",
+    "composition": "基础规则组合的显式补充",
+    "generated": "按地区入声配置生成"
+  },
+  "derivation_components": {
+    "entering.omit": "按当地已启用入声尾省尾输入",
+    "entering.mutual": "当地已启用入声尾互兼容"
+  },
+  "constraints": [
+    {
+      "id": "yuo_identity",
+      "description": "含 yuo 的形式停止向外扩展；该限制优先于其他兼容。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "plain_e_exclusion",
+      "description": "ir 单向匹配普通 e，ee 单向匹配帽子 e；两种输入互不串配。",
+      "rules": [
+        "F046",
+        "F047",
+        "F048",
+        "F049",
+        "F050",
+        "F051",
+        "F052",
+        "F053",
+        "F054",
+        "F055",
+        "F056",
+        "F057",
+        "F058",
+        "F059",
+        "F060",
+        "F061",
+        "F062",
+        "F063",
+        "F064",
+        "F065"
+      ]
+    },
+    {
+      "id": "standalone_o",
+      "description": "o 匹配 eo 的规则限定独立音节 o。",
+      "rules": [
+        "F067"
+      ],
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "after_initial_yu",
+      "description": "u/v 兼容 yu 使用表内声母起首限制；u 替换位置的前缀须为登记声母。",
+      "rules": [
+        "F016",
+        "F017",
+        "F018",
+        "F109"
+      ],
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "no_duplicate_initial",
+      "description": "音节开头扩写遇到目标前缀时停止重复扩写。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "no_duplicate_ieu",
+      "description": "eu 兼容 ieu 时，已以 ieu 结尾的形式不重复插入 i。",
+      "rules": [
+        "F068"
+      ],
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "no_double_entering",
+      "description": "已有 p/t/k 尾的输入不再添加第二个入声尾。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "regional_entering_codas",
+      "description": "入声省尾和互兼容采用现有地区启用配置。",
+      "configuration": "resources/regions/*/region.toml 与既有地区配置解析"
+    }
+  ],
+  "separate_configuration": {
+    "name": "jqx_u_to_yu",
+    "description": "地区转写配置与 IPA 对应独立审查；不作为新增模糊规则。"
+  },
+  "execution_dimensions": [
+    "region",
+    "category",
+    "applies",
+    "bidirectional",
+    "chainable",
+    "priority_tier",
+    "starts_with"
+  ],
+  "execution_order": "fuzzy_scheme.tsv 的现有行顺序"
+}
