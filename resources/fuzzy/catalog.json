@@ -356,86 +356,6 @@
           }
         },
         {
-          "id": "F053",
-          "match": [
-            "common",
-            "iuirk",
-            "yuek"
-          ],
-          "intent": "ir 输入普通 e与零声母转写组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F152"
-            ]
-          }
-        },
-        {
-          "id": "F056",
-          "match": [
-            "common",
-            "uiri",
-            "wei"
-          ],
-          "intent": "ir 输入普通 e与零声母转写组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F010"
-            ]
-          }
-        },
-        {
-          "id": "F057",
-          "match": [
-            "common",
-            "uirk",
-            "wek"
-          ],
-          "intent": "ir 输入普通 e与零声母转写组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F002"
-            ]
-          }
-        },
-        {
-          "id": "F059",
-          "match": [
-            "common",
-            "uirn",
-            "wen"
-          ],
-          "intent": "ir 输入普通 e与零声母转写组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F125"
-            ]
-          }
-        },
-        {
-          "id": "F060",
-          "match": [
-            "common",
-            "uirng",
-            "weng"
-          ],
-          "intent": "ir 输入普通 e与零声母转写组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F002"
-            ]
-          }
-        },
-        {
           "id": "F098",
           "match": [
             "common",
@@ -1100,38 +1020,6 @@
           }
         },
         {
-          "id": "F064",
-          "match": [
-            "common",
-            "wirn",
-            "ven"
-          ],
-          "intent": "ir 输入普通 e与声母替代组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F019"
-            ]
-          }
-        },
-        {
-          "id": "F065",
-          "match": [
-            "common",
-            "wuirn",
-            "ven"
-          ],
-          "intent": "ir 输入普通 e与声母替代组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F020"
-            ]
-          }
-        },
-        {
           "id": "F169",
           "match": [
             "common",
@@ -1648,10 +1536,10 @@
           "id": "F047",
           "match": [
             "common",
-            "ir",
+            "e",
             "ek"
           ],
-          "intent": "ir 输入普通 e与省尾输入组合",
+          "intent": "普通 e 输入或 ir→e 级联与省尾输入组合",
           "origin": {
             "kind": "explicit"
           }
@@ -1660,10 +1548,10 @@
           "id": "F048",
           "match": [
             "common",
-            "ir",
+            "e",
             "et"
           ],
-          "intent": "ir 输入普通 e与省尾输入组合",
+          "intent": "普通 e 输入或 ir→e 级联与省尾输入组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1676,10 +1564,10 @@
           "id": "F049",
           "match": [
             "common",
-            "irk",
+            "ek",
             "et"
           ],
-          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "intent": "普通 e 输入或 ir→e 级联与入声尾互兼容组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1692,10 +1580,10 @@
           "id": "F050",
           "match": [
             "common",
-            "irp",
+            "ep",
             "ek"
           ],
-          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "intent": "普通 e 输入或 ir→e 级联与入声尾互兼容组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1708,10 +1596,10 @@
           "id": "F051",
           "match": [
             "common",
-            "irp",
+            "ep",
             "et"
           ],
-          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "intent": "普通 e 输入或 ir→e 级联与入声尾互兼容组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1724,10 +1612,10 @@
           "id": "F052",
           "match": [
             "common",
-            "irt",
+            "et",
             "ek"
           ],
-          "intent": "ir 输入普通 e与入声尾互兼容组合",
+          "intent": "普通 e 输入或 ir→e 级联与入声尾互兼容组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1740,10 +1628,10 @@
           "id": "F054",
           "match": [
             "common",
-            "uir",
+            "ue",
             "yuek"
           ],
-          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与省尾输入组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1757,10 +1645,10 @@
           "id": "F055",
           "match": [
             "common",
-            "uir",
+            "ue",
             "yuet"
           ],
-          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与省尾输入组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1774,10 +1662,10 @@
           "id": "F058",
           "match": [
             "common",
-            "uirk",
+            "uek",
             "yuet"
           ],
-          "intent": "ir 输入普通 e、声母后 u/v 拼写与入声尾互兼容组合",
+          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与入声尾互兼容组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1791,10 +1679,10 @@
           "id": "F061",
           "match": [
             "common",
-            "vir",
+            "ve",
             "yuek"
           ],
-          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与省尾输入组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1808,10 +1696,10 @@
           "id": "F062",
           "match": [
             "common",
-            "vir",
+            "ve",
             "yuet"
           ],
-          "intent": "ir 输入普通 e、声母后 u/v 拼写与省尾输入组合",
+          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与省尾输入组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -1825,10 +1713,10 @@
           "id": "F063",
           "match": [
             "common",
-            "virk",
+            "vek",
             "yuet"
           ],
-          "intent": "ir 输入普通 e、声母后 u/v 拼写与入声尾互兼容组合",
+          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与入声尾互兼容组合",
           "origin": {
             "kind": "composition",
             "parents": [
@@ -2245,11 +2133,12 @@
       "implementation": [
         "platforms/rime/fuzzy.py",
         "crates/core/src/syllable.rs"
-      ]
+      ],
+      "rules": []
     },
     {
       "id": "plain_e_exclusion",
-      "description": "ir 单向匹配普通 e，ee 单向匹配帽子 e；两种输入互不串配。",
+      "description": "ir→e 可继续参与其他兼容；由 ir 生成的 e 不能参与 e/ee→ê，直接 e 与 ee 输入仍可匹配 ê。",
       "rules": [
         "F046",
         "F047",
@@ -2258,19 +2147,14 @@
         "F050",
         "F051",
         "F052",
-        "F053",
         "F054",
         "F055",
-        "F056",
-        "F057",
         "F058",
-        "F059",
-        "F060",
         "F061",
         "F062",
         "F063",
-        "F064",
-        "F065"
+        "F045",
+        "F192"
       ]
     },
     {
@@ -2304,7 +2188,8 @@
       "implementation": [
         "platforms/rime/fuzzy.py",
         "crates/core/src/syllable.rs"
-      ]
+      ],
+      "rules": []
     },
     {
       "id": "no_duplicate_ieu",
@@ -2323,12 +2208,14 @@
       "implementation": [
         "platforms/rime/fuzzy.py",
         "crates/core/src/syllable.rs"
-      ]
+      ],
+      "rules": []
     },
     {
       "id": "regional_entering_codas",
       "description": "入声省尾和互兼容采用现有地区启用配置。",
-      "configuration": "resources/regions/*/region.toml 与既有地区配置解析"
+      "configuration": "resources/regions/*/region.toml 与既有地区配置解析",
+      "rules": []
     }
   ],
   "separate_configuration": {

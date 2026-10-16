@@ -265,6 +265,15 @@ fn e_ir_and_double_e_inputs_preserve_and_extend_circumflex_e() {
         .normalize("e", SyllableScheme::GonPin)
         .iter()
         .any(|item| item.text == "ê"));
+    let mixed = map.normalize("eir", SyllableScheme::GonPin);
+    assert!(mixed.iter().any(|item| item.text == "êe"));
+    assert!(!mixed.iter().any(|item| item.text == "êê"));
+    let lancong =
+        FuzzyMap::load_tsv_for_region(fuzzy_path(), "lancong").expect("load Lancong fuzzy rules");
+    assert!(lancong
+        .normalize("ir", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "ek" || item.text == "et"));
     assert!(!map
         .normalize("ea", SyllableScheme::GonPin)
         .iter()

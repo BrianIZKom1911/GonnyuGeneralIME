@@ -174,7 +174,7 @@ def test_eo_accepts_only_standalone_o_one_way() -> None:
 def test_ir_matches_plain_e_and_double_e_matches_circumflex_one_way() -> None:
     rules = load_rules(RULES_PATH)
     rule = next(rule for rule in rules if rule.source == "ir" and rule.target == "e")
-    assert not rule.chainable
+    assert rule.chainable
     for plain, circumflex in (("ir", "ee"), ("irn", "een"), ("gen", "geen")):
         assert plain in normalize(plain, rules)
         assert circumflex in normalize(circumflex, rules)
