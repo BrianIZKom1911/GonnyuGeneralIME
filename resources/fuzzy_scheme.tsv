@@ -47,7 +47,7 @@ common	rime	iuenn	yuênn			syllable-final	false	true	primary	iuenn	零声母 iue
 common	rime	o	eo	ɵ	儿	syllable-final	false	false	primary	o	独立音节 o 单向兼容 eo	none
 common	rime	uin	win			syllable-final	false	true	primary	uin	零声母 uin 匹配 win	none
 fungcen	coda	t	k			syllable-final	true	true	secondary			none
-common	rime	wei	wi	ui	为	syllable-final	false	false	primary	wei	零声母 wei 单向兼容 wi	none
+common	rime	wei	wi	ui	为	syllable-final	false	true	primary	wei	零声母 wei 单向兼容 wi，可接续匹配入声韵尾	none
 common	onset	siu	seu		兽	syllable-final	false	false	primary			none
 common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon 可从 uen 模糊输入	none
 common	rime	iau	yeu	iɛu	妖	syllable-final	false	true	primary	iau	零声母 iau→yeu	none
@@ -116,7 +116,7 @@ common	rime	uie	wiê			syllable-final	false	true	primary	uie	零声母 uie 匹�
 common	rime	uen	wen	uen	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽 ê 可由 e 或 ee 输入	none
 common	rime	iue	yuê			syllable-final	false	true	primary	iue	零声母 iue 匹配 yuê	none
 lancong	coda		t		客	syllable-final	false	true	fallback		入声尾：输入不带尾可模糊匹配带尾（za→zat）	none
-common	rime	you	yiu	iu	有	syllable-final	false	false	primary	you	yiu 可从 you 模糊输入	none
+common	rime	you	yiu	iu	有	syllable-final	false	true	primary	you	yiu 可从 you 模糊输入，可接续匹配入声韵尾	none
 songau	coda		t			syllable-final	false	true	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式	none
 common	rime	iong	yong	iuŋ	用	syllable-final	false	true	primary	iong	iong→yong	none
 common	onset	j	jj			syllable-initial	false	true	primary			none
