@@ -401,8 +401,6 @@ With no initial consonant:
 
 `yu` is provisionally used throughout for [y].
 
-`yuo` inputs, including forms with initials or codas, match their original spelling only and do not expand through fuzzy matching.
-
 | gon-pin | Default IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Jingon IPA | Yikyan-Henfeng IPA | Jisuibaedu IPA | Xyucuênn IPA | Singzï IPA | Accepted alternative input | Notes |
 | --- | --- | --- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | --- | --- |
 | yu | [y] | - | - | - | - | - | - | - | - | - | - | v (after an initial only), u (after an initial only, never immediately after y) |  |
