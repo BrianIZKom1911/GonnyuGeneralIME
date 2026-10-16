@@ -165,6 +165,8 @@ def test_eo_accepts_only_standalone_o_one_way() -> None:
 
 def test_open_e_input_matches_circumflex_one_way() -> None:
     rules = load_rules(RULES_PATH)
+    rule = next(rule for rule in rules if rule.source == "e" and rule.target == "ê")
+    assert rule.chainable
     for plain, circumflex in (("e", "ê"), ("en", "ên"), ("gek", "gêk")):
         assert plain in normalize(plain, rules)
         assert circumflex in normalize(plain, rules)
@@ -174,6 +176,13 @@ def test_open_e_input_matches_circumflex_one_way() -> None:
     assert "    - derive/^Gê$/Fe/" in algebra
     assert "    - derive/^Ggêk$/Fgek/" in algebra
     assert "    - derive/^Ge$/Fê/" not in algebra
+
+
+def test_open_e_compatibility_can_chain_without_chaining_double_e() -> None:
+    rules = load_rules(RULES_PATH, "lancong")
+    assert "guêt" in normalize("gue", rules)
+    assert "ê" not in normalize("ee", rules)
+    assert "gêk" not in normalize("geek", rules)
 
 
 def test_voiced_initial_compatibility_composes_with_special_vowels():
@@ -567,12 +576,21 @@ def test_yuo_family_accepts_all_supported_mandarin_style_spellings() -> None:
                 assert invalid not in outputs
 
 
+def test_plain_e_targets_are_replaced_by_circumflex_targets() -> None:
+    rules = load_rules(RULES_PATH)
+
+    for source, target, removed in (("yan", "yên", "yen"), ("ngen", "ngiên", "ngien"), ("nget", "ngiêt", "ngiet")):
+        outputs = normalize(source, rules)
+        assert target in outputs
+        assert removed not in outputs
+
+
 def test_added_theoretical_spellings_normalize_to_stored_forms() -> None:
     rules = load_rules(RULES_PATH)
 
     for input_syllable, expected in {
         "hieu": "heu",
-        "fi": "fei",
+        "fi": "fêi",
         "zuon": "zon",
         "cuon": "con",
         "ciu": "ceu",
@@ -585,7 +603,8 @@ def test_fi_to_fui_is_one_way_and_lancong_only() -> None:
         rules = load_rules(RULES_PATH, region)
         for source in ("fi", "fi1", "fi3", "fi4", "fi5"):
             assert ("fui" in normalize(source, rules)) == (region == "lancong")
-            assert "fei" in normalize(source, rules)
+            assert "fêi" in normalize(source, rules)
+            assert "fei" not in normalize(source, rules)
         for reverse in (False, True):
             assert "fi" not in normalize("fui", rules, reverse=reverse)
         for source in ("afi", "lfi", "fian", "fin", "fip", "fit", "fik"):

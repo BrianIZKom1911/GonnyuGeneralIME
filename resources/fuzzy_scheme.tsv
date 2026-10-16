@@ -24,7 +24,7 @@ common	rime	wui	wi	ui	为	syllable-final	false	false	primary	wui	零声母 wui �
 common	rime	wen	won	uon	碗	syllable-final	false	false	primary	wen	won 可从 wen 模糊输入
 common	rime	uen	won	uon	碗	syllable-final	false	false	primary	uen	零声母 won 可从 uen 模糊输入
 common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon 可从 uen 模糊输入
-common	rime	yan	yen	ian	烟	syllable-final	false	false	primary	yan	仅保留输入 yan→yen 的模糊，不改写现有 yan
+common	rime	yan	yên	ian	烟	syllable-final	false	false	primary	yan	仅保留输入 yan→yên 的模糊，不改写现有 yan
 common	rime	i	ï	ɿ		anywhere	false	false	primary		i 可单向模糊匹配 ï
 common	rime	ea	ê	ɛ	额	anywhere	false	false	primary		ea 可单向模糊匹配 ê
 common	rime	ee	e			anywhere	false	false	primary		ee 可单向匹配普通 e
@@ -47,7 +47,7 @@ common	rime	vee	yuet			syllable-final	false	false	fallback	jvee,qvee	ee 普通 e
 common	rime	veek	yuet			syllable-final	false	false	secondary	jveek,qveek	ee 普通 e 的组合兼容
 common	rime	ween	ven			syllable-final	false	false	primary	ween	ee 普通 e 的组合兼容
 common	rime	wueen	ven			syllable-final	false	false	primary	wueen	ee 普通 e 的组合兼容
-common	rime	e	ê	ɛ	额	anywhere	false	false	primary		e 可单向模糊匹配 ê
+common	rime	e	ê	ɛ	额	anywhere	false	true	primary		e 可单向模糊匹配 ê
 common	rime	o	eo	ɵ	儿	syllable-final	false	false	primary	o	独立音节 o 单向兼容 eo
 common	rime	eu	ieu	iɛu	够	syllable-final	false	true	secondary	ng,g,k	g/k/ng 后可省略 i
 common	rime	iau	yeu	iɛu	妖	syllable-final	false	false	primary	iau	零声母 iau→yeu
@@ -75,15 +75,15 @@ common	rime	yue	yuot	yot	月	syllable-final	false	false	primary	yue,jyue,lyue,ny
 common	rime	yuet	yuot	yot	月	syllable-final	false	false	primary	yue,jyue,lyue,nyue,qyue,xyue	正确 t 尾兼容到 yuot
 common	rime	yuek	yuot	yot	月	syllable-final	false	false	primary	yue,jyue,lyue,nyue,qyue,xyue	误写 k 尾仍兼容到 yuot
 common	rime	ieu	eu	ɛu	后	syllable-final	false	false	secondary	h	限定 hieu→heu
-common	rime	fi	fei			syllable-final	false	false	primary	fi	整音节 fi→fei
+common	rime	fi	fêi			syllable-final	false	false	primary	fi	整音节 fi→fêi
 lancong	rime	fi	fui			syllable-final	false	false	primary	fi	南昌整音节 fi→fui，单向兼容
 common	rime	zuon	zon			syllable-final	false	false	primary	zuon	整音节 zuon→zon
 common	rime	cuon	con			syllable-final	false	false	primary	cuon	整音节 cuon→con
 common	rime	ciu	ceu			syllable-final	false	false	primary	ciu	整音节 ciu→ceu
 common	rime	suon	son		算	syllable-final	false	true	primary		
 common	onset	siu	seu		兽	syllable-final	false	false	primary		
-common	rime	en	ien			syllable-final	false	false	primary	ng,k,g	
-common	rime	et	iet		额	syllable-final	false	false	primary	ng	
+common	rime	en	iên			syllable-final	false	false	primary	ng,k,g	各地仅匹配带帽 iên 目标
+common	rime	et	iêt		额	syllable-final	false	false	primary	ng	输入 nget 匹配 ngiêt
 common	rime	u	yu	y	与	anywhere	false	false	secondary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	yu 可从声母后的 u 输入，且 u 不接在 y 后
 tiqien	coda		k			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
 tiqien	coda		p			syllable-final	false	false	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式
