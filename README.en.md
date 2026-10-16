@@ -20,19 +20,15 @@ Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Ti
 
 Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fungcen, Yikyan-Henfeng, and Sinyi (Xinyu). Other installation options are available in the [Installation](#installation) section below.
 
-## Release 1.2.1
+## Release 1.2.2
 
-- feat(dict): Add the Singzï dictionary with one-way input aliases for voiced initials.
-- fix(dict): Correct Lancong e vowels and related entries, distinguish vowel values with ê, and add paired alternative readings.
-- fix(phonology): Update readings in Sinyi and other localities, and correct Fenni spelling and checked-tone coda mappings.
-- fix(input): Add one-way ee input for ê and fix combinations of voiced-initial and special-vowel aliases, including jien input for jjiên.
-- docs: Update the romanisation reference and tutorial, distinguishing zero initials [] or [ʔ] from checked-tone codas.
-
+- fix: Correct Nanchang and Fungcheng dictionary phonology and readings; complete circumflex ê input compatibility.
+- test: Full quality checks and tests pass.
 
 ## Contents
 
 - [GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method](#gonnyugeneralime--a-general-gongan-chinese-input-method)
-  - [Release 1.2.1](#release-121)
+  - [Release 1.2.2](#release-122)
   - [Contents](#contents)
   - [Overview](#overview)
     - [What it provides](#what-it-provides)
@@ -247,7 +243,7 @@ Checked-tone codas follow these spelling and input rules.
 | eo | [ɵ] | - | - | - | - | - | - | - | - | - | - | o (standalone syllable, one-way) |  |
 | ai | [ai] | - | - | - | - | - | - | - | - | - | - | — |  |
 | oi | [oi] | - | [ɔi] | [ɔi] | [ɔi] | - | [ɔi] | - | - | - | - | — |  |
-| ei | [ei] or [ɨi] | [ɛi] | [ɛi] | [əi] | - | - | - | - | - | - | - | — | In Nanchang, [ei] occurs only in contracted pronunciations. |
+| ei | [ei] or [ɨi] | [ɛi] | [ɛi] | [əi] | - | - | - | - | - | - | - | — | － |
 | eoi | - | - | - | [ɵi] | - | - | - | - | - | - | - | — |  |
 | aeu | - | - | - | - | [æu] | - | - | - | - | - | - |  |  |
 | au | [au] | [ɑu] | - | - | - | [ɑu] | - | - | - | - | - | ao |  |

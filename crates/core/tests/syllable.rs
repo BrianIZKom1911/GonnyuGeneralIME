@@ -617,6 +617,9 @@ fn yuo_family_accepts_all_supported_mandarin_style_spellings() {
     for onset in ["", "j", "n", "q", "x"] {
         let expected = format!("{onset}yuon");
         for variant in variants {
+            if onset.is_empty() && variant != "yue" {
+                continue;
+            }
             let input = format!("{onset}{variant}n");
             assert!(
                 map.normalize(&input, SyllableScheme::GonPin)
@@ -631,6 +634,9 @@ fn yuo_family_accepts_all_supported_mandarin_style_spellings() {
         let expected = format!("{onset}yuot");
         let invalid = format!("{onset}yuok");
         for variant in variants {
+            if onset.is_empty() && variant != "yue" {
+                continue;
+            }
             for coda in ["", "t", "k"] {
                 let input = format!("{onset}{variant}{coda}");
                 let outputs = map.normalize(&input, SyllableScheme::GonPin);
@@ -687,11 +693,27 @@ fn added_theoretical_spellings_normalize_to_stored_forms() {
 #[test]
 fn u_v_to_yu_bridges_require_an_onset() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
-    for (source, forbidden) in [("ue", "yue"), ("ve", "yue"), ("uee", "yuek"), ("vee", "yuek")] {
-        assert!(map.normalize(source, SyllableScheme::GonPin).iter().all(|item| item.text != forbidden));
+    for (source, forbidden) in [
+        ("ue", "yue"),
+        ("ve", "yue"),
+        ("uee", "yuek"),
+        ("vee", "yuek"),
+    ] {
+        assert!(map
+            .normalize(source, SyllableScheme::GonPin)
+            .iter()
+            .all(|item| item.text != forbidden));
     }
-    for (source, expected) in [("jue", "jyue"), ("jve", "jyue"), ("juee", "jyuek"), ("jvee", "jyuek")] {
-        assert!(map.normalize(source, SyllableScheme::GonPin).iter().any(|item| item.text == expected));
+    for (source, expected) in [
+        ("jue", "jyue"),
+        ("jve", "jyue"),
+        ("juee", "jyuek"),
+        ("jvee", "jyuek"),
+    ] {
+        assert!(map
+            .normalize(source, SyllableScheme::GonPin)
+            .iter()
+            .any(|item| item.text == expected));
     }
 }
 

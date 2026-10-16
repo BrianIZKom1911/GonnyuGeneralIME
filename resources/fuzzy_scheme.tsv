@@ -113,6 +113,9 @@ common	rime	uêik	uik	uɛiʔ		syllable-final	false	true	primary	b,p,m,f,v,d,t,n,
 common	rime	uen	wen	uen	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽子 e 使用 e 输入
 common	rime	uen	wên	uɛn	文	syllable-final	false	true	primary	uen	零声母 un/uen 同组；带帽子 e 使用 e 输入
 common	rime	uên	wên	uɛn	文	syllable-final	false	true	primary	uên	零声母 un/uen 同组；带帽子 e 使用 e 输入
+common	rime	un	wun	un		syllable-final	false	true	primary	un		零声母 un 单向匹配 wun
+common	rime	ut	wut			syllable-final	false	true	primary	ut		零声母 ut 单向匹配 wut
+common	rime	it	yit			syllable-final	false	true	primary	it		零声母 it 单向匹配 yit
 common	rime	uet	wêt			syllable-final	false	false	primary	uet	零声母 uet 输入匹配 wêt
 common	rime	uek	wêk			syllable-final	false	false	primary	uek	零声母 uek 输入匹配 wêk
 common	rime	ueu	wêu			syllable-final	false	false	primary	ueu	零声母 ueu 输入匹配 wêu
