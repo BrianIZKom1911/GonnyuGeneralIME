@@ -652,7 +652,7 @@ fn added_theoretical_spellings_normalize_to_stored_forms() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     for (input, expected) in [
         ("hieu", "heu"),
-        ("fi", "fei"),
+        ("fi", "fêi"),
         ("zuon", "zon"),
         ("cuon", "con"),
         ("ciu", "ceu"),
@@ -689,7 +689,8 @@ fn fi_to_fui_is_one_way_and_lancong_only() {
                 outputs.iter().any(|item| item.text == "fui"),
                 region == "lancong"
             );
-            assert!(outputs.iter().any(|item| item.text == "fei"));
+            assert!(outputs.iter().any(|item| item.text == "fêi"));
+            assert!(outputs.iter().all(|item| item.text != "fei"));
         }
         for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
             assert!(!map
