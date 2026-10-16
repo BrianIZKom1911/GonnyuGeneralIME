@@ -72,6 +72,27 @@ int main(int argc, char** argv) {
     gannyu_string_destroy(snapshot);
     if (!commits_bank_card) return 11;
 
+    if (std::strcmp(region, "lancong") == 0) {
+      if (gannyu_engine_set_candidate_limit(handle, 100) != 0) {
+        gannyu_pipeline_destroy(handle);
+        return 18;
+      }
+      snapshot = nullptr;
+      if (gannyu_engine_process_key(handle, "{\"type\":\"text\",\"text\":\"birt\"}", &snapshot) != 0 ||
+          snapshot == nullptr) {
+        gannyu_pipeline_destroy(handle);
+        return 16;
+      }
+      const bool has_not = std::strstr(snapshot, "\"text\":\"不\"") != nullptr;
+      const bool has_north = std::strstr(snapshot, "\"text\":\"北\"") != nullptr;
+      std::puts(snapshot);
+      gannyu_string_destroy(snapshot);
+      if (!has_not || has_north) {
+        gannyu_pipeline_destroy(handle);
+        return 17;
+      }
+    }
+
     const std::string schema_id = std::string("gannyu_") + region;
     const std::filesystem::path userdb = std::filesystem::path(argv[3]) / (schema_id + ".userdb");
     const std::filesystem::path marker = userdb / "gonnyu-reset-probe";
