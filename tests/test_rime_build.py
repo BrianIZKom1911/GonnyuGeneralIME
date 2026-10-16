@@ -576,26 +576,51 @@ def test_yuo_family_accepts_all_supported_mandarin_style_spellings() -> None:
                 assert invalid not in outputs
 
 
-def test_plain_e_targets_are_replaced_by_circumflex_targets() -> None:
+def test_circumflex_targets_preserve_dictionary_spellings() -> None:
     rules = load_rules(RULES_PATH)
 
-    for source, target, removed in (("yan", "yên", "yen"), ("ngen", "ngiên", "ngien"), ("nget", "ngiêt", "ngiet")):
+    for source, target, removed in (("yan", "yên", None), ("ien", "yên", None), ("iep", "yêp", None), ("iet", "yêt", None), ("iek", "yêk", None), ("ieu", "yêu", None), ("ngen", "ngiên", "ngien"), ("nget", "ngiêt", "ngiet"), ("nge", "ngiêt", "ngiet")):
         outputs = normalize(source, rules)
         assert target in outputs
-        assert removed not in outputs
+        if removed is not None:
+            assert removed not in outputs
+
+    yan_outputs = normalize("yan", rules)
+    assert "yên" in yan_outputs
+    assert "yen" not in yan_outputs
 
 
 def test_added_theoretical_spellings_normalize_to_stored_forms() -> None:
     rules = load_rules(RULES_PATH)
 
     for input_syllable, expected in {
-        "hieu": "heu",
+        "hieu": "hêu",
+        "iau": "yêu",
+        "yao": "yêu",
+        "hou": "hêu",
+        "uet": "wêt",
+        "uek": "wêk",
+        "ueu": "wêu",
         "fi": "fêi",
         "zuon": "zon",
         "cuon": "con",
         "ciu": "ceu",
     }.items():
         assert expected in normalize(input_syllable, rules)
+
+
+def test_u_v_to_yu_bridges_require_an_onset() -> None:
+    rules = load_rules(RULES_PATH)
+    for source, forbidden in (("ue", "yue"), ("ve", "yue"), ("uee", "yuek"), ("vee", "yuek")):
+        assert forbidden not in normalize(source, rules)
+    for source, expected in (("jue", "jyue"), ("jve", "jyue"), ("juee", "jyuek"), ("jvee", "jyuek")):
+        assert expected in normalize(source, rules)
+    assert "heu" in normalize("hieu", rules)
+
+
+def test_xyucuenn_zero_onset_uen_matches_wenn() -> None:
+    rules = load_rules(RULES_PATH, "xyucuenn")
+    assert "wênn" in normalize("uen", rules)
 
 
 def test_fi_to_fui_is_one_way_and_lancong_only() -> None:

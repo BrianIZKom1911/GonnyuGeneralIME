@@ -651,7 +651,20 @@ fn yuo_family_accepts_all_supported_mandarin_style_spellings() {
 fn added_theoretical_spellings_normalize_to_stored_forms() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
     for (input, expected) in [
-        ("hieu", "heu"),
+        ("hieu", "hêu"),
+        ("yan", "yên"),
+        ("ien", "yên"),
+        ("iep", "yêp"),
+        ("iet", "yêt"),
+        ("iek", "yêk"),
+        ("ieu", "yêu"),
+        ("iau", "yêu"),
+        ("yao", "yêu"),
+        ("hou", "hêu"),
+        ("uet", "wêt"),
+        ("uek", "wêk"),
+        ("ueu", "wêu"),
+        ("nge", "ngiêt"),
         ("fi", "fêi"),
         ("zuon", "zon"),
         ("cuon", "con"),
@@ -664,6 +677,31 @@ fn added_theoretical_spellings_normalize_to_stored_forms() {
             "{input} should normalize to {expected}"
         );
     }
+    let yan_outputs = map.normalize("yan", SyllableScheme::GonPin);
+    assert!(yan_outputs.iter().any(|item| item.text == "yên"));
+    assert!(yan_outputs.iter().all(|item| item.text != "yen"));
+    let hieu_outputs = map.normalize("hieu", SyllableScheme::GonPin);
+    assert!(hieu_outputs.iter().any(|item| item.text == "heu"));
+}
+
+#[test]
+fn u_v_to_yu_bridges_require_an_onset() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
+    for (source, forbidden) in [("ue", "yue"), ("ve", "yue"), ("uee", "yuek"), ("vee", "yuek")] {
+        assert!(map.normalize(source, SyllableScheme::GonPin).iter().all(|item| item.text != forbidden));
+    }
+    for (source, expected) in [("jue", "jyue"), ("jve", "jyue"), ("juee", "jyuek"), ("jvee", "jyuek")] {
+        assert!(map.normalize(source, SyllableScheme::GonPin).iter().any(|item| item.text == expected));
+    }
+}
+
+#[test]
+fn xyucuenn_zero_onset_uen_matches_wenn() {
+    let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "xyucuenn").unwrap();
+    assert!(map
+        .normalize("uen", SyllableScheme::GonPin)
+        .iter()
+        .any(|item| item.text == "wênn"));
 }
 
 #[test]
