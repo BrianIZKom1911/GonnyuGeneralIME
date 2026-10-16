@@ -162,7 +162,13 @@ def test_eo_accepts_only_standalone_o_one_way() -> None:
             assert "o" not in forms and "e" not in forms
         for source in ("yuo", "yuon", "yuong", "yuot", "yuop", "yuok", "gyuo", "jyuot"):
             for reverse in (False, True):
-                assert normalize(source, rules, reverse=reverse) == {source: 0}
+                f = normalize(source, rules, reverse=reverse)
+                if source[-1:] in {"p", "t", "k"}:
+                    # entering-coda yuo forms may coda-swap within entering codas
+                    unexpected = {k for k in f if k != source and k[-1:] not in {"p", "t", "k"}}
+                    assert not unexpected, (region, source, reverse, unexpected)
+                else:
+                    assert f == {source: 0}, (region, source, reverse)
         algebra = compile_algebra({"eo", "geot", "yueok"}, rules)
         assert "    - derive/^Gyueok$/Fyuok/" not in algebra
         assert "    - derive/^Geo$/Fo/" in algebra

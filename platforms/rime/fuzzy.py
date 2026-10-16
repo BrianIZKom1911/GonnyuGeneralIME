@@ -134,7 +134,7 @@ def normalize(value: str, rules: list[FuzzyRule], reverse: bool = False) -> dict
     while cursor < len(outputs) and len(produced_texts) < MAX_FORMS:
         base, base_tier, expandable, origins = outputs[cursor]
         cursor += 1
-        if not expandable or "yuo" in base:
+        if not expandable or ("yuo" in base and base[-1:] not in {"p", "t", "k"}):
             continue
         for rule in rules:
             if rule.starts_with and not base.startswith(rule.starts_with):
@@ -142,30 +142,36 @@ def normalize(value: str, rules: list[FuzzyRule], reverse: bool = False) -> dict
             if reverse:
                 if not rule.bidirectional:
                     continue
-                source, target = rule.target, rule.source
+                directions = [(rule.target, rule.source)]
             else:
-                source, target = rule.source, rule.target
-            for candidate, start, source_length in substitute_matches(
-                base, source, target, rule.applies, rule.starts_with
-            ):
-                if rule.condition == "not-derived-from-ir" and any(
-                    start <= position < start + source_length for position in origins
+                directions = [(rule.source, rule.target)]
+                if (rule.bidirectional and rule.applies == "syllable-final"
+                        and rule.source[-1:] in {"p", "t", "k"}
+                        and rule.target[-1:] in {"p", "t", "k"}
+                        and rule.source[-1:] != rule.target[-1:]):
+                    directions.append((rule.target, rule.source))
+            for source, target in directions:
+                for candidate, start, source_length in substitute_matches(
+                    base, source, target, rule.applies, rule.starts_with
                 ):
-                    continue
-                candidate_origins = _carry_ir_e_origins(
-                    origins, start, source_length, len(target), source, target
-                )
-                state = (candidate, candidate_origins)
-                if state in produced:
-                    continue
-                if candidate not in produced_texts and len(produced_texts) >= MAX_FORMS:
-                    continue
-                produced.add(state)
-                produced_texts.add(candidate)
-                outputs.append(
-                    (candidate, max(base_tier, TIER_RANK[rule.tier]), rule.chainable,
-                     candidate_origins)
-                )
+                    if rule.condition == "not-derived-from-ir" and any(
+                        start <= position < start + source_length for position in origins
+                    ):
+                        continue
+                    candidate_origins = _carry_ir_e_origins(
+                        origins, start, source_length, len(target), source, target
+                    )
+                    state = (candidate, candidate_origins)
+                    if state in produced:
+                        continue
+                    if candidate not in produced_texts and len(produced_texts) >= MAX_FORMS:
+                        continue
+                    produced.add(state)
+                    produced_texts.add(candidate)
+                    outputs.append(
+                        (candidate, max(base_tier, TIER_RANK[rule.tier]), rule.chainable,
+                         candidate_origins)
+                    )
     forms = {}
     for text, tier, _, _ in outputs:
         forms[text] = min(tier, forms.get(text, tier))
