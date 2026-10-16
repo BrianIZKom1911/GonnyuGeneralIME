@@ -26,7 +26,27 @@ common	rime	uen	won	uon	碗	syllable-final	false	false	primary	uen	零声母 won
 common	rime	uen	uon	uon	碗	syllable-final	false	false	primary		带声母 uon 可从 uen 模糊输入
 common	rime	yan	yen	ian	烟	syllable-final	false	false	primary	yan	仅保留输入 yan→yen 的模糊，不改写现有 yan
 common	rime	i	ï	ɿ		anywhere	false	false	primary		i 可单向模糊匹配 ï
-common	rime	ee	ê	ɛ	额	anywhere	false	false	primary		ee 可单向模糊匹配 ê
+common	rime	ea	ê	ɛ	额	anywhere	false	false	primary		ea 可单向模糊匹配 ê
+common	rime	ee	e			anywhere	false	false	primary		ee 可单向匹配普通 e
+common	rime	ee	ek			syllable-final	false	false	fallback	bee,buee,cee,cuee,dee,duee,fee,fuee,gee,guee,hee,huee,jyuee,kuee,lee,luee,mee,muee,nyuee,pee,puee,qyuee,see,suee,tee,tuee,wee,xyuee,yee,yuee,zee,zuee	ee 普通 e 的组合兼容
+common	rime	ee	et			syllable-final	false	false	fallback	bee,cee,fee,guee,jyuee,kuee,lee,nee,qyuee,see,suee,tee,tuee,zee	ee 普通 e 的组合兼容
+common	rime	eek	et			syllable-final	false	false	secondary	beek,ceek,feek,gueek,jyueek,kueek,leek,neek,qyueek,seek,sueek,teek,tueek,zeek	ee 普通 e 的组合兼容
+common	rime	eep	ek			syllable-final	false	false	secondary	beep,ceep,deep,feep,kueep,leep,meep,peep,seep,teep,tueep,weep,zeep	ee 普通 e 的组合兼容
+common	rime	eep	et			syllable-final	false	false	secondary	gueep	ee 普通 e 的组合兼容
+common	rime	eet	ek			syllable-final	false	false	secondary	beet,ceet,deet,feet,jyueet,kueet,leet,meet,peet,qyueet,seet,teet,tueet,weet,yeet,yueet,zeet	ee 普通 e 的组合兼容
+common	rime	iueek	yuek			syllable-final	false	false	primary	iueek	ee 普通 e 的组合兼容
+common	rime	uee	yuek			syllable-final	false	false	fallback	juee,nuee,quee,uee,xuee	ee 普通 e 的组合兼容
+common	rime	uee	yuet			syllable-final	false	false	fallback	juee,quee	ee 普通 e 的组合兼容
+common	rime	ueei	wei			syllable-final	false	false	primary	ueei	ee 普通 e 的组合兼容
+common	rime	ueek	wek			syllable-final	false	false	primary	ueek	ee 普通 e 的组合兼容
+common	rime	ueek	yuet			syllable-final	false	false	secondary	jueek,queek	ee 普通 e 的组合兼容
+common	rime	ueen	wen			syllable-final	false	false	primary	ueen	ee 普通 e 的组合兼容
+common	rime	ueeng	weng			syllable-final	false	false	primary	ueeng	ee 普通 e 的组合兼容
+common	rime	vee	yuek			syllable-final	false	false	fallback	jvee,nvee,qvee,vee,xvee	ee 普通 e 的组合兼容
+common	rime	vee	yuet			syllable-final	false	false	fallback	jvee,qvee	ee 普通 e 的组合兼容
+common	rime	veek	yuet			syllable-final	false	false	secondary	jveek,qveek	ee 普通 e 的组合兼容
+common	rime	ween	ven			syllable-final	false	false	primary	ween	ee 普通 e 的组合兼容
+common	rime	wueen	ven			syllable-final	false	false	primary	wueen	ee 普通 e 的组合兼容
 common	rime	e	ê	ɛ	额	anywhere	false	false	primary		e 可单向模糊匹配 ê
 common	rime	o	eo	ɵ	儿	syllable-final	false	false	primary	o	独立音节 o 单向兼容 eo
 common	rime	eu	ieu	iɛu	够	syllable-final	false	true	secondary	ng,g,k	g/k/ng 后可省略 i

@@ -243,7 +243,7 @@ Checked-tone codas follow these spelling and input rules.
 | a | [a] | - | - | - | - | - | - | - | - | - | - | — |  |
 | o | [o] | - | [ɔ] | - | - | - | [ɔ] | - | - | [ɔ] | [ɔ] | — |  |
 | oe | - | - | - | [ø] | - | - | [œ] or [ø] | - | - | - | - |  |  |
-| e* | [e] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | - | [ə] or [ɛ] | [ə] or [ɛ] or [ɯ] | [ə] or [ɛ] | [ɛ] or [ɤ] | [ɛ] | ee (→ ê, one-way) |  |
+| e* | [e] | [ɛ] | [ɛ] | [ə] or [ɛ] | [ə] | - | [ə] or [ɛ] | [ə] or [ɛ] or [ɯ] | [ə] or [ɛ] | [ɛ] or [ɤ] | [ɛ] | ea (→ ê, one-way), ee (→ e, one-way) |  |
 | eo | [ɵ] | - | - | - | - | - | - | - | - | - | - | o (standalone syllable, one-way) |  |
 | ai | [ai] | - | - | - | - | - | - | - | - | - | - | — |  |
 | oi | [oi] | - | [ɔi] | [ɔi] | [ɔi] | - | [ɔi] | - | - | - | - | — |  |
@@ -288,7 +288,7 @@ Checked-tone codas follow these spelling and input rules.
 
 \* Nasalized finals are marked with `nn` at the end; a final single `n` can be typed as a one-way alias for `nn`, e.g. `an`→`ann`. The other nasalized finals in the tables follow the same rule. Omit `nn` when a coda follows.
 
-\* Some regions use `ê` for IPA [ɛ] or [e]; input uses `e` or `ee` (one-way matching to `ê`). The same applies to `ê` in other finals; ordinary `e` uses input `e`. Input `e` can match `ê` through one-way fuzzy matching.
+\* Some regions use `ê` for IPA [ɛ] or [e]; `ea` matches `ê` one-way, and `ee` matches ordinary `e` one-way. The same applies to `ê` in other finals. Input `e` can match `ê` through one-way fuzzy matching.
 
 #### Front-vowel finals
 

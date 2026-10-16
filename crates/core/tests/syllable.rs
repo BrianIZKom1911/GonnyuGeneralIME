@@ -66,7 +66,7 @@ fn voiced_initial_inputs_are_common_and_one_way() {
 #[test]
 fn voiced_initial_compatibility_composes_with_special_vowels() {
     let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "singzi").unwrap();
-    for (source, target) in [("jien", "jjiên"), ("jieen", "jjiên"), ("zi", "zzï")] {
+    for (source, target) in [("jien", "jjiên"), ("jiean", "jjiên"), ("zi", "zzï")] {
         assert!(map
             .normalize(source, SyllableScheme::GonPin)
             .iter()
@@ -241,22 +241,54 @@ fn open_e_input_matches_circumflex_one_way() {
 }
 
 #[test]
-fn double_e_input_matches_only_circumflex() {
+fn ea_and_double_e_inputs_select_circumflex_and_plain_e() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
-    for (source, target, plain) in [
-        ("ee", "ê", "e"),
-        ("een", "ên", "en"),
-        ("geek", "gêk", "gek"),
-        ("geen1", "gên", "gen"),
+    for (plain_input, hat_input, plain, circumflex) in [
+        ("ee", "ea", "e", "ê"),
+        ("een", "ean", "en", "ên"),
+        ("geek", "geak", "gek", "gêk"),
+        ("geen1", "gean1", "gen", "gên"),
     ] {
-        let outputs = map.normalize(source, SyllableScheme::GonPin);
-        assert!(outputs.iter().any(|item| item.text == target));
+        let outputs = map.normalize(plain_input, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == plain));
+        assert!(!outputs.iter().any(|item| item.text == circumflex));
+        let outputs = map.normalize(hat_input, SyllableScheme::GonPin);
+        assert!(outputs.iter().any(|item| item.text == circumflex));
         assert!(!outputs.iter().any(|item| item.text == plain));
         for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
             assert!(!map
-                .normalize(target, scheme)
+                .normalize(plain, scheme)
                 .iter()
-                .any(|item| item.text == source.trim_end_matches('1')));
+                .any(|item| item.text == plain_input.trim_end_matches('1')));
+            assert!(!map
+                .normalize(circumflex, scheme)
+                .iter()
+                .any(|item| item.text == hat_input.trim_end_matches('1')));
+        }
+    }
+}
+
+#[test]
+fn plain_e_combinations_are_common_terminal_and_preserve_tiers() {
+    let map = FuzzyMap::load_tsv(fuzzy_path()).expect("load fuzzy rules");
+    let additions: Vec<_> = map
+        .iter()
+        .filter(|rule| rule.gon_fuzzy.contains("ee") && rule.gon_pin != "e")
+        .collect();
+    assert_eq!(additions.len(), 19);
+    for rule in additions {
+        assert_eq!(rule.region, "common");
+        assert!(!rule.bidirectional && !rule.chainable);
+        for source in &rule.starts_with {
+            let stem = source.strip_suffix(&rule.gon_fuzzy).unwrap();
+            let target = format!("{stem}{}", rule.gon_pin);
+            let outputs = map.normalize(source, SyllableScheme::GonPin);
+            assert!(outputs
+                .iter()
+                .any(|item| item.text == target && item.tier == rule.priority_tier));
+            assert!(!outputs
+                .iter()
+                .any(|item| item.text == target.replace('e', "ê")));
         }
     }
 }

@@ -178,29 +178,55 @@ def test_open_e_input_matches_circumflex_one_way() -> None:
 
 def test_voiced_initial_compatibility_composes_with_special_vowels():
     rules = load_rules(RULES_PATH, "singzi")
-    for source, target in (("jien", "jjiên"), ("jieen", "jjiên"), ("zi", "zzï")):
+    for source, target in (("jien", "jjiên"), ("jiean", "jjiên"), ("zi", "zzï")):
         assert target in normalize(source, rules)
     assert not any(form.startswith("jjj") for form in normalize("jjiên", rules))
     algebra = compile_algebra({"jjiên", "zzï"}, rules)
     assert "    - derive/^Gjjiên$/Fjien/" in algebra
-    assert "    - derive/^Gjjiên$/Fjieen/" in algebra
+    assert "    - derive/^Gjjiên$/Fjiean/" in algebra
     assert "    - derive/^Gzzï$/Fzi/" in algebra
     assert "    - derive/^Gjjiên$/Fjjjien/" not in algebra
 
 
-def test_double_e_input_matches_only_circumflex() -> None:
+def test_ea_and_double_e_inputs_select_circumflex_and_plain_e() -> None:
     rules = load_rules(RULES_PATH)
-    for source, target, plain in (("ee", "ê", "e"), ("een", "ên", "en"),
-                                  ("geek", "gêk", "gek"), ("geen1", "gên", "gen")):
-        assert target in normalize(source, rules)
-        assert plain not in normalize(source, rules)
+    for plain_input, hat_input, plain, circumflex in (
+        ("ee", "ea", "e", "ê"),
+        ("een", "ean", "en", "ên"),
+        ("geek", "geak", "gek", "gêk"),
+        ("geen1", "gean1", "gen", "gên"),
+    ):
+        assert plain in normalize(plain_input, rules)
+        assert circumflex not in normalize(plain_input, rules)
+        assert circumflex in normalize(hat_input, rules)
+        assert plain not in normalize(hat_input, rules)
         for reverse in (False, True):
-            assert source.rstrip("1") not in normalize(target, rules, reverse=reverse)
+            assert plain_input.rstrip("1") not in normalize(plain, rules, reverse=reverse)
+            assert hat_input.rstrip("1") not in normalize(circumflex, rules, reverse=reverse)
     algebra = compile_algebra({"e", "ê", "gêk", "gek"}, rules)
-    assert "    - derive/^Gê$/Fee/" in algebra
-    assert "    - derive/^Ggêk$/Fgeek/" in algebra
-    assert "    - derive/^Ge$/Fee/" not in algebra
-    assert "    - derive/^Ggek$/Fgeek/" not in algebra
+    assert "    - derive/^Gê$/Fea/" in algebra
+    assert "    - derive/^Ggêk$/Fgeak/" in algebra
+    assert "    - derive/^Ge$/Fee/" in algebra
+    assert "    - derive/^Ggek$/Fgeek/" in algebra
+    assert "    - derive/^Gê$/Fee/" not in algebra
+    assert "    - derive/^Ggêk$/Fgeek/" not in algebra
+
+
+def test_plain_e_combinations_are_common_terminal_and_preserve_tiers() -> None:
+    rules = load_rules(RULES_PATH)
+    additions = [rule for rule in rules if "ee" in rule.source and rule.source != "ee" or
+                 rule.source == "ee" and rule.target != "e"]
+    assert len(additions) == 19
+    for rule in additions:
+        assert rule.region == "common"
+        assert not rule.bidirectional and not rule.chainable
+        for source in rule.starts_with:
+            assert source.endswith(rule.source)
+            target = source[:-len(rule.source)] + rule.target
+            assert normalize(source, rules)[target] == {"primary": 0, "secondary": 1, "fallback": 2}[rule.tier]
+            assert not any(part in source.replace("ee", "e") or part in target
+                           for part in ("ae", "eo", "oe", "ie"))
+            assert target.replace("e", "ê") not in normalize(source, rules)
 
 
 def test_yun_to_yung_compatibility_is_yikyan_only_and_one_way() -> None:
