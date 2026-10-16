@@ -667,6 +667,46 @@ fn added_theoretical_spellings_normalize_to_stored_forms() {
 }
 
 #[test]
+fn fi_to_fui_is_one_way_and_lancong_only() {
+    for region in [
+        "lancong",
+        "fenni",
+        "fungcen",
+        "jingon",
+        "jisuibaedu",
+        "seusong",
+        "singzi",
+        "sinyi",
+        "songau",
+        "tiqien",
+        "xyucuenn",
+        "yikyan-henfeng",
+    ] {
+        let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), region).unwrap();
+        for source in ["fi", "fi1", "fi3", "fi4", "fi5"] {
+            let outputs = map.normalize(source, SyllableScheme::GonPin);
+            assert_eq!(
+                outputs.iter().any(|item| item.text == "fui"),
+                region == "lancong"
+            );
+            assert!(outputs.iter().any(|item| item.text == "fei"));
+        }
+        for scheme in [SyllableScheme::GonPin, SyllableScheme::GonFuzzy] {
+            assert!(!map
+                .normalize("fui", scheme)
+                .iter()
+                .any(|item| item.text == "fi"));
+        }
+        for source in ["afi", "lfi", "fian", "fin", "fip", "fit", "fik"] {
+            assert!(!map
+                .normalize(source, SyllableScheme::GonPin)
+                .iter()
+                .any(|item| item.text == source.replace("fi", "fui")));
+        }
+    }
+}
+
+#[test]
 fn mandarin_ao_and_ou_inputs_normalize_to_au_and_eu() {
     let map = FuzzyMap::load_tsv(fuzzy_path()).expect("fuzzy_map should load");
 

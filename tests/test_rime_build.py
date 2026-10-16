@@ -580,6 +580,20 @@ def test_added_theoretical_spellings_normalize_to_stored_forms() -> None:
         assert expected in normalize(input_syllable, rules)
 
 
+def test_fi_to_fui_is_one_way_and_lancong_only() -> None:
+    for region in active_regions():
+        rules = load_rules(RULES_PATH, region)
+        for source in ("fi", "fi1", "fi3", "fi4", "fi5"):
+            assert ("fui" in normalize(source, rules)) == (region == "lancong")
+            assert "fei" in normalize(source, rules)
+        for reverse in (False, True):
+            assert "fi" not in normalize("fui", rules, reverse=reverse)
+        for source in ("afi", "lfi", "fian", "fin", "fip", "fit", "fik"):
+            assert source.replace("fi", "fui") not in normalize(source, rules)
+        algebra = compile_algebra({"fui"}, rules)
+        assert ("    - derive/^Gfui$/Ffi/" in algebra) == (region == "lancong")
+
+
 def test_mandarin_ao_and_ou_inputs_normalize_to_au_and_eu() -> None:
     rules = load_rules(RULES_PATH)
 

@@ -76,6 +76,7 @@ common	rime	yuet	yuot	yot	月	syllable-final	false	false	primary	yue,jyue,lyue,n
 common	rime	yuek	yuot	yot	月	syllable-final	false	false	primary	yue,jyue,lyue,nyue,qyue,xyue	误写 k 尾仍兼容到 yuot
 common	rime	ieu	eu	ɛu	后	syllable-final	false	false	secondary	h	限定 hieu→heu
 common	rime	fi	fei			syllable-final	false	false	primary	fi	整音节 fi→fei
+lancong	rime	fi	fui			syllable-final	false	false	primary	fi	南昌整音节 fi→fui，单向兼容
 common	rime	zuon	zon			syllable-final	false	false	primary	zuon	整音节 zuon→zon
 common	rime	cuon	con			syllable-final	false	false	primary	cuon	整音节 cuon→con
 common	rime	ciu	ceu			syllable-final	false	false	primary	ciu	整音节 ciu→ceu
