@@ -1488,6 +1488,30 @@
           "origin": {
             "kind": "explicit"
           }
+        },
+        {
+          "id": "F193",
+          "match": [
+            "common",
+            "ên",
+            "ênn"
+          ],
+          "intent": "鼻化韵帽子 e 单 n 输入匹配双 n 规范写法",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F194",
+          "match": [
+            "xyucuenn",
+            "wun",
+            "wênn"
+          ],
+          "intent": "零声母 wun 输入匹配规范 wênn",
+          "origin": {
+            "kind": "explicit"
+          }
         }
       ]
     },

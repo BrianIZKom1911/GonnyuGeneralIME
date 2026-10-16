@@ -1,5 +1,7 @@
 region	category	gon_fuzzy	gon_pin	ipa	example	applies	bidirectional	chainable	priority_tier	starts_with	note	conversion_condition
 xyucuenn	rime	ian	iann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法	none
+common	rime	ên	ênn			syllable-final	false	false	primary		鼻化韵帽子 e 单 n 输入匹配双 n 规范写法	none
+xyucuenn	rime	wun	wênn			syllable-final	false	false	primary	wun	零声母 wun 输入匹配规范 wênn	none
 xyucuenn	rime	uenn	un			syllable-final	false	true	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	鼻化韵旧式输入归并到 un 后继续匹配规范写法	none
 common	rime	et	iêt		额	syllable-final	false	true	primary	ng	输入 nget 匹配 ngiêt	none
 common	rime	yuen	yuon	yon	渲	syllable-final	false	false	primary	yuen,jyuen,nyuen,qyuen,xyuen	覆盖现有全部 yuon 规范音	none
