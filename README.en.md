@@ -635,6 +635,8 @@ Copyright in the project documentation belongs to the rights holder, with all ri
 
 Special thanks to @豫章鸿也 for extensive advice on the project’s romanisation and character and word choices.
 
+Thanks also to **岭北南安**, whose work on the geographical distribution of Jiangxi vocabulary provided important inspiration for this input method.
+
 Given the scale of the dictionaries and the author's limited expertise and time, errors may remain. The author takes responsibility for them. Contributions of additions and corrections are appreciated.
 
 ## Origins: the loss of Gon(Gan)
