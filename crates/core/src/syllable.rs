@@ -351,10 +351,11 @@ impl FuzzyMap {
         const MAX_OUTPUTS: usize = 64;
         while cursor < outputs.len() && produced_texts.len() < MAX_OUTPUTS {
             let (base, expandable, origins) = outputs[cursor].clone();
-            if !expandable || base.text.contains("yuo") {
+            if !expandable {
                 cursor += 1;
                 continue;
             }
+            let contains_yuo = base.text.contains("yuo");
             let (index, empty_source) = match target {
                 SyllableScheme::GonPin => (&self.gon_fuzzy_index, &self.gon_fuzzy_empty_source),
                 SyllableScheme::GonFuzzy => (&self.gon_pin_index, &self.gon_pin_empty_source),
@@ -386,6 +387,15 @@ impl FuzzyMap {
                         (entry.gon_pin.as_str(), entry.gon_fuzzy.as_str())
                     }
                 };
+                if contains_yuo {
+                    let is_coda = |value: &str| matches!(value, "p" | "t" | "k");
+                    let yuo_coda_rule = entry.applies == FuzzyApplies::SyllableFinal
+                        && ((from.is_empty() && is_coda(to))
+                            || (is_coda(from) && is_coda(to)));
+                    if !yuo_coda_rule {
+                        continue;
+                    }
+                }
                 let substituted = match entry.applies {
                     FuzzyApplies::SyllableInitial => {
                         substitute_initial_matches(&base.text, from, to)

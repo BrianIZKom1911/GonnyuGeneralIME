@@ -2141,7 +2141,7 @@
   "constraints": [
     {
       "id": "yuo_identity",
-      "description": "含 yuo 的形式停止向外扩展；该限制优先于其他兼容。",
+      "description": "含 yuo 的形式只允许按地区入声配置补尾或互兼容，停止其他兼容扩展。",
       "implementation": [
         "platforms/rime/fuzzy.py",
         "crates/core/src/syllable.rs"

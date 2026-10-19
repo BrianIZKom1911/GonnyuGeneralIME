@@ -134,8 +134,9 @@ def normalize(value: str, rules: list[FuzzyRule], reverse: bool = False) -> dict
     while cursor < len(outputs) and len(produced_texts) < MAX_FORMS:
         base, base_tier, expandable, origins = outputs[cursor]
         cursor += 1
-        if not expandable or ("yuo" in base and base[-1:] not in {"p", "t", "k"}):
+        if not expandable:
             continue
+        contains_yuo = "yuo" in base
         for rule in rules:
             if rule.starts_with and not base.startswith(rule.starts_with):
                 continue
@@ -151,6 +152,13 @@ def normalize(value: str, rules: list[FuzzyRule], reverse: bool = False) -> dict
                         and rule.source[-1:] != rule.target[-1:]):
                     directions.append((rule.target, rule.source))
             for source, target in directions:
+                if contains_yuo and not (
+                    rule.applies == "syllable-final"
+                    and ((not source and target in {"p", "t", "k"})
+                         or (source[-1:] in {"p", "t", "k"}
+                             and target[-1:] in {"p", "t", "k"}))
+                ):
+                    continue
                 for candidate, start, source_length in substitute_matches(
                     base, source, target, rule.applies, rule.starts_with
                 ):
