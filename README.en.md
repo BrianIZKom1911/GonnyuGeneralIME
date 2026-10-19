@@ -544,10 +544,10 @@ The Yikyan-Henfeng (Yiyang-Hengfeng) dictionary uses the following tone markers:
 | Marker | Tone category | Pitch value |
 | --- | --- | --- |
 | 1 | yin level | 44 |
-| 2 | yang level | 22 |
-| 3 | rising | 412 |
-| 4 | yin departing | 45 |
-| 5 | yang departing | 212 |
+| 2 | yang level | 24 |
+| 3 | rising | 42 |
+| 4 | yin departing | 35 |
+| 5 | yang departing | 21 |
 | 6 | yin checked | 5 |
 | 7 | yang checked | 4 |
 
