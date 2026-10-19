@@ -166,3 +166,6 @@ common	rime	ienn	yênn			syllable-final	false	true	primary	ienn	零声母 ienn �
 common	rime	ie	yê			syllable-final	false	true	primary	ie	零声母 ie 匹配 yê	none
 common	rime	un	wun	un		syllable-final	false	true	primary	un	零声母 un 单向匹配 wun	none
 common	rime	yuek	yuot	yot	月	syllable-final	false	true	primary	yue,jyue,lyue,nyue,qyue,xyue	误写 k 尾仍兼容到 yuot	none
+goungon	coda		k			syllable-final	false	true	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式	none
+goungon	coda		t			syllable-final	false	true	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式	none
+goungon	coda	k	t			syllable-final	true	true	secondary		自动生成：完整音系检测到两种入声韵尾，允许互相模糊	none

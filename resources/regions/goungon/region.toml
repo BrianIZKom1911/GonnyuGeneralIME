@@ -1,0 +1,35 @@
+[region]
+id = "goungon"
+name_zh = "高安"
+status = "active"
+
+[tone_classes]
+1 = { name = "阴平", value = "35" }
+2 = { name = "阳平", value = "13" }
+3 = { name = "上声", value = "42" }
+4 = { name = "阴去", value = "33" }
+5 = { name = "阳去", value = "11" }
+6 = { name = "阴入", value = "5" }
+7 = { name = "阳入", value = "1" }
+
+[ipa_tone_map]
+0 = 0
+1 = 1
+2 = 2
+3 = 3
+4 = 4
+5 = 5
+6 = 6
+7 = 7
+
+[phonology]
+jqx_u_to_yu = true
+syllables = "phonology/syllables.jsonl"
+fuzzy_map = "../../fuzzy_scheme.tsv"
+entering_codas = ["k", "t"]
+
+[language]
+chars = "dictionaries/chars.tsv"
+words = "dictionaries/words.tsv"
+gan_chars = "dictionaries/gan_chars.tsv"
+gan_words = "dictionaries/gan_words.tsv"

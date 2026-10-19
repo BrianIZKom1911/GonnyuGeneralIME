@@ -71,3 +71,9 @@ id = "singzi"
 name_zh = "星子"
 status = "active"
 path = "regions/singzi/region.toml"
+
+[[regions]]
+id = "goungon"
+name_zh = "高安"
+status = "active"
+path = "regions/goungon/region.toml"

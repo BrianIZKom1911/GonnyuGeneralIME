@@ -1973,6 +1973,45 @@
             "kind": "generated",
             "basis": "regional_entering_codas"
           }
+        },
+        {
+          "id": "F197",
+          "match": [
+            "goungon",
+            "",
+            "k"
+          ],
+          "intent": "省略入声 k 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F198",
+          "match": [
+            "goungon",
+            "",
+            "t"
+          ],
+          "intent": "省略入声 t 尾的输入匹配带尾形式",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
+        },
+        {
+          "id": "F199",
+          "match": [
+            "goungon",
+            "k",
+            "t"
+          ],
+          "intent": "入声 k/t 尾互兼容",
+          "origin": {
+            "kind": "generated",
+            "basis": "regional_entering_codas"
+          }
         }
       ]
     },
