@@ -681,3 +681,4 @@ We believe our work is an important part of protecting Sinitic linguistic divers
 5. 江南西道客. Fungcen (Fengcheng) dictionary resources. Email: yunmoqingchen@qq.com.
 6. 剑邑 Jason. Fungcen (Fengcheng) testing and feedback.
 7. Brian Z. Xinyu (新喻) readings and dictionary entries. <https://github.com/BrianIZKom1911>
+8. 阿星. Goungon phonology and dictionary resources.
