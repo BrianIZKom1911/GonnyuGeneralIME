@@ -247,7 +247,7 @@ Checked-tone codas follow these spelling and input rules.
 | eoi | - | - | - | [ɵi] | - | - | - | - | - | - | - | — |  |
 | aeu | - | - | - | - | [æu] | - | - | - | - | - | - |  |  |
 | au | [au] | [ɑu] | - | - | - | [ɑu] | - | - | - | - | - | ao |  |
-| ou | - | - | [ɔu] | - | - | - | - | - | - | - | - | - |  |
+| ou | - | - | [ɔu] | - | - | - | - | [ɔu] | - | - | - | - |  |
 | eu | [ɛu] or  [ɨu] | [əu] | - | [əu] or [ɪu] | - | [əu] | - | [əu] | - | - | [eu] | ou (after some initials), ieu (after h) |  |
 | am | - | [am] | [am] | - | - | - | - | - | - | - | - | — |  |
 | om | - | - | [ɔm] | - | - | - | - | - | - | - | - | - |  |
@@ -298,7 +298,7 @@ With no initial consonant:
 | i* | [i]  or  [ɿ] | - | - | - | - | [ʅ] | - | - | - | - | [ʅ] | — |  |
 | iae | - | - | - | - | [iæ] | - | - | - | - | [iæ] | - |  |  |
 | ia | [ia] | - | - | - | - | - | - | - | - | - | - | — |  |
-| io | - | [iɔ] | [iɔ] | [io] | - | [io] | [io] or [iɔ] | - | [io] | [io] or [iɔ] | [io] or [iɔ] | - |  |
+| io | - | [iɔ] | [iɔ] | [io] | - | [io] | [io] or [iɔ] | [io] | [io] | [io] or [iɔ] | [io] or [iɔ] | - |  |
 | ie | [iɛ] | - | - | [ie] | - | [ie] | - | - | - | [ie] | - | — |  |
 | iai | - | - | - | [iai] | - | - | - | - | - | - | - | - |  |
 | ioi | - | - | - | [ioi] or [iɔi] | - | - | - | - | - | - | - | - |  |
@@ -404,8 +404,10 @@ With no initial consonant:
 | gon-pin | Default IPA | Fungcen IPA | Tiqien IPA | Sinyi IPA | Songau IPA | Seusong IPA | Jingon IPA | Yikyan-Henfeng IPA | Jisuibaedu IPA | Xyucuênn IPA | Singzï IPA | Accepted alternative input | Notes |
 | --- | --- | --- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | --- | --- |
 | yu | [y] | - | - | - | - | - | - | - | - | - | - | v (after an initial only), u (after an initial only, never immediately after y) |  |
+| yua | - | - | - | - | - | - | - | [ya] | - | - | - | — |  |
 | yue | [ye] | - | - | - | - | - | [yɛ] | [yɛ] | [yə] | - | - | - |  |
 | yueo | - | [yɵ] | - | - | - | - | - | - | - | - | - | — |  |
+| yuoi | - | - | - | - | - | - | - | [yoi] | - | - | - | — |  |
 | yun | [yn] | - | - | - | - | - | - | - | - | - | - | — |  |
 | yuon | [yon] | - | - | [yɔn] | - | - | [yɔn] | - | - | - | - | yoin (without an initial), yuen |  |
 | yuen | - | - | - | - | - | - | [yɛn] | [yɛn] or [yɛŋ] | - | - | - | yueng |  |
