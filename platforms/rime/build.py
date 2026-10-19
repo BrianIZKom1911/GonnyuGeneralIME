@@ -580,13 +580,16 @@ def write_mobile_default(output: Path, regions: tuple[str, ...]) -> None:
     )
 
 
-def write_resource_manifest(output: Path, regions: tuple[str, ...]) -> None:
+def write_resource_manifest(output: Path, regions: tuple[str, ...], package_files: tuple[str, ...] | None = None) -> None:
     files = []
-    for path in sorted(output.rglob("*")):
-        if not path.is_file():
-            continue
+    paths = (output / name for name in package_files) if package_files is not None else output.rglob("*")
+    for path in sorted(paths):
         relative = path.relative_to(output).as_posix()
         if relative == "resource-manifest.json":
+            continue
+        if not path.is_file():
+            if package_files is not None:
+                raise FileNotFoundError(path)
             continue
         files.append(
             {
@@ -630,6 +633,7 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
     algebra = compile_algebra(canonical, rules)
     output.mkdir(parents=True, exist_ok=True)
     (output / "lua").mkdir(exist_ok=True)
+    shutil.copy2(ROOT / "LICENSE", output / "LICENSE")
     dictionary_count = write_dictionary(output / f"gannyu_{region}.dict.yaml", entries, region)
     annotations, before, after = build_metadata(entries)
     readings = build_preferred_readings(entries)

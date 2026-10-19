@@ -14,6 +14,7 @@ from platforms.rime.build import (
     entry_codes,
     build_preferred_readings,
     load_entries,
+    write_resource_manifest,
 )
 from platforms.rime.fuzzy import compile_algebra, load_rules, normalize
 
@@ -351,12 +352,29 @@ def test_rime_build_writes_resource_manifest(tmp_path: Path) -> None:
     assert any(file["path"] == "lua/gannyu_lancong_data.lua" for file in manifest["files"])
     assert any(file["path"] == "lua/gannyu_lancong_annotations.bin" for file in manifest["files"])
     assert any(file["path"] == "lua/gannyu_annotation_store.lua" for file in manifest["files"])
+    assert (tmp_path / "LICENSE").read_bytes() == (Path(__file__).resolve().parents[1] / "LICENSE").read_bytes()
+    assert any(file["path"] == "LICENSE" for file in manifest["files"])
     reader = (tmp_path / "lua/gannyu_annotation_store.lua").read_bytes()
     source = Path(__file__).resolve().parents[1] / "platforms/rime/gannyu_annotation_store.lua"
     assert reader == source.read_bytes()
     record = next(file for file in manifest["files"] if file["path"] == "lua/gannyu_annotation_store.lua")
     assert record["size"] == len(reader)
     assert record["sha256"] == hashlib.sha256(reader).hexdigest()
+
+
+def test_rime_package_manifest_only_lists_packaged_files(tmp_path: Path) -> None:
+    for name in ("default.yaml", "default.custom.yaml", "LICENSE"):
+        (tmp_path / name).write_text(name, encoding="utf-8")
+    files = ("default.custom.yaml", "resource-manifest.json", "LICENSE")
+
+    write_resource_manifest(tmp_path, ("goungon",), files)
+
+    manifest = json.loads((tmp_path / "resource-manifest.json").read_text(encoding="utf-8"))
+    assert {record["path"] for record in manifest["files"]} == set(files) - {"resource-manifest.json"}
+    for record in manifest["files"]:
+        content = (tmp_path / record["path"]).read_bytes()
+        assert record["size"] == len(content)
+        assert record["sha256"] == hashlib.sha256(content).hexdigest()
 
 
 def test_rime_mandarin_only_annotation_includes_dialect_reading() -> None:
