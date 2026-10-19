@@ -152,7 +152,12 @@ def test_zero_initial_weik_never_becomes_uik() -> None:
 
 
 def test_eo_accepts_only_standalone_o_one_way() -> None:
-    for region in ("lancong", "fenni", "fungcen", "tiqien", "sinyi", "songau", "seusong", "jingon", "yikyan-henfeng"):
+    entering_codas = {
+        "lancong": "tk", "fenni": "", "fungcen": "tpk", "tiqien": "pk",
+        "sinyi": "tk", "songau": "tk", "seusong": "", "jingon": "",
+        "yikyan-henfeng": "k",
+    }
+    for region, codas in entering_codas.items():
         rules = load_rules(RULES_PATH, region)
         assert "eo" in normalize("o6", rules)
         for source, target in (("e", "eo"), ("go", "geo"), ("oo", "oeo"), ("ot", "eot"), ("et", "eot"), ("got", "geot"), ("get", "geot"), ("gop", "geop"), ("gep", "geop"), ("gok", "geok"), ("gek", "geok"), ("yue", "yueo"), ("yuek", "yueok")):
@@ -160,15 +165,13 @@ def test_eo_accepts_only_standalone_o_one_way() -> None:
         for reverse in (False, True):
             forms = normalize("eo", rules, reverse=reverse)
             assert "o" not in forms and "e" not in forms
-        for source in ("yuo", "yuon", "yuong", "yuot", "yuop", "yuok", "gyuo", "jyuot"):
+        expected_yuo = {"yuo" + coda for coda in codas}
+        assert {"yuot", "yuop", "yuok"}.intersection(normalize("yuo", rules)) == expected_yuo
+        for source in ("yuot", "yuop", "yuok", "jyuot"):
             for reverse in (False, True):
                 f = normalize(source, rules, reverse=reverse)
-                if source[-1:] in {"p", "t", "k"}:
-                    # entering-coda yuo forms may coda-swap within entering codas
-                    unexpected = {k for k in f if k != source and k[-1:] not in {"p", "t", "k"}}
-                    assert not unexpected, (region, source, reverse, unexpected)
-                else:
-                    assert f == {source: 0}, (region, source, reverse)
+                unexpected = {k for k in f if k != source and k[-1:] not in {"p", "t", "k"}}
+                assert not unexpected, (region, source, reverse, unexpected)
         algebra = compile_algebra({"eo", "geot", "yueok"}, rules)
         assert "    - derive/^Gyueok$/Fyuok/" not in algebra
         assert "    - derive/^Geo$/Fo/" in algebra

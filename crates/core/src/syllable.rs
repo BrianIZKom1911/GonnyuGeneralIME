@@ -390,8 +390,7 @@ impl FuzzyMap {
                 if contains_yuo {
                     let is_coda = |value: &str| matches!(value, "p" | "t" | "k");
                     let yuo_coda_rule = entry.applies == FuzzyApplies::SyllableFinal
-                        && ((from.is_empty() && is_coda(to))
-                            || (is_coda(from) && is_coda(to)));
+                        && ((from.is_empty() && is_coda(to)) || (is_coda(from) && is_coda(to)));
                     if !yuo_coda_rule {
                         continue;
                     }

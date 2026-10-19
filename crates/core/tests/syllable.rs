@@ -626,8 +626,7 @@ fn gkng_eu_rule_is_prefix_scoped() {
 
 #[test]
 fn yuo_family_accepts_all_supported_mandarin_style_spellings() {
-    let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "common")
-        .expect("fuzzy_map should load");
+    let map = FuzzyMap::load_tsv_for_region(fuzzy_path(), "common").expect("fuzzy_map should load");
     let variants = ["yue", "ue", "ve"];
 
     for onset in ["", "j", "n", "q", "x"] {
