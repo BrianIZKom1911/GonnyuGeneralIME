@@ -597,17 +597,26 @@ The Singzï (Xingzi) dictionary uses the following tone markers:
 
 #### Goungon (Goungon)
 
-The Goungon (Goungon) dictionary uses the following tone markers:
+Goungon tones are shown under the same tone markers with separate columns for literature and source-data notation and the project's interpretation. The source-data column retains the dictionary source's pitch values. The project's interpretation was proposed by the Goungon dictionary contributor from auditory observations, experimental phonetic measurements, and comparison with the literature.
 
-| Marker | Traditional tone category | Pitch value |
-| --- | --- | --- |
-| 1 | yin level | 35 |
-| 2 | yang level | 13 |
-| 3 | rising | 42 |
-| 4 | yin departing | 33 |
-| 5 | yang departing | 11 |
-| 6 | yin checked | 5 |
-| 7 | yang checked | 1 |
+| Marker | Traditional tone category | Literature and source-data pitch value | Project interpretation |
+| --- | --- | --- | --- |
+| 1 | yin level | 35 | 25 |
+| 2 | yang level | 13 | 213 |
+| 3 | rising | 42 | 42 |
+| 4 | yin departing | 33 | 33 |
+| 5 | yang departing | 11 | 11 |
+| 6 | yin checked | 5 | 3 |
+| 7 | yang checked | 1 | 1 |
+
+The Goungon dictionary contributor supplied the following two sets of measurements. The table gives measured values. In the first set, yang level and rising were originally notated as 213 and 42; in the second set, yang level was originally notated as 13.
+
+| Measurement | Yin level | Yang level | Rising | Yin departing | Yang departing | Yin checked | Yang checked |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Set 1 | 25 | 112 | 41 | 33 | 11 | 3 | 1 |
+| Set 2 | 25 | 12 | 41 | 33 | 11 | 3 | 1 |
+
+The contributor also reports alternative literature notations of 213 for yang level, 44 or 55 for yin departing, 22 or 33 for yang departing, 4 or 3 for yin checked, and 2 or 3 for yang checked. Repeated measurements gave 12 or 112 for yang level, with the rise remaining below level 3; 41 or 42 for the rising tone; and usually 3, approaching level 4, for yin checked. Yang checked was also measured as 21 with a falling contour.
 
 ## References
 
@@ -630,6 +639,7 @@ The project compiles its regional dictionaries from participants’ everyday lan
 13. Li Rulong and Zhang Shuangqing, editors. *Survey Report on Hakka and Gan Dialects* (客赣方言调查报告) [M]. Xiamen: Xiamen University Press, 1992. ISBN 7-5615-0385-7. [Catalogue](https://books.google.com/books?id=ApAtAQAAIAAJ).
 14. Jiangxi Provincial Local Gazetteer Compilation Committee; Chen Changyi, editor. *Gazetteer of the Dialects of Jiangxi Province* (江西省方言志) [M]. Beijing: Fangzhi Press, 2005. *Jiangxi Provincial Gazetteer*, vol. 96. ISBN 7-80192-490-8. [Catalogue](https://search.worldcat.org/title/70105497).
 15. Xiao Jiugen. *A Study of the Badu Dialect* (八都方言研究) [D]. Master's thesis, Guangxi University, 2001.
+16. Mei Zhixing. *A Study of Variation in the Central Rounded Vowel [ɵ] in the Goungon Dialect* (高安方言央圆唇元音[ɵ]的变异研究) [Dissertation]. Guangdong University of Foreign Studies, 2020.
 
 ### Dependency declarations
 
