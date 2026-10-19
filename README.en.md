@@ -1,4 +1,4 @@
-# GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method
+# GonnyuGeneralIME — A General Gon(Gan) Chinese Input Method | GonPin
 
 [简体中文](README.md) | **English**
 

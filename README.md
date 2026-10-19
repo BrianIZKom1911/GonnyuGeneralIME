@@ -1,4 +1,4 @@
-# 赣语通用输入法 GonnyuGeneralIME
+# 赣语通用输入法 GonnyuGeneralIME | 赣拼 GonPin
 
 **简体中文** | [English](README.en.md)
 
