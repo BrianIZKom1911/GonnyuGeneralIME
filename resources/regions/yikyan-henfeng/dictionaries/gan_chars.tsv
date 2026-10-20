@@ -1,6 +1,6 @@
 本词	国际音标	方言拼音	汉语拼音	词汇属性	对应官话词	官话拼音	词频	同义词	新旧标记
 㧢	ien1	yên1	yin1	赣			126269		
-阿	a1	a1	a1	赣	我	wo3	100000		
+阿	a1	a1	a1	赣	我	wo3	400000		
 佢	ɛ2	ê2	qu2	赣	他	ta1	100000		
 渠	ɛ2	ê2	qu2	赣	他	ta1	100000		
 呐	na0	na0	na4	赣	只	zhi3	100000		
@@ -108,7 +108,7 @@
 落	laʔ8	lak7	luo4	赣			100000		
 有	iu3	yiu3	you3	赣			100000		
 嬷	mo3	mo3	ma1	赣			100000		
-畜	tʃʰyʔ7	qyuk6	chu4	赣			100000		
+畜	tʃʰyʔ7	qiuk6	chu4	赣			100000		
 窠	kʰo3	ko3	ke1	赣			100000		
 蚊	men5	mên4	wen2	赣			100000		
 虫	tɕʰyɛn2	qyuên2	chong2	赣			100000		老1
@@ -160,7 +160,7 @@
 狗	kiəu3	gieu3	gou3	赣			100000		老1
 睄	sau7	sau6	shao4	赣	瞄	miao2	100000		
 渳	miʔ7	mik6	mi3	赣	泯	min3	100000		
-捥	yəʔ8	yuek7	wan4	赣	扭	niu3	100000		
+捥	yɛʔ8	yuêk7	wan4	赣	扭	niu3	100000		
 搉	kʰɔʔ7	kok6	que4	赣	敲	qiao1	100000		
 姩	ȵiɛn2	niên2	nian4	赣	女儿	nv3 er2	100000		
 呢	niʔ0	nik0	ne5	赣			100000		
@@ -169,7 +169,7 @@
 辘	luʔ8	luk7	lu4	赣			100000		
 杯	poi1	boi1	bei1	赣	玩	wan2	100000		
 伢	a0	a0	ya2	赣			100000		
-是	sɿ1	sï1	shi4	赣			100000		
+是	sɿ1	sï1	shi4	赣			900000		
 还	xan2	han2	hai2	赣			100000		
 海	xoi3	hoi3	hai3	赣			100000		
 间	tʃin1	jin1		赣			100000		新1
@@ -190,7 +190,7 @@
 月	ȵyɔʔ8	nyuok7	yue4	赣			100000		又1
 浙	tɕyɔʔ8	jyuok7	zhe4	赣			100000		
 绝	tɕʰyɔʔ8	qyuok7	jue2	赣			100000		
-舌	ɕyəʔ8	xyuek7	she2	赣			100000		
+舌	ɕyɛʔ8	xyuêk7	she2	赣			100000		
 诀	tɕyɔʔ7	jyuok6	jue2	赣			100000		
 越	yɔʔ8	yuok7	yue4	赣			100000		
 阅	yɔʔ8	yuok7	yue4	赣			100000		
@@ -203,10 +203,13 @@
 吮	tɕʰyon6	qyuon5		赣			100000		新1
 抻	tɕʰyon1	qyuon1		赣			100000		新1
 一	iɪʔ7	yek6	yi1	赣			100000		又1
-吸	ɕiɪʔ7	xiek6	xi1	赣			100000		又1
-鼻	pʰiɪʔ8	piek7	bi2	赣			100000		又1
-吉	tɕiɪʔ7	jiek6	ji2	赣			100000		又1
-脚	tɕiɪʔ7	jiek6	jiao3	赣			100000		又1
-屄	piɪʔ7	biek6	bi1	赣			100000		又1
-漆	tɕʰiɪʔ7	qiek6	qi1	赣			100000		又1
+吸	ɕiɪʔ7	xik6	xi1	赣			100000		又1
+鼻	pʰiɪʔ8	pik7	bi2	赣			100000		又1
+吉	tɕiɪʔ7	jik6	ji2	赣			100000		又1
+脚	tɕiɛʔ7	jiêk6	jiao3	赣			100000		又1
+屄	piɛʔ7	biêk6	bi1	赣			100000		又1
+漆	tɕʰiɪʔ7	qik6	qi1	赣			100000		又1
 揖	iɪʔ7	yek6	yi1	赣			100000		又1
+褥	uʔ8	wuk7	ru4	赣			100000		
+傪		cen1	can1	赣			100000		
+啊	ŋa1	nga1	a5	赣			100000		
