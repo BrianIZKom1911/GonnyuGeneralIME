@@ -624,7 +624,7 @@ class GannyuInputMethodService : InputMethodService() {
             key.isLetter && englishMode && englishShift -> key.label.uppercase()
             else -> key.label
         }
-        isAllCaps = false; textSize = if (key.isLetter) 23f else if (key.label.length > 2) 12f else 15f
+        isAllCaps = false; textSize = if (key.isLetter) 23f else if (key.label == "表情") 18f else if (key.label.length > 2) 12f else 15f
         if (key.isLetter) setTypeface(Typeface.DEFAULT_BOLD)
         if (key.label == "空格") contentDescription = "空格"
         if (key.label == "↵") contentDescription = text
