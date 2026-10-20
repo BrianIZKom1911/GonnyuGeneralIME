@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.graphics.Typeface
+import android.icu.text.BreakIterator
 import android.text.InputType
 import android.util.Log
 import android.view.KeyEvent
@@ -23,6 +24,7 @@ import android.widget.TextView
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.Executors
+import java.util.Locale
 
 private class NativePipelineBridge {
     init { System.loadLibrary("gannyu_input_jni") }
@@ -877,7 +879,18 @@ class GannyuInputMethodService : InputMethodService() {
             sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
             return
         }
-        connection.deleteSurroundingTextInCodePoints(1, 0)
+        val beforeCursor = connection.getTextBeforeCursor(32, 0)?.toString()
+        if (beforeCursor.isNullOrEmpty()) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            return
+        }
+        val iterator = BreakIterator.getCharacterInstance(Locale.ROOT)
+        iterator.setText(beforeCursor)
+        val clusterStart = iterator.preceding(beforeCursor.length).takeIf { it != BreakIterator.DONE } ?: 0
+        val codePointCount = beforeCursor.codePointCount(clusterStart, beforeCursor.length).coerceAtLeast(1)
+        if (!connection.deleteSurroundingTextInCodePoints(codePointCount, 0)) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+        }
     }
 
     private fun stopBackspaceRepeat() {
