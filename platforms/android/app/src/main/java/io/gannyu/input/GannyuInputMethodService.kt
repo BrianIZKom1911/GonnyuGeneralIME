@@ -1044,7 +1044,8 @@ class GannyuInputMethodService : InputMethodService() {
                 }
                 isAllCaps = false
                 isEnabled = !candidateLoading
-                setTextColor(keyTextColor)
+                textSize = 12f
+                setTextColor(keySecondaryTextColor)
                 setOnClickListener { loadMoreCandidates() }
             }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(44)))
         }
