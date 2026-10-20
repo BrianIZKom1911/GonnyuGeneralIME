@@ -89,6 +89,7 @@ class GannyuInputMethodService : InputMethodService() {
     private var lastRenderedKeyboardWidth = 0
     // One-shot state only: it is never persisted and resets after one letter.
     private var englishShift = false
+    private var editorSelectionCollapsed: Boolean? = null
     private val backspaceRepeatHandler = Handler(Looper.getMainLooper())
     private val backspaceRepeat = object : Runnable {
         override fun run() {
@@ -362,6 +363,9 @@ class GannyuInputMethodService : InputMethodService() {
     override fun onStartInput(attribute: android.view.inputmethod.EditorInfo?, restarting: Boolean) {
         super.onStartInput(attribute, restarting)
         englishShift = false
+        editorSelectionCollapsed = attribute?.let {
+            if (it.initialSelStart >= 0 && it.initialSelEnd >= 0) it.initialSelStart == it.initialSelEnd else null
+        }
         resetState(clearAccumulated = true)
     }
 
@@ -378,6 +382,7 @@ class GannyuInputMethodService : InputMethodService() {
         stopBackspaceRepeat()
         hideKeyPreview()
         englishShift = false
+        editorSelectionCollapsed = null
         resetState(clearAccumulated = true)
         super.onFinishInput()
     }
@@ -399,6 +404,7 @@ class GannyuInputMethodService : InputMethodService() {
         candidatesEnd: Int,
     ) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        editorSelectionCollapsed = if (newSelStart >= 0 && newSelEnd >= 0) newSelStart == newSelEnd else null
     }
 
     override fun onWindowHidden() {
@@ -729,7 +735,17 @@ class GannyuInputMethodService : InputMethodService() {
             applyEngineSnapshot(processEngineEvent("""{"type":"backspace"}"""))
             return
         }
-        currentInputConnection?.deleteSurroundingTextInCodePoints(1, 0)
+        val connection = currentInputConnection ?: return
+        val selectedText = connection.getSelectedText(0)
+        if (!selectedText.isNullOrEmpty()) {
+            if (connection.commitText("", 1)) editorSelectionCollapsed = true
+            return
+        }
+        if (selectedText == null && editorSelectionCollapsed != true) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            return
+        }
+        connection.deleteSurroundingTextInCodePoints(1, 0)
     }
 
     private fun stopBackspaceRepeat() {
