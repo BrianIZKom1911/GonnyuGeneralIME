@@ -23,6 +23,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.ArrayDeque
 import java.util.concurrent.Executors
 import java.util.Locale
 
@@ -77,6 +78,12 @@ class GannyuInputMethodService : InputMethodService() {
     @Volatile private var pipelineHandle: Long = 0
     @Volatile private var pipelineReady: Boolean = false
     @Volatile private var pipelineLoadGeneration = 0L
+    @Volatile private var engineGeneration = 0L
+    private var hasPendingComposition = false
+    private var pendingEngineOperationCount = 0
+    private var needsEngineClear = true
+    private val pendingEngineEvents = ArrayDeque<String>()
+    private val engineExecutor = Executors.newSingleThreadExecutor()
     private lateinit var cacheTag: TextView
     private lateinit var candidateScroll: HorizontalScrollView
     private lateinit var candidateBar: LinearLayout
@@ -94,7 +101,6 @@ class GannyuInputMethodService : InputMethodService() {
     private var candidateHasMore = false
     private var candidateLoading = false
     private var candidateLoadFailed = false
-    private val candidateLoadExecutor = Executors.newSingleThreadExecutor()
     private val candidateLoadHandler = Handler(Looper.getMainLooper())
     private var keyboardPage = KeyboardPage.LETTERS
     private var editorKeyboardOverride = false
@@ -106,6 +112,10 @@ class GannyuInputMethodService : InputMethodService() {
     // One-shot state only: it is never persisted and resets after one letter.
     private var englishShift = false
     private var editorSelectionCollapsed: Boolean? = null
+    private var editorSelectionStart: Int? = null
+    private var editorSelectionEnd: Int? = null
+    private var expectedSelectionStart: Int? = null
+    private var expectedSelectionEnd: Int? = null
     private val backspaceRepeatHandler = Handler(Looper.getMainLooper())
     private val backspaceRepeat = object : Runnable {
         override fun run() {
@@ -345,9 +355,10 @@ class GannyuInputMethodService : InputMethodService() {
     override fun onDestroy() {
         stopBackspaceRepeat()
         pipelineLoadGeneration += 1
+        engineGeneration += 1
         synchronized(preloadLock) { preloadLock.notifyAll() }
         candidateLoadGeneration += 1
-        candidateLoadExecutor.shutdownNow()
+        engineExecutor.shutdownNow()
         pipelineHandle = 0
         pipelineReady = false
         super.onDestroy()
@@ -411,6 +422,10 @@ class GannyuInputMethodService : InputMethodService() {
         editorSelectionCollapsed = attribute?.let {
             if (it.initialSelStart >= 0 && it.initialSelEnd >= 0) it.initialSelStart == it.initialSelEnd else null
         }
+        editorSelectionStart = attribute?.initialSelStart?.takeIf { it >= 0 }
+        editorSelectionEnd = attribute?.initialSelEnd?.takeIf { it >= 0 }
+        expectedSelectionStart = null
+        expectedSelectionEnd = null
         resetState(clearAccumulated = true)
     }
 
@@ -428,6 +443,10 @@ class GannyuInputMethodService : InputMethodService() {
         hideKeyPreview()
         englishShift = false
         editorSelectionCollapsed = null
+        editorSelectionStart = null
+        editorSelectionEnd = null
+        expectedSelectionStart = null
+        expectedSelectionEnd = null
         restoreEditorKeyboardState()
         resetState(clearAccumulated = true)
         super.onFinishInput()
@@ -452,7 +471,18 @@ class GannyuInputMethodService : InputMethodService() {
     ) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
         editorSelectionCollapsed = if (newSelStart >= 0 && newSelEnd >= 0) newSelStart == newSelEnd else null
-        if (lastSnapshot.rawInput.isNotEmpty() &&
+        val expected = newSelStart >= 0 && newSelEnd >= 0 &&
+            newSelStart == expectedSelectionStart && newSelEnd == expectedSelectionEnd
+        editorSelectionStart = newSelStart.takeIf { it >= 0 }
+        editorSelectionEnd = newSelEnd.takeIf { it >= 0 }
+        if (expected) {
+            expectedSelectionStart = null
+            expectedSelectionEnd = null
+            return
+        }
+        expectedSelectionStart = null
+        expectedSelectionEnd = null
+        if (hasPendingComposition &&
             (oldSelStart != newSelStart || oldSelEnd != newSelEnd) &&
             newSelStart >= 0 && newSelEnd >= 0
         ) {
@@ -501,6 +531,14 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun loadSelectedPipelineAsync() {
         val generation = ++pipelineLoadGeneration
+        engineGeneration += 1
+        needsEngineClear = true
+        if (pipelineReady && pipelineHandle != 0L) {
+            pendingEngineEvents.clear()
+            hasPendingComposition = false
+            pendingEngineOperationCount = 0
+            lastSnapshot = EngineSnapshot()
+        }
         pipelineHandle = 0
         pipelineReady = false
         synchronized(preloadLock) { preloadLock.notifyAll() }
@@ -828,7 +866,7 @@ class GannyuInputMethodService : InputMethodService() {
                 if (englishShift) { englishShift = false; renderKeyboard() }
             } else appendInput(key.label.single())
             keyboardPage != KeyboardPage.LETTERS || key.label in PUNCT_AFTER_COMPOSE -> {
-                if (lastSnapshot.rawInput.isNotEmpty()) applyEngineSnapshot(processEngineText(key.label))
+                if (hasPendingComposition) applyEngineSnapshot(processEngineText(key.label))
                 else currentInputConnection?.commitText(key.label, 1)
             }
             else                                         -> currentInputConnection?.commitText(key.label, 1)
@@ -865,7 +903,7 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun handleBackspace() {
-        if (lastSnapshot.rawInput.isNotEmpty()) {
+        if (hasPendingComposition) {
             applyEngineSnapshot(processEngineEvent("""{"type":"backspace"}"""))
             return
         }
@@ -898,7 +936,7 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun handleSpace() {
-        if (lastSnapshot.rawInput.isEmpty()) {
+        if (!hasPendingComposition) {
             currentInputConnection?.commitText(" ", 1)
             return
         }
@@ -906,7 +944,7 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun handleEnter() {
-        if (lastSnapshot.rawInput.isNotEmpty()) {
+        if (hasPendingComposition) {
             applyEngineSnapshot(processEngineEnter())
             return
         }
@@ -933,16 +971,32 @@ class GannyuInputMethodService : InputMethodService() {
     private fun processEngineEnter(): EngineSnapshot? = processEngineEvent("""{"type":"enter"}""")
 
     private fun commitCandidate(candidate: RankedCandidate) {
-        if (pipelineHandle == 0L) return
+        if (!pipelineReady || pipelineHandle == 0L) return
         // The expanded panel represents one candidate snapshot.  Selecting an
         // item invalidates it, so hide it before requesting the next snapshot.
         if (candidateExpanded) collapseCandidateExpansion()
-        applyEngineSnapshot(nativeSelectCandidate(pipelineHandle, candidate.globalIndex)?.let(::parseSnapshot))
+        invalidateCandidateSnapshot()
+        enqueueNativeOperation { handle -> nativeBridge.nativeSelectCandidate(handle, candidate.globalIndex) }
     }
 
     private fun resetState(clearAccumulated: Boolean) {
-        if (pipelineHandle != 0L && clearAccumulated) {
-            applyEngineSnapshot(nativeClearComposition(pipelineHandle)?.let(::parseSnapshot), render = false)
+        if (clearAccumulated) {
+            engineGeneration += 1
+            pendingEngineEvents.clear()
+            hasPendingComposition = false
+            pendingEngineOperationCount = 0
+            if (pipelineReady && pipelineHandle != 0L) {
+                needsEngineClear = false
+                val handle = pipelineHandle
+                val generation = engineGeneration
+                engineExecutor.execute {
+                    if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                        runCatching { nativeBridge.nativeClearComposition(handle) }
+                    }
+                }
+            } else {
+                needsEngineClear = true
+            }
         }
         lastSnapshot = EngineSnapshot()
         candidateLoadGeneration += 1
@@ -956,7 +1010,7 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun renderState() {
         if (!::candidateBar.isInitialized) return
-        if (::candidateBar.isInitialized) refreshCandidates()
+        initializeEngine()
         renderCacheTag()
         if (::candidateBar.isInitialized) renderCandidateBar()
         if (::candidateExpandedRows.isInitialized) renderExpandedCandidates()
@@ -969,21 +1023,70 @@ class GannyuInputMethodService : InputMethodService() {
         cacheTag.text = display
     }
 
-    private fun refreshCandidates() {
-        if (!::candidateBar.isInitialized) return
-        candidateBar.removeAllViews()
-        if (!pipelineReady || pipelineHandle == 0L) {
-            Log.w(TAG, "refreshCandidates SKIP ready=$pipelineReady handle=$pipelineHandle")
-            lastSnapshot = EngineSnapshot()
-            return
-        }
-        val snapshot = nativeSnapshot(pipelineHandle)?.let(::parseSnapshot) ?: EngineSnapshot()
-        applyEngineSnapshot(snapshot, render = false)
-    }
-
     private fun postUpdateCandidates() {
         if (::candidateBar.isInitialized) candidateBar.post {
-            if (candidateBar.isAttachedToWindow) renderState()
+            if (candidateBar.isAttachedToWindow) {
+                initializeEngine()
+                renderState()
+            }
+        }
+    }
+
+    private fun initializeEngine() {
+        if (!pipelineReady || pipelineHandle == 0L || (!needsEngineClear && pendingEngineEvents.isEmpty())) return
+        val handle = pipelineHandle
+        val generation = engineGeneration
+        if (needsEngineClear) {
+            needsEngineClear = false
+            engineExecutor.execute {
+                if (generation != engineGeneration || pipelineHandle != handle || !pipelineReady) return@execute
+                runCatching { nativeBridge.nativeClearComposition(handle) }
+                val snapshot = runCatching { nativeBridge.nativeSnapshot(handle)?.let(::parseSnapshot) }.getOrNull()
+                candidateLoadHandler.post {
+                    if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                        applyEngineSnapshot(snapshot)
+                    }
+                }
+            }
+        }
+        while (pendingEngineEvents.isNotEmpty()) {
+            enqueueEngineEvent(handle, generation, pendingEngineEvents.removeFirst())
+        }
+    }
+
+    private fun enqueueEngineEvent(handle: Long, generation: Long, eventJson: String) {
+        pendingEngineOperationCount += 1
+        hasPendingComposition = true
+        engineExecutor.execute {
+            if (generation != engineGeneration || pipelineHandle != handle || !pipelineReady) return@execute
+            val snapshot = runCatching {
+                nativeBridge.nativeProcessKey(handle, eventJson)?.let(::parseSnapshot)
+            }.getOrNull()
+            candidateLoadHandler.post {
+                if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                    pendingEngineOperationCount = (pendingEngineOperationCount - 1).coerceAtLeast(0)
+                    applyEngineSnapshot(snapshot)
+                }
+            }
+        }
+    }
+
+    private fun enqueueNativeOperation(operation: (Long) -> String?) {
+        if (!pipelineReady || pipelineHandle == 0L) return
+        initializeEngine()
+        val handle = pipelineHandle
+        val generation = engineGeneration
+        pendingEngineOperationCount += 1
+        hasPendingComposition = true
+        engineExecutor.execute {
+            if (generation != engineGeneration || pipelineHandle != handle || !pipelineReady) return@execute
+            val snapshot = runCatching { operation(handle)?.let(::parseSnapshot) }.getOrNull()
+            candidateLoadHandler.post {
+                if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                    pendingEngineOperationCount = (pendingEngineOperationCount - 1).coerceAtLeast(0)
+                    applyEngineSnapshot(snapshot)
+                }
+            }
         }
     }
 
@@ -1189,8 +1292,10 @@ class GannyuInputMethodService : InputMethodService() {
         val schemaId = lastSnapshot.schemaId
         val offset = candidateNextOffset
         renderExpandedCandidates()
-        candidateLoadExecutor.execute {
-            val result = runCatching { nativeBridge.nativeCandidates(handle, offset, 100)?.let(::JSONObject) }.getOrNull()
+        engineExecutor.execute {
+            val result = runCatching {
+                if (pipelineReady && pipelineHandle == handle) nativeBridge.nativeCandidates(handle, offset, 100)?.let(::JSONObject) else null
+            }.getOrNull()
             candidateLoadHandler.post {
                 if (!candidateExpanded || candidateLoadGeneration != generation || pipelineHandle != handle ||
                     lastSnapshot.rawInput != rawInput || lastSnapshot.schemaId != schemaId) return@post
@@ -1217,8 +1322,20 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun processEngineEvent(eventJson: String): EngineSnapshot? {
-        if (pipelineHandle == 0L || !pipelineReady) return null
-        return nativeProcessKey(pipelineHandle, eventJson)?.let(::parseSnapshot)
+        invalidateCandidateSnapshot()
+        if (!pipelineReady || pipelineHandle == 0L) {
+            pendingEngineEvents.addLast(eventJson)
+            if (runCatching { JSONObject(eventJson).optString("type") == "text" }.getOrDefault(false)) {
+                hasPendingComposition = true
+            }
+            return null
+        }
+        initializeEngine()
+        if (runCatching { JSONObject(eventJson).optString("type") == "text" }.getOrDefault(false)) {
+            hasPendingComposition = true
+        }
+        enqueueEngineEvent(pipelineHandle, engineGeneration, eventJson)
+        return null
     }
 
     private fun applyEngineSnapshot(snapshot: EngineSnapshot?, render: Boolean = true) {
@@ -1226,9 +1343,15 @@ class GannyuInputMethodService : InputMethodService() {
         val compositionChanged = lastSnapshot.rawInput != snapshot.rawInput ||
             lastSnapshot.schemaId != snapshot.schemaId || !snapshot.commitText.isNullOrEmpty()
         if (!snapshot.commitText.isNullOrEmpty()) {
-            currentInputConnection?.commitText(snapshot.commitText, 1)
+            val selectionStart = editorSelectionStart
+            if (currentInputConnection?.commitText(snapshot.commitText, 1) == true && selectionStart != null) {
+                val cursor = selectionStart + snapshot.commitText.length
+                expectedSelectionStart = cursor
+                expectedSelectionEnd = cursor
+            }
         }
         lastSnapshot = snapshot
+        hasPendingComposition = snapshot.rawInput.isNotEmpty() || pendingEngineOperationCount > 0
         if (compositionChanged) {
             candidateLoadGeneration += 1
             candidateLoading = false
@@ -1238,6 +1361,15 @@ class GannyuInputMethodService : InputMethodService() {
         if (render && ::candidateBar.isInitialized) {
             renderState()
         }
+    }
+
+    private fun invalidateCandidateSnapshot() {
+        candidateLoadGeneration += 1
+        candidateLoading = false
+        candidateExpanded = false
+        expandedCandidates.clear()
+        lastSnapshot = lastSnapshot.copy(preedit = "", candidates = emptyList(), hasNextPage = false)
+        if (::candidateBar.isInitialized) renderState()
     }
 
     private fun parseSnapshot(json: String): EngineSnapshot {
