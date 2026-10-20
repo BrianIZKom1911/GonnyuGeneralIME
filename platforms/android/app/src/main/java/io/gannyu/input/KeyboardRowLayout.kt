@@ -22,48 +22,92 @@ internal class KeyboardRowLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : LinearLayout(context, attrs) {
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
-    private var activeKey: Button? = null
+    private val pointerKeys = linkedMapOf<Int, Button>()
+    private val pointerDownTimes = linkedMapOf<Int, Long>()
+    private val blockedPointers = mutableSetOf<Int>()
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                activeKey = nearestKey(event.x.toInt()) ?: return super.dispatchTouchEvent(event)
-                return dispatchInside(activeKey!!, event)
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                val target = activeKey ?: return super.dispatchTouchEvent(event)
-                val outsideVertically = event.y < -touchSlop || event.y >= height + touchSlop
-                if (outsideVertically || nearestKey(event.x.toInt()) !== target) {
-                    cancel(target, event)
-                    activeKey = null
-                    return true
-                }
-                return dispatchInside(target, event)
-            }
-
-            MotionEvent.ACTION_UP -> {
-                val target = activeKey ?: return super.dispatchTouchEvent(event)
-                activeKey = null
-                if (nearestKey(event.x.toInt()) !== target) {
-                    cancel(target, event)
-                    return true
-                }
-                return dispatchInside(target, event)
-            }
-
-            MotionEvent.ACTION_CANCEL -> {
-                val target = activeKey ?: return super.dispatchTouchEvent(event)
-                activeKey = null
-                cancel(target, event)
+                pointerDownTimes.clear()
+                blockedPointers.clear()
+                pointerKeys.clear()
+                assignPointer(event, event.actionIndex)
+                if (pointerKeys.isEmpty()) return super.dispatchTouchEvent(event)
+                dispatchPointer(event, event.actionIndex, MotionEvent.ACTION_DOWN)
                 return true
             }
 
-            else -> {
-                val target = activeKey ?: return super.dispatchTouchEvent(event)
-                return dispatchInside(target, event)
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                val index = event.actionIndex
+                val id = event.getPointerId(index)
+                assignPointer(event, index)
+                if (id in pointerKeys) dispatchPointer(event, index, MotionEvent.ACTION_DOWN)
             }
+
+            MotionEvent.ACTION_MOVE -> {
+                if (pointerKeys.isEmpty()) return if (blockedPointers.isEmpty()) super.dispatchTouchEvent(event) else true
+                pointerKeys.toMap().forEach { (pointerId, target) ->
+                    val index = event.findPointerIndex(pointerId)
+                    if (index < 0 || event.getY(index) < -touchSlop || event.getY(index) >= height + touchSlop ||
+                        nearestKey(event.getX(index).toInt()) !== target
+                    ) {
+                        dispatchPointer(event, index, MotionEvent.ACTION_CANCEL)
+                        pointerKeys.remove(pointerId)
+                        pointerDownTimes.remove(pointerId)
+                        blockedPointers += pointerId
+                    } else {
+                        dispatchPointer(event, index, MotionEvent.ACTION_MOVE)
+                    }
+                }
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+                if (pointerKeys.isEmpty()) return super.dispatchTouchEvent(event)
+                pointerKeys.keys.toList().forEach { pointerId ->
+                    dispatchPointer(event, event.findPointerIndex(pointerId), MotionEvent.ACTION_CANCEL)
+                }
+                pointerKeys.clear()
+                pointerDownTimes.clear()
+                blockedPointers.clear()
+                return true
+            }
+
+            MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP -> {
+                val index = event.actionIndex
+                val pointerId = event.getPointerId(index)
+                val target = pointerKeys[pointerId]
+                if (target != null) {
+                    val action = if (event.getY(index) < -touchSlop || event.getY(index) >= height + touchSlop ||
+                        nearestKey(event.getX(index).toInt()) !== target
+                    ) MotionEvent.ACTION_CANCEL else MotionEvent.ACTION_UP
+                    dispatchPointer(event, index, action)
+                }
+                pointerKeys.remove(pointerId)
+                pointerDownTimes.remove(pointerId)
+                blockedPointers.remove(pointerId)
+                if (event.actionMasked == MotionEvent.ACTION_UP) {
+                    pointerKeys.clear()
+                    pointerDownTimes.clear()
+                    blockedPointers.clear()
+                }
+                return true
+            }
+
+            else -> if (pointerKeys.isEmpty() && blockedPointers.isEmpty()) return super.dispatchTouchEvent(event)
         }
+        return true
+    }
+
+    private fun assignPointer(event: MotionEvent, pointerIndex: Int) {
+        val pointerId = event.getPointerId(pointerIndex)
+        val target = nearestKey(event.getX(pointerIndex).toInt()) ?: return
+        if (pointerKeys.values.any { it === target }) {
+            blockedPointers += pointerId
+            return
+        }
+        pointerKeys[pointerId] = target
+        pointerDownTimes[pointerId] = event.downTime
     }
 
     private fun nearestKey(x: Int): Button? {
@@ -81,25 +125,19 @@ internal class KeyboardRowLayout @JvmOverloads constructor(
         return keys[nearestIndex]
     }
 
-    private fun dispatchInside(target: Button, source: MotionEvent): Boolean {
-        val event = MotionEvent.obtain(source)
-        val maxX = (target.width - 1).coerceAtLeast(0).toFloat()
-        val maxY = (target.height - 1).coerceAtLeast(0).toFloat()
-        event.setLocation(
-            (source.x - target.left).coerceIn(0f, maxX),
-            (source.y - target.top).coerceIn(0f, maxY),
+    private fun dispatchPointer(source: MotionEvent, pointerIndex: Int, action: Int) {
+        if (pointerIndex < 0) return
+        val pointerId = source.getPointerId(pointerIndex)
+        val target = pointerKeys[pointerId] ?: return
+        val event = MotionEvent.obtain(
+            pointerDownTimes[pointerId] ?: source.downTime,
+            source.eventTime,
+            action,
+            source.getX(pointerIndex) - target.left,
+            source.getY(pointerIndex) - target.top,
+            source.metaState,
         )
-        return try {
-            target.dispatchTouchEvent(event)
-        } finally {
-            event.recycle()
-        }
-    }
-
-    private fun cancel(target: Button, source: MotionEvent) {
-        val event = MotionEvent.obtain(source)
-        event.action = MotionEvent.ACTION_CANCEL
-        event.offsetLocation(-target.left.toFloat(), -target.top.toFloat())
+        event.source = source.source
         try {
             target.dispatchTouchEvent(event)
         } finally {
