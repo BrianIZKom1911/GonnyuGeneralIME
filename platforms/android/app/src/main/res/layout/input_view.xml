@@ -22,7 +22,7 @@
         android:gravity="center_vertical"
         android:textColor="@color/keyboard_text"
         android:textStyle="bold"
-        android:textSize="12sp"
+        android:textSize="12dp"
         android:visibility="invisible" />
 
     <LinearLayout
@@ -63,7 +63,7 @@
             android:contentDescription="展开候选"
             android:text="⌄"
             android:textColor="@color/keyboard_text"
-            android:textSize="17sp" />
+            android:textSize="17dp" />
     </LinearLayout>
 
     <FrameLayout
@@ -109,7 +109,7 @@
         android:includeFontPadding="false"
         android:paddingBottom="9dp"
         android:textColor="@color/keyboard_text"
-        android:textSize="28sp"
+        android:textSize="28dp"
         android:textStyle="bold"
         android:visibility="gone" />
 </FrameLayout>

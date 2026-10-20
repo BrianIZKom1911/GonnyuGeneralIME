@@ -77,7 +77,7 @@ def test_android_keyboard_uses_a_system_adaptive_neutral_palette_on_all_pages() 
     assert "private val keyTextColor: Int" in source
     assert "private val keySecondaryTextColor: Int" in source
     assert "key.label in ACTION_KEYS" in source
-    assert "dp(46)" in source
+    assert "setTextSize(TypedValue.COMPLEX_UNIT_DIP" in source
     assert "FUNCTION_KEY_WIDTH_MULTIPLIER = 1.12f" in source
     assert "private fun functionKeyWidth(label: String, keyWidth: Int): Int" in source
     assert "private val FUNCTION_WIDTH_KEYS" in source
@@ -118,6 +118,8 @@ def test_android_candidates_keep_full_metadata_with_independent_widths() -> None
     assert "android.view.Gravity.START or android.view.Gravity.TOP" in source
     layout = (ROOT / "platforms/android/app/src/main/res/layout/input_view.xml").read_text(encoding="utf-8")
     assert 'android:layout_height="39dp"' in layout
+    assert "scaledDensity" not in source
+    assert "textSize = 16f * density" in source
     assert 'android:layout_gravity="start"' in layout
     assert 'android:gravity="start|center_vertical"' in layout
     assert "candidateExpandButton" in layout
@@ -127,14 +129,16 @@ def test_android_candidates_keep_full_metadata_with_independent_widths() -> None
     assert "private fun loadMoreCandidates()" in source
     assert "nativeCandidates(handle, offset, 100)" in source
     assert "candidateNextOffset = offset + candidates.size" in source
-    assert "textSize = 18f" in source
+    assert "setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16f)" in source
     assert "setTypeface(null, Typeface.NORMAL)" in source
     assert "if (candidateExpanded) collapseCandidateExpansion()" in source
     assert 'key.label == "空格" -> ""' in source
     assert "private fun supportsKeyPreview" in source
     assert "private fun showKeyPreview" in source
     assert "keyPreview" in layout
-    assert 'android:textSize="28sp"' in layout
+    assert 'android:textSize="28dp"' in layout
+    assert 'android:textSize="12dp"' in layout
+    assert 'android:textSize="17dp"' in layout
 
 
 def test_android_rime_regions_come_from_the_packaged_manifest() -> None:

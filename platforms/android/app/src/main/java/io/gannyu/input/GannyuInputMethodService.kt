@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.icu.text.BreakIterator
 import android.text.InputType
 import android.util.Log
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -383,7 +384,7 @@ class GannyuInputMethodService : InputMethodService() {
         })
         val collapseButton = Button(this).apply {
             text = "⌃"
-            textSize = 17f
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17f)
             setTextColor(keyTextColor)
             background = getDrawable(R.drawable.key_action)
             elevation = dp(4).toFloat()
@@ -739,13 +740,16 @@ class GannyuInputMethodService : InputMethodService() {
             key.isLetter && englishMode && englishShift -> key.label.uppercase()
             else -> key.label
         }
-        isAllCaps = false; textSize = if (key.isLetter) 23f else if (key.label == "表情") 18f else if (key.label.length > 2) 12f else 15f
+        isAllCaps = false
+        setTextSize(TypedValue.COMPLEX_UNIT_DIP, if (key.isLetter) 23f else if (key.label == "表情") 18f else if (key.label.length > 2) 12f else 15f)
         if (key.isLetter) setTypeface(Typeface.DEFAULT_BOLD)
         if (key.label == "空格") contentDescription = "空格"
         if (key.label == "↵") contentDescription = text
         if (key.label == "表情") contentDescription = "表情"
         if (key.label in setOf("上一页", "下一页")) contentDescription = "${key.label}，第${emojiPageIndex + 1}页，共${EMOJI_PAGES.size}页"
-        if (keyboardPage == KeyboardPage.EMOJI && key.label !in ACTION_KEYS && key.label != "空格") textSize = 23f
+        if (keyboardPage == KeyboardPage.EMOJI && key.label !in ACTION_KEYS && key.label != "空格") {
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 23f)
+        }
         layoutParams = LinearLayout.LayoutParams(width, dp(46), if (width == 0) 1f else 0f).apply {
             marginEnd = gap
         }
@@ -1130,7 +1134,7 @@ class GannyuInputMethodService : InputMethodService() {
 
             addView(TextView(context).apply {
                 text = candidate.text
-                textSize = 18f; setTextColor(keyTextColor)
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16f); setTextColor(keyTextColor)
                 setTypeface(null, Typeface.NORMAL)
                 gravity = android.view.Gravity.START
                 maxLines = 1
@@ -1143,7 +1147,7 @@ class GannyuInputMethodService : InputMethodService() {
                 if (expanded) minimumHeight = dp(37)
                 addView(TextView(context).apply {
                     text = displayMeta
-                    textSize = 10f; setTextColor(keySecondaryTextColor)
+                    setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10f); setTextColor(keySecondaryTextColor)
                     gravity = android.view.Gravity.START
                     if (expanded) {
                         maxLines = Int.MAX_VALUE
@@ -1235,7 +1239,7 @@ class GannyuInputMethodService : InputMethodService() {
                 }
                 isAllCaps = false
                 isEnabled = !candidateLoading
-                textSize = 12f
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
                 setTextColor(keySecondaryTextColor)
                 setOnClickListener { loadMoreCandidates() }
             }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(44)))
@@ -1251,8 +1255,8 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun candidateWidth(candidate: RankedCandidate): Int {
-        val scale = resources.displayMetrics.scaledDensity
-        val wordWidth = android.graphics.Paint().apply { textSize = 18f * scale }.measureText(candidate.text)
+        val density = resources.displayMetrics.density
+        val wordWidth = android.graphics.Paint().apply { textSize = 16f * density }.measureText(candidate.text)
         return maxOf(dp(44), kotlin.math.ceil(wordWidth.toDouble()).toInt() + dp(10))
     }
 
