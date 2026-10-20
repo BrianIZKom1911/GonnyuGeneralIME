@@ -450,6 +450,12 @@ class GannyuInputMethodService : InputMethodService() {
     ) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
         editorSelectionCollapsed = if (newSelStart >= 0 && newSelEnd >= 0) newSelStart == newSelEnd else null
+        if (lastSnapshot.rawInput.isNotEmpty() &&
+            (oldSelStart != newSelStart || oldSelEnd != newSelEnd) &&
+            newSelStart >= 0 && newSelEnd >= 0
+        ) {
+            resetState(clearAccumulated = true)
+        }
     }
 
     override fun onWindowHidden() {
