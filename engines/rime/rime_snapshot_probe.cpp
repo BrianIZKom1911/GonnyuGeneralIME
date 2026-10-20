@@ -164,6 +164,56 @@ int main() {
   GannyuPipelineHandle handle;
   handle.candidate_limit = 100;
   Check(Snapshot(&handle, false, std::nullopt).find("\"candidates\":[]") != std::string::npos);
+  context_available = true;
+  page_size = 9;
+  GannyuPipelineHandle range_handle;
+  range_handle.session = 1;
+  range_handle.schema_id = "gannyu_lancong";
+  range_handle.candidate_limit = 60;
+  GlobalRuntime().handles.push_back(&range_handle);
+  int range_cases = 0;
+  for (int count : {0, 1, 99, 100, 101, 200, 201, 250}) {
+    texts.clear();
+    comments.clear();
+    for (int index = 0; index < count; ++index) {
+      texts.push_back("候选" + std::to_string(index));
+      comments.push_back("注释");
+    }
+    for (size_t offset : {0, 100, 200, 300}) {
+      page = 3;
+      highlight = 2;
+      key_calls = iterator_calls = iterator_ends = 0;
+      char* json = nullptr;
+      Check(gannyu_engine_candidates(&range_handle, offset, 100, &json) == kOk && json != nullptr);
+      const std::string batch(json);
+      gannyu_string_destroy(json);
+      Check(batch.find("\"offset\":" + std::to_string(offset) + ',') != std::string::npos);
+      Check(batch.find(count > static_cast<int>(offset + 100) ? "\"hasMore\":true" : "\"hasMore\":false") != std::string::npos);
+      const size_t expected = std::min<size_t>(100, count > static_cast<int>(offset) ? count - offset : 0);
+      size_t position = 0;
+      for (size_t index = 0; index < expected; ++index) {
+        const std::string marker = "\"globalIndex\":" + std::to_string(offset + index) + ",\"pageIndex\":";
+        position = batch.find(marker, position);
+        Check(position != std::string::npos);
+        position += marker.size();
+      }
+      Check(batch.find("\"globalIndex\":", position) == std::string::npos);
+      Check(page == 3 && highlight == 2 && range_handle.candidate_limit == 60);
+      Check(key_calls == 0 && iterator_calls <= 101 && iterator_ends == 1);
+      ++range_cases;
+    }
+  }
+  char* invalid_batch = reinterpret_cast<char*>(1);
+  Check(gannyu_engine_candidates(&range_handle, 0, 0, &invalid_batch) == kInvalidArgument && invalid_batch == nullptr);
+  Check(gannyu_engine_candidates(&range_handle, 0, 101, &invalid_batch) == kInvalidArgument);
+  Check(gannyu_engine_candidates(&range_handle, static_cast<size_t>(-1), 100, &invalid_batch) == kInvalidArgument);
+  Check(gannyu_engine_candidates(&range_handle, 0, 100, nullptr) == kInvalidArgument);
+  test_api.candidate_list_from_index = nullptr;
+  Check(gannyu_engine_candidates(&range_handle, 0, 100, &invalid_batch) == kLoadFailure && invalid_batch == nullptr);
+  test_api.candidate_list_from_index = Begin;
+  GlobalRuntime().handles.clear();
+  Check(gannyu_engine_candidates(&range_handle, 0, 100, &invalid_batch) == kInvalidArgument);
+  std::cout << range_cases << " candidate range cases passed\n";
   std::cout << cases << " snapshot equivalence cases passed\n";
   test_api.finalize = Finalize;
   test_api.initialize = Initialize;

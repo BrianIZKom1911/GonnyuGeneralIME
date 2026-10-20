@@ -22,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.Executors
 
 private class NativePipelineBridge {
     init { System.loadLibrary("gannyu_input_jni") }
@@ -29,6 +30,7 @@ private class NativePipelineBridge {
     external fun nativeCreate(manifestPath: String?, regionId: String?, dataDir: String): Long
     external fun nativeLastError(): String?
     external fun nativeSnapshot(handle: Long): String?
+    external fun nativeCandidates(handle: Long, offset: Int, limit: Int): String?
     external fun nativeProcessKey(handle: Long, eventJson: String): String?
     external fun nativeSelectCandidate(handle: Long, globalIndex: Int): String?
     external fun nativeChangeCandidatePage(handle: Long, direction: Int): String?
@@ -84,6 +86,13 @@ class GannyuInputMethodService : InputMethodService() {
     private var lastSnapshot = EngineSnapshot()
     private var candidateExpanded = false
     private val expandedCandidates = mutableListOf<RankedCandidate>()
+    private var candidateLoadGeneration = 0
+    private var candidateNextOffset = 0
+    private var candidateHasMore = false
+    private var candidateLoading = false
+    private var candidateLoadFailed = false
+    private val candidateLoadExecutor = Executors.newSingleThreadExecutor()
+    private val candidateLoadHandler = Handler(Looper.getMainLooper())
     private var keyboardPage = KeyboardPage.LETTERS
     private var englishMode = false
     private var lastRenderedKeyboardWidth = 0
@@ -305,6 +314,8 @@ class GannyuInputMethodService : InputMethodService() {
 
     override fun onDestroy() {
         stopBackspaceRepeat()
+        candidateLoadGeneration += 1
+        candidateLoadExecutor.shutdownNow()
         pipelineHandle = 0
         pipelineReady = false
         super.onDestroy()
@@ -800,6 +811,8 @@ class GannyuInputMethodService : InputMethodService() {
             applyEngineSnapshot(nativeClearComposition(pipelineHandle)?.let(::parseSnapshot), render = false)
         }
         lastSnapshot = EngineSnapshot()
+        candidateLoadGeneration += 1
+        candidateLoading = false
         candidateExpanded = false
         expandedCandidates.clear()
         if (::candidateBar.isInitialized) renderState()
@@ -830,7 +843,8 @@ class GannyuInputMethodService : InputMethodService() {
             lastSnapshot = EngineSnapshot()
             return
         }
-        lastSnapshot = nativeSnapshot(pipelineHandle)?.let(::parseSnapshot) ?: EngineSnapshot()
+        val snapshot = nativeSnapshot(pipelineHandle)?.let(::parseSnapshot) ?: EngineSnapshot()
+        applyEngineSnapshot(snapshot, render = false)
     }
 
     private fun postUpdateCandidates() {
@@ -862,6 +876,7 @@ class GannyuInputMethodService : InputMethodService() {
         expanded: Boolean,
     ) : LinearLayout(context) {
         private var downX = 0f
+        private var downY = 0f
         private var moved = false
 
         init {
@@ -907,12 +922,25 @@ class GannyuInputMethodService : InputMethodService() {
 
         override fun onTouchEvent(event: MotionEvent): Boolean {
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> { downX = event.x; moved = false; parent.requestDisallowInterceptTouchEvent(true); return true }
-                MotionEvent.ACTION_MOVE -> {
-                    if (kotlin.math.abs(event.x - downX) > dp(8)) { moved = true; parent.requestDisallowInterceptTouchEvent(false) }
+                MotionEvent.ACTION_DOWN -> {
+                    downX = event.x
+                    downY = event.y
+                    moved = false
+                    parent.requestDisallowInterceptTouchEvent(true)
                     return true
                 }
-                MotionEvent.ACTION_UP -> { parent.requestDisallowInterceptTouchEvent(false); if (!moved) commitCandidate(candidate); return true }
+                MotionEvent.ACTION_MOVE -> {
+                    if (kotlin.math.hypot(event.x - downX, event.y - downY) >= dp(8)) {
+                        moved = true
+                        parent.requestDisallowInterceptTouchEvent(false)
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_UP -> {
+                    parent.requestDisallowInterceptTouchEvent(false)
+                    if (!moved && kotlin.math.hypot(event.x - downX, event.y - downY) < dp(8)) commitCandidate(candidate)
+                    return true
+                }
                 MotionEvent.ACTION_CANCEL -> { parent.requestDisallowInterceptTouchEvent(false); return true }
             }
             return super.onTouchEvent(event)
@@ -928,6 +956,8 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun renderExpandedCandidates() {
         if (!::candidateExpandedRows.isInitialized) return
+        val scrollY = candidateExpandedScroll.scrollY
+        val generation = candidateLoadGeneration
         candidateExpandedRows.removeAllViews()
         if (!candidateExpanded) {
             candidateExpansionContainer.visibility = View.GONE
@@ -959,6 +989,22 @@ class GannyuInputMethodService : InputMethodService() {
             usedWidth += (if (usedWidth == 0) 0 else dp(3)) + width
         }
         if (row.childCount > 0) candidateExpandedRows.addView(row)
+        if (candidateHasMore) {
+            candidateExpandedRows.addView(Button(this).apply {
+                text = when {
+                    candidateLoading -> "正在加载候选…"
+                    candidateLoadFailed -> "重试加载候选"
+                    else -> "加载更多候选"
+                }
+                isAllCaps = false
+                isEnabled = !candidateLoading
+                setTextColor(keyTextColor)
+                setOnClickListener { loadMoreCandidates() }
+            }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(44)))
+        }
+        candidateExpandedScroll.post {
+            if (candidateExpanded && candidateLoadGeneration == generation) candidateExpandedScroll.scrollTo(0, scrollY)
+        }
     }
 
     private fun expandedCandidateRow(): LinearLayout = LinearLayout(this).apply {
@@ -979,15 +1025,55 @@ class GannyuInputMethodService : InputMethodService() {
         }
         if (lastSnapshot.candidates.isEmpty()) return
         candidateExpanded = true
+        candidateLoadGeneration += 1
+        candidateNextOffset = 0
+        candidateHasMore = true
+        candidateLoading = false
+        candidateLoadFailed = false
         expandedCandidates.clear()
         expandedCandidates += lastSnapshot.candidates
         renderState()
+        loadMoreCandidates()
     }
 
     private fun collapseCandidateExpansion() {
+        candidateLoadGeneration += 1
+        candidateLoading = false
         candidateExpanded = false
         expandedCandidates.clear()
         renderState()
+    }
+
+    private fun loadMoreCandidates() {
+        if (!candidateExpanded || candidateLoading || !candidateHasMore || !pipelineReady || pipelineHandle == 0L) return
+        candidateLoading = true
+        candidateLoadFailed = false
+        val generation = ++candidateLoadGeneration
+        val handle = pipelineHandle
+        val rawInput = lastSnapshot.rawInput
+        val schemaId = lastSnapshot.schemaId
+        val offset = candidateNextOffset
+        renderExpandedCandidates()
+        candidateLoadExecutor.execute {
+            val result = runCatching { nativeBridge.nativeCandidates(handle, offset, 100)?.let(::JSONObject) }.getOrNull()
+            candidateLoadHandler.post {
+                if (!candidateExpanded || candidateLoadGeneration != generation || pipelineHandle != handle ||
+                    lastSnapshot.rawInput != rawInput || lastSnapshot.schemaId != schemaId) return@post
+                candidateLoading = false
+                val candidates = runCatching { result?.let { parseSnapshot(it.toString()).candidates } }.getOrNull()
+                if (result == null || candidates == null || result.optInt("offset", -1) != offset ||
+                    result.optString("rawInput") != rawInput || result.optString("schemaId") != schemaId ||
+                    candidates.size > 100 || candidates.withIndex().any { it.value.globalIndex != offset + it.index }) {
+                    candidateLoadFailed = true
+                } else {
+                    if (offset == 0) expandedCandidates.clear()
+                    expandedCandidates += candidates
+                    candidateNextOffset = offset + candidates.size
+                    candidateHasMore = result.optBoolean("hasMore") && candidates.isNotEmpty()
+                }
+                renderExpandedCandidates()
+            }
+        }
     }
 
     private fun processEngineText(text: String): EngineSnapshot? {
@@ -1002,12 +1088,15 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun applyEngineSnapshot(snapshot: EngineSnapshot?, render: Boolean = true) {
         if (snapshot == null) return
-        val compositionChanged = lastSnapshot.rawInput != snapshot.rawInput || !snapshot.commitText.isNullOrEmpty()
+        val compositionChanged = lastSnapshot.rawInput != snapshot.rawInput ||
+            lastSnapshot.schemaId != snapshot.schemaId || !snapshot.commitText.isNullOrEmpty()
         if (!snapshot.commitText.isNullOrEmpty()) {
             currentInputConnection?.commitText(snapshot.commitText, 1)
         }
         lastSnapshot = snapshot
         if (compositionChanged) {
+            candidateLoadGeneration += 1
+            candidateLoading = false
             candidateExpanded = false
             expandedCandidates.clear()
         }

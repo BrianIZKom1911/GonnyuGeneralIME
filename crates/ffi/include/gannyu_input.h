@@ -97,6 +97,8 @@ int gannyu_pipeline_entry_count(GannyuPipelineHandle *handle);
 int gannyu_region_list(const char *manifest_path, char **out_json);
 
 int gannyu_engine_snapshot(GannyuPipelineHandle *handle, char **out_json);
+int gannyu_engine_candidates(GannyuPipelineHandle *handle, size_t offset,
+                            size_t limit, char **out_json);
 int gannyu_engine_set_candidate_limit(GannyuPipelineHandle *handle, size_t limit);
 
 int gannyu_engine_process_key(GannyuPipelineHandle *handle,

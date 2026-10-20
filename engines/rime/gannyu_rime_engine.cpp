@@ -9,6 +9,7 @@
 #include <exception>
 #include <filesystem>
 #include <memory>
+#include <limits>
 #include <mutex>
 #include <optional>
 #include <sstream>
@@ -462,6 +463,52 @@ int gannyu_engine_set_candidate_limit(GannyuPipelineHandle* handle, size_t limit
     std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
     handle->candidate_limit = limit;
     return kOk;
+  });
+}
+
+int gannyu_engine_candidates(GannyuPipelineHandle* handle, size_t offset, size_t limit, char** out_json) {
+  return AbiStatus([&] {
+    g_last_error.clear();
+    if (out_json == nullptr) return kInvalidArgument;
+    *out_json = nullptr;
+    if (handle == nullptr || limit == 0 || limit > 100 ||
+        offset > static_cast<size_t>(std::numeric_limits<int>::max()) - limit) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (std::find(runtime.handles.begin(), runtime.handles.end(), handle) == runtime.handles.end()) {
+      SetError("engine handle is unavailable");
+      return kInvalidArgument;
+    }
+    if (!RIME_PROVIDED(Api(), candidate_list_from_index) ||
+        !RIME_PROVIDED(Api(), candidate_list_next) || !RIME_PROVIDED(Api(), candidate_list_end)) {
+      SetError("candidate range iteration is unavailable");
+      return kLoadFailure;
+    }
+    std::ostringstream output;
+    output << "{\"rawInput\":\"" << JsonEscape(Api()->get_input(handle->session))
+           << "\",\"schemaId\":\"" << JsonEscape(handle->schema_id)
+           << "\",\"offset\":" << offset << ",\"candidates\":[";
+    bool has_more = false;
+    RimeCandidateListIterator iterator{};
+    if (Api()->candidate_list_from_index(handle->session, &iterator, static_cast<int>(offset))) {
+      auto end = [](RimeCandidateListIterator* value) { Api()->candidate_list_end(value); };
+      std::unique_ptr<RimeCandidateListIterator, decltype(end)> guard(&iterator, end);
+      size_t count = 0;
+      while (count < limit && Api()->candidate_list_next(&iterator)) {
+        if (count++ > 0) output << ',';
+        const auto& candidate = iterator.candidate;
+        output << "{\"text\":\"" << JsonEscape(candidate.text) << "\"";
+        if (candidate.comment != nullptr && candidate.comment[0] != '\0') {
+          output << ",\"annotation\":\"" << JsonEscape(candidate.comment) << "\"";
+        }
+        output << ",\"globalIndex\":" << iterator.index
+               << ",\"pageIndex\":" << iterator.index << ",\"deletable\":false}";
+      }
+      has_more = count == limit && Api()->candidate_list_next(&iterator);
+    }
+    output << "],\"hasMore\":" << (has_more ? "true" : "false") << '}';
+    *out_json = CopyOut(output.str());
+    return *out_json == nullptr ? kSerializeFailure : kOk;
   });
 }
 

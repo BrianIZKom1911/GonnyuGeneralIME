@@ -380,7 +380,7 @@ fn build_snapshot(
     }
 }
 
-fn serialize_snapshot(snapshot: &EngineSnapshot, out_json: *mut *mut c_char) -> c_int {
+fn serialize_snapshot(snapshot: &impl Serialize, out_json: *mut *mut c_char) -> c_int {
     if out_json.is_null() {
         return invalid_argument("invalid output json pointer");
     }
@@ -1058,6 +1058,53 @@ pub unsafe extern "C" fn gannyu_engine_snapshot(
     }
     let snapshot = build_snapshot(&*handle, false, None);
     serialize_snapshot(&snapshot, out_json)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_candidates(
+    handle: *mut GannyuPipelineHandle,
+    offset: usize,
+    limit: usize,
+    out_json: *mut *mut c_char,
+) -> c_int {
+    clear_last_error();
+    if out_json.is_null() {
+        return invalid_argument("candidate output is null");
+    }
+    *out_json = ptr::null_mut();
+    if handle.is_null() || limit == 0 || limit > 100 || offset > i32::MAX as usize - limit {
+        return invalid_argument("invalid candidate range");
+    }
+    let handle = &*handle;
+    let pipeline = handle.pipeline.lock();
+    let session = handle.session.lock();
+    let all_candidates = pipeline.retrieve(&session.raw_input);
+    let candidates = all_candidates
+        .iter()
+        .enumerate()
+        .skip(offset)
+        .take(limit)
+        .map(|(index, candidate)| EngineCandidateSnapshot {
+            text: candidate.text.clone(),
+            annotation: candidate.annotation.clone(),
+            reading: candidate.reading.clone(),
+            mandarin_reading: candidate.mandarin_reading.clone(),
+            global_index: index,
+            page_index: index,
+            deletable: candidate
+                .annotation
+                .as_deref()
+                .is_some_and(|annotation| annotation.contains("[用户]")),
+        })
+        .collect::<Vec<_>>();
+    let batch = serde_json::json!({
+        "rawInput": session.raw_input,
+        "schemaId": handle.region_id,
+        "offset": offset,
+        "candidates": candidates,
+        "hasMore": all_candidates.len() > offset + limit,
+    });
+    serialize_snapshot(&batch, out_json)
 }
 
 #[no_mangle]

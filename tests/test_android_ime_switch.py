@@ -124,7 +124,9 @@ def test_android_candidates_keep_full_metadata_with_independent_widths() -> None
     assert "candidateExpansionContainer" in layout
     assert "height = (parentHeight - topMargin).takeIf { it > 0 }" in source
     assert "nativeChangeCandidatePage" in source
-    assert "private fun loadMoreCandidates()" not in source
+    assert "private fun loadMoreCandidates()" in source
+    assert "nativeCandidates(handle, offset, 100)" in source
+    assert "candidateNextOffset = offset + candidates.size" in source
     assert "textSize = 18f" in source
     assert "setTypeface(null, Typeface.NORMAL)" in source
     assert "if (candidateExpanded) collapseCandidateExpansion()" in source

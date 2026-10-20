@@ -55,7 +55,6 @@ Java_io_gannyu_input_GannyuInputMethodService_nativeCreate(
     if (resource_root_c != NULL) (*env)->ReleaseStringUTFChars(env, resource_root, resource_root_c);
     if (region_c != NULL) (*env)->ReleaseStringUTFChars(env, region, region_c);
     if (user_data_dir_c != NULL) (*env)->ReleaseStringUTFChars(env, user_data_dir, user_data_dir_c);
-    if (status == 0) status = gannyu_engine_set_candidate_limit(handle, 60);
     return status == 0 ? (jlong)(intptr_t)handle : 0;
 }
 
@@ -136,6 +135,16 @@ Java_io_gannyu_input_GannyuInputMethodService_nativeDestroy(JNIEnv* env, jobject
 JNIEXPORT jlong JNICALL
 Java_io_gannyu_input_NativePipelineBridge_nativeCreate(JNIEnv* env, jobject thiz, jstring resource_root, jstring region, jstring user_data_dir) {
     return Java_io_gannyu_input_GannyuInputMethodService_nativeCreate(env, thiz, resource_root, region, user_data_dir);
+}
+
+JNIEXPORT jstring JNICALL
+Java_io_gannyu_input_NativePipelineBridge_nativeCandidates(
+    JNIEnv* env, jobject thiz, jlong handle, jint offset, jint limit) {
+    (void)thiz;
+    if (offset < 0 || limit <= 0) return NULL;
+    char* out = NULL;
+    return gannyu_engine_candidates((GannyuPipelineHandle*)(intptr_t)handle,
+                                    (size_t)offset, (size_t)limit, &out) == 0 ? copy_out_string(env, out) : NULL;
 }
 
 JNIEXPORT jstring JNICALL
