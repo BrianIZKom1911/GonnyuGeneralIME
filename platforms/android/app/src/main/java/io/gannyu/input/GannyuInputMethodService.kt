@@ -95,6 +95,9 @@ class GannyuInputMethodService : InputMethodService() {
     private val candidateLoadExecutor = Executors.newSingleThreadExecutor()
     private val candidateLoadHandler = Handler(Looper.getMainLooper())
     private var keyboardPage = KeyboardPage.LETTERS
+    private var editorKeyboardOverride = false
+    private var savedKeyboardPage = KeyboardPage.LETTERS
+    private var savedEnglishMode = false
     private var emojiPageIndex = 0
     private var englishMode = false
     private var lastRenderedKeyboardWidth = 0
@@ -400,6 +403,8 @@ class GannyuInputMethodService : InputMethodService() {
 
     override fun onStartInput(attribute: android.view.inputmethod.EditorInfo?, restarting: Boolean) {
         super.onStartInput(attribute, restarting)
+        restoreEditorKeyboardState()
+        applyEditorKeyboardState(attribute)
         englishShift = false
         editorSelectionCollapsed = attribute?.let {
             if (it.initialSelStart >= 0 && it.initialSelEnd >= 0) it.initialSelStart == it.initialSelEnd else null
@@ -421,6 +426,7 @@ class GannyuInputMethodService : InputMethodService() {
         hideKeyPreview()
         englishShift = false
         editorSelectionCollapsed = null
+        restoreEditorKeyboardState()
         resetState(clearAccumulated = true)
         super.onFinishInput()
     }
@@ -429,6 +435,7 @@ class GannyuInputMethodService : InputMethodService() {
         stopBackspaceRepeat()
         englishShift = false
         hideKeyPreview()
+        restoreEditorKeyboardState()
         resetState(clearAccumulated = true)
         super.onFinishInputView(finishingInput)
     }
@@ -456,6 +463,33 @@ class GannyuInputMethodService : InputMethodService() {
     override fun onEvaluateFullscreenMode(): Boolean = false
 
     private fun desiredRegionId(): String? = selectedRegionId(this)
+
+    private fun restoreEditorKeyboardState() {
+        if (!editorKeyboardOverride) return
+        keyboardPage = savedKeyboardPage
+        englishMode = savedEnglishMode
+        editorKeyboardOverride = false
+    }
+
+    private fun applyEditorKeyboardState(info: EditorInfo?) {
+        val inputType = info?.inputType ?: return
+        val inputClass = inputType and InputType.TYPE_MASK_CLASS
+        val variation = inputType and InputType.TYPE_MASK_VARIATION
+        val numeric = inputClass == InputType.TYPE_CLASS_NUMBER || inputClass == InputType.TYPE_CLASS_PHONE
+        val asciiText = inputClass == InputType.TYPE_CLASS_TEXT && variation in setOf(
+            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_URI,
+            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+        )
+        if (!numeric && !asciiText) return
+        savedKeyboardPage = keyboardPage
+        savedEnglishMode = englishMode
+        editorKeyboardOverride = true
+        keyboardPage = if (numeric) KeyboardPage.NUMBERS else KeyboardPage.LETTERS
+        if (asciiText) englishMode = true
+    }
 
     private fun loadSelectedPipelineAsync() {
         val generation = ++pipelineLoadGeneration
