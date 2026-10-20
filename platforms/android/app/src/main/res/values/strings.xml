@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GonnyuGeneralIME</string>
+    <string name="setup_language_title">赣语通用输入法 | 赣拼</string>
     <string name="setup_title">GonnyuGeneralIME</string>
     <string name="setup_summary">支持赣语拼音与普通话拼音混合输入。</string>
     <string name="resource_failed_region">%1$s 地区资源预加载失败，请重试。</string>
@@ -30,10 +31,10 @@
     <string name="user_data_clear_success">%1已清空。</string>
     <string name="user_data_clear_failed">清空失败，请重试。</string>
     <string name="system_operations_label">完成以下设置</string>
-    <string name="open_ime_settings">1. 启用 Gonnyu 输入法</string>
-    <string name="open_ime_picker">2. 切换至 Gonnyu</string>
-    <string name="enable_ime_title">启用 Gonnyu 输入法</string>
-    <string name="enable_ime_message">接下来会打开系统输入法设置。请找到 Gonnyu 并启用，然后返回此 App 完成下一步。</string>
+    <string name="open_ime_settings">1. 启用赣语输入法</string>
+    <string name="open_ime_picker">2. 切换至赣语</string>
+    <string name="enable_ime_title">启用赣语输入法</string>
+    <string name="enable_ime_message">接下来会打开系统输入法设置。请找到赣语输入法并启用，然后返回此 App 完成下一步。</string>
     <string name="go_to_settings">前往设置</string>
     <string name="open_tutorial">使用教程</string>
     <string name="preedit_hint">赣拼 / 拼音</string>

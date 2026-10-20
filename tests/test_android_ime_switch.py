@@ -163,6 +163,9 @@ def test_android_setup_gates_picker_until_ime_is_enabled() -> None:
     layout = (ROOT / "platforms/android/app/src/main/res/layout/activity_setup.xml").read_text(
         encoding="utf-8"
     )
+    strings = (ROOT / "platforms/android/app/src/main/res/values/strings.xml").read_text(
+        encoding="utf-8"
+    )
 
     assert "showEnableImeInstructions" in setup
     assert "enabledInputMethodList" in setup
@@ -170,3 +173,10 @@ def test_android_setup_gates_picker_until_ime_is_enabled() -> None:
     assert "R.id.imeSetupStatus" not in setup
     assert "statusView.visibility = View.GONE" in setup
     assert layout.index("@+id/setupCard") < layout.index("@+id/regionCard")
+    assert layout.index("@+id/setupLanguageTitle") < layout.index("@+id/setupTitle")
+    assert layout.count('android:textSize="24sp"') >= 2
+    assert 'name="setup_language_title">赣语通用输入法 | 赣拼<' in strings
+    for name in ("open_ime_settings", "open_ime_picker", "enable_ime_title", "enable_ime_message"):
+        value = strings.split(f'name="{name}">', 1)[1].split("</string>", 1)[0]
+        assert "赣语" in value
+        assert "Gonnyu" not in value
