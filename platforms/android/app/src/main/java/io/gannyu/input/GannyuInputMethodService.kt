@@ -6,11 +6,14 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.graphics.Typeface
+import android.text.InputType
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.FrameLayout
@@ -744,8 +747,25 @@ class GannyuInputMethodService : InputMethodService() {
     private fun handleEnter() {
         if (lastSnapshot.rawInput.isNotEmpty()) {
             applyEngineSnapshot(processEngineEnter())
-        } else {
-            currentInputConnection?.commitText("\n", 1)
+            return
+        }
+        val connection = currentInputConnection ?: return
+        val info = currentInputEditorInfo
+        if (info == null ||
+            info.inputType and InputType.TYPE_MASK_CLASS == InputType.TYPE_NULL ||
+            info.imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION != 0
+        ) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+            return
+        }
+        if (!info.actionLabel.isNullOrEmpty() && info.actionId != EditorInfo.IME_ACTION_UNSPECIFIED) {
+            connection.performEditorAction(info.actionId)
+            return
+        }
+        when (val action = info.imeOptions and EditorInfo.IME_MASK_ACTION) {
+            EditorInfo.IME_ACTION_UNSPECIFIED,
+            EditorInfo.IME_ACTION_NONE -> sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+            else -> connection.performEditorAction(action)
         }
     }
 
