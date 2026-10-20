@@ -72,8 +72,9 @@ class GannyuInputMethodService : InputMethodService() {
             get() = "$nameZh（$id）"
     }
 
-    private var pipelineHandle: Long = 0
-    private var pipelineReady: Boolean = false
+    @Volatile private var pipelineHandle: Long = 0
+    @Volatile private var pipelineReady: Boolean = false
+    @Volatile private var pipelineLoadGeneration = 0L
     private lateinit var cacheTag: TextView
     private lateinit var candidateScroll: HorizontalScrollView
     private lateinit var candidateBar: LinearLayout
@@ -130,6 +131,7 @@ class GannyuInputMethodService : InputMethodService() {
         @Volatile private var staticHandle: Long = 0
         @Volatile private var staticRegionId: String? = null
         @Volatile private var preloadedRegionId: String? = null
+        private var preloadGeneration = 0L
         private val nativeBridge = NativePipelineBridge()
 
         @JvmStatic
@@ -210,39 +212,51 @@ class GannyuInputMethodService : InputMethodService() {
             onComplete: ((Boolean, String?) -> Unit)? = null,
         ) {
             val desiredRegion = normalizeRegionId(regionId)
+            val generation = synchronized(preloadLock) { ++preloadGeneration }
             Thread {
                 try {
                     val handle = nativeCreateStatic(context, desiredRegion)
                     val errorDetail = if (handle == 0L) nativeLastErrorStatic() else null
                     Log.i(TAG, "preload handle=" + handle)
                     if (handle != 0L) {
-                        synchronized(preloadLock) {
-                            if (preloadedHandle != 0L) {
-                                destroyHandle(preloadedHandle)
+                        val accepted = synchronized(preloadLock) {
+                            if (generation != preloadGeneration) {
+                                preloadLock.notifyAll()
+                                false
+                            } else {
+                                val previous = preloadedHandle
+                                preloadedHandle = handle
+                                preloadedRegionId = desiredRegion
+                                if (previous != 0L) destroyHandle(previous)
+                                preloadLock.notifyAll()
+                                true
                             }
-                            preloadedHandle = handle
-                            preloadedRegionId = desiredRegion
-                            preloadLock.notifyAll()
+                        }
+                        if (!accepted) {
+                            destroyHandle(handle)
+                            return@Thread
                         }
                         onComplete?.invoke(true, null)
                         return@Thread
                     }
+                    synchronized(preloadLock) { preloadLock.notifyAll() }
                     onComplete?.invoke(false, errorDetail.orEmpty().ifBlank { "native pipeline creation returned no detail" })
                 } catch (e: Exception) {
                     Log.e(TAG, "preload failed", e)
+                    synchronized(preloadLock) { preloadLock.notifyAll() }
                     onComplete?.invoke(false, e.stackTraceToString())
                 }
             }.start()
         }
 
         @JvmStatic
-        fun currentStaticRegionId(): String? = staticRegionId
+        fun currentStaticRegionId(): String? = staticRegionId.takeIf { staticHandle != 0L }
 
         @JvmStatic
         fun isRegionPrepared(regionId: String?): Boolean {
             val desired = normalizeRegionId(regionId)
-            return desired == normalizeRegionId(staticRegionId) ||
-                desired == normalizeRegionId(preloadedRegionId)
+            return (staticHandle != 0L && desired == normalizeRegionId(staticRegionId)) ||
+                (preloadedHandle != 0L && desired == normalizeRegionId(preloadedRegionId))
         }
 
         private fun normalizeRegionId(regionId: String?): String? =
@@ -325,6 +339,8 @@ class GannyuInputMethodService : InputMethodService() {
 
     override fun onDestroy() {
         stopBackspaceRepeat()
+        pipelineLoadGeneration += 1
+        synchronized(preloadLock) { preloadLock.notifyAll() }
         candidateLoadGeneration += 1
         candidateLoadExecutor.shutdownNow()
         pipelineHandle = 0
@@ -442,10 +458,15 @@ class GannyuInputMethodService : InputMethodService() {
     private fun desiredRegionId(): String? = selectedRegionId(this)
 
     private fun loadSelectedPipelineAsync() {
+        val generation = ++pipelineLoadGeneration
+        pipelineHandle = 0
+        pipelineReady = false
+        synchronized(preloadLock) { preloadLock.notifyAll() }
         Thread {
             try {
                 val desired = desiredRegionId()
                 synchronized(preloadLock) {
+                    if (generation != pipelineLoadGeneration || desired != desiredRegionId()) return@Thread
                     if (staticHandle != 0L && staticRegionId == desired) {
                         pipelineHandle = staticHandle
                         pipelineReady = true
@@ -454,9 +475,10 @@ class GannyuInputMethodService : InputMethodService() {
                         return@Thread
                     }
                     if (staticHandle != 0L && staticRegionId != desired) {
-                        destroyHandle(staticHandle)
+                        val previous = staticHandle
                         staticHandle = 0L
                         staticRegionId = null
+                        destroyHandle(previous)
                     }
                     if (preloadedHandle != 0L && preloadedRegionId == desired) {
                         pipelineHandle = preloadedHandle
@@ -470,21 +492,30 @@ class GannyuInputMethodService : InputMethodService() {
                         return@Thread
                     }
                     if (preloadedHandle != 0L && preloadedRegionId != desired) {
-                        destroyHandle(preloadedHandle)
+                        val previous = preloadedHandle
                         preloadedHandle = 0L
                         preloadedRegionId = null
+                        destroyHandle(previous)
                     }
                 }
                 Log.i(TAG, "Delegating to preload for region=${desired ?: "(default)"}")
                 preloadSelectedRegionAsync(this, desired)
                 synchronized(preloadLock) {
-                    (preloadLock as Object).wait(20_000)
-                    if (preloadedHandle != 0L) {
+                    val deadline = android.os.SystemClock.uptimeMillis() + 20_000
+                    while (generation == pipelineLoadGeneration && desired == desiredRegionId() &&
+                        (preloadedHandle == 0L || preloadedRegionId != desired)
+                    ) {
+                        val remaining = deadline - android.os.SystemClock.uptimeMillis()
+                        if (remaining <= 0) break
+                        (preloadLock as Object).wait(remaining)
+                    }
+                    if (generation != pipelineLoadGeneration || desired != desiredRegionId()) return@Thread
+                    if (preloadedHandle != 0L && preloadedRegionId == desired) {
                         pipelineHandle = preloadedHandle
                         preloadedHandle = 0L
+                        preloadedRegionId = null
                         staticHandle = pipelineHandle
                         staticRegionId = desired
-                        preloadedRegionId = null
                         pipelineReady = true
                         Log.i(TAG, "Pipeline loaded via preload for region=${desired ?: "(default)"}")
                         postUpdateCandidates()
@@ -495,6 +526,10 @@ class GannyuInputMethodService : InputMethodService() {
                 return@Thread
             } catch (e: Exception) {
                 Log.e(TAG, "Pipeline init failed", e)
+                if (generation == pipelineLoadGeneration) {
+                    pipelineHandle = 0
+                    pipelineReady = false
+                }
             }
         }.start()
     }
