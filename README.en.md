@@ -70,6 +70,7 @@ Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fu
       - [Goungon (Goungon)](#goungon-goungon)
   - [References](#references)
     - [Literature](#literature)
+    - [Reference implementations](#reference-implementations)
     - [Dependency declarations](#dependency-declarations)
     - [Licensing and rights reservation](#licensing-and-rights-reservation)
     - [Acknowledgements](#acknowledgements)
@@ -641,14 +642,18 @@ The project compiles its regional dictionaries from participants’ everyday lan
 15. Xiao Jiugen. *A Study of the Badu Dialect* (八都方言研究) [D]. Master's thesis, Guangxi University, 2001.
 16. Mei Zhixing. *A Study of Variation in the Central Rounded Vowel [ɵ] in the Goungon Dialect* (高安方言央圆唇元音[ɵ]的变异研究) [Dissertation]. Guangdong University of Foreign Studies, 2020.
 
+### Reference implementations
+
+Mobile keyboard interactions reference the public implementations of [Hamster (open-source version)](https://github.com/imfuxiao/Hamster), [Trime](https://github.com/osfans/trime), and [HeliBoard](https://github.com/HeliBorg/HeliBoard).
+
+The open-source version of Hamster is by xiao.fu (imfuxiao), licensed under the [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt). Copyright (c) 2025 xiao.fu.
+
 ### Dependency declarations
 
 The mobile input engine directly uses the following open-source projects. Exact revisions are pinned by the build lock; distributions retain the corresponding licences and copyright notices.
 
 1. RIME Developers. **librime** `1.17.0`, BSD 3-Clause License. <https://github.com/rime/librime>
 2. librime-lua Developers. **librime-lua** commit `ad1e4a6c98abf634dd34242a747f9b1d5d069fbe`, BSD 3-Clause License. <https://github.com/hchunhui/librime-lua>
-
-The project references the [open-source version of Hamster](https://github.com/imfuxiao/Hamster) by xiao.fu (imfuxiao), licensed under the [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt). Copyright (c) 2025 xiao.fu.
 
 ### Licensing and rights reservation
 

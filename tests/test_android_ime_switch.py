@@ -36,7 +36,7 @@ def test_android_ime_clears_window_state_without_releasing_its_pipeline() -> Non
 def test_android_ime_switch_key_is_leftmost_on_all_pages() -> None:
     source = SERVICE.read_text(encoding="utf-8")
     bottom = source.split("private fun renderBottomRow", 1)[1].split("private fun spacer", 1)[0]
-    assert bottom.index("listOf(IME_SWITCH_KEY)") < bottom.index("listOf(mode, nav, \"空格\"")
+    assert bottom.index("listOf(IME_SWITCH_KEY)") < bottom.index("+ pageKeys")
     assert "KeyboardPage.NUMBERS" in source
     assert "KeyboardPage.SYMBOLS" in source
     assert "KeyboardPage.SYMBOLS_MORE" in source
@@ -88,7 +88,7 @@ def test_android_keyboard_uses_a_system_adaptive_neutral_palette_on_all_pages() 
 def test_android_bottom_row_places_comma_and_period_after_space() -> None:
     source = SERVICE.read_text(encoding="utf-8")
     bottom = source.split("private fun renderBottomRow", 1)[1].split("private fun spacer", 1)[0]
-    assert 'listOf(mode, nav, "空格", if (englishMode) "," else "，", if (englishMode) "." else "。", "↵")' in bottom
+    assert 'listOf(mode, nav, "表情", "空格", if (englishMode) "," else "，", if (englishMode) "." else "。", "↵")' in bottom
 
 
 def test_android_numbers_page_uses_fullwidth_symbols_except_comma_period_and_at() -> None:

@@ -70,6 +70,7 @@
       - [高安（Goungon）](#高安goungon)
   - [参考](#参考)
     - [文献](#文献)
+    - [参考实现](#参考实现)
     - [依赖声明](#依赖声明)
     - [许可与权利保留](#许可与权利保留)
     - [致谢](#致谢)
@@ -643,14 +644,18 @@ Windows 小狼毫将压缩包内容复制到 `%APPDATA%\Rime`，在输入法菜�
 15. 萧九根. 《八都方言研究》[D]. 广西大学硕士学位论文，2001.
 16. 梅之星. 《高安方言央圆唇元音[ɵ]的变异研究》[D]. 广东外语外贸大学，2020.
 
+### 参考实现
+
+移动端键盘交互参考[仓输入法（Hamster）开源版本](https://github.com/imfuxiao/Hamster)、[同文输入法（Trime）](https://github.com/osfans/trime)与 [HeliBoard](https://github.com/HeliBorg/HeliBoard) 的公开实现。
+
+仓输入法开源版本作者为 xiao.fu（imfuxiao），采用 [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt)，版权声明为 Copyright (c) 2025 xiao.fu。
+
 ### 依赖声明
 
 移动端输入引擎直接使用以下开源项目。构建系统按锁文件固定具体版本；发布物保留相应许可证和版权声明。
 
 1. RIME Developers. **librime**，版本 `1.17.0`，BSD 3-Clause License。<https://github.com/rime/librime>
 2. librime-lua Developers. **librime-lua**，固定提交 `ad1e4a6c98abf634dd34242a747f9b1d5d069fbe`，BSD 3-Clause License。<https://github.com/hchunhui/librime-lua>
-
-本项目参考了 xiao.fu（imfuxiao）的[仓输入法（Hamster）开源版本](https://github.com/imfuxiao/Hamster)。该开源版本采用 [MIT License](https://github.com/imfuxiao/Hamster/blob/main/LICENSE.txt)，版权声明为 Copyright (c) 2025 xiao.fu。
 
 ### 许可与权利保留
 

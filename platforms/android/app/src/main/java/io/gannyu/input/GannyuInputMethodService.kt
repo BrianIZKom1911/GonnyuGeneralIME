@@ -40,7 +40,7 @@ private class NativePipelineBridge {
 }
 
 class GannyuInputMethodService : InputMethodService() {
-    private enum class KeyboardPage { LETTERS, NUMBERS, SYMBOLS, SYMBOLS_MORE }
+    private enum class KeyboardPage { LETTERS, NUMBERS, SYMBOLS, SYMBOLS_MORE, EMOJI }
 
     private data class RankedCandidate(
         val text: String,
@@ -94,6 +94,7 @@ class GannyuInputMethodService : InputMethodService() {
     private val candidateLoadExecutor = Executors.newSingleThreadExecutor()
     private val candidateLoadHandler = Handler(Looper.getMainLooper())
     private var keyboardPage = KeyboardPage.LETTERS
+    private var emojiPageIndex = 0
     private var englishMode = false
     private var lastRenderedKeyboardWidth = 0
     // One-shot state only: it is never persisted and resets after one letter.
@@ -294,6 +295,16 @@ class GannyuInputMethodService : InputMethodService() {
 
         private const val FUNCTION_KEY_WIDTH_MULTIPLIER = 1.12f
         private const val SEGMENT_KEY_WIDTH_MULTIPLIER = 1.5f
+        private val EMOJI_PAGES = listOf(
+            "😀 😃 😄 😁 😆 😅 😂 😊 😇 🙂 🙃 😉 😌 😍 😘 😗 😙 😚 😋 😛 😝 😜 🤗 🤔 😎 😏 😒 🙄 😬 😴".split(" "),
+            "😔 😞 😟 😕 🙁 😣 😖 😫 😩 😢 😭 😤 😠 😡 😳 😱 😨 😰 😥 😓 😶 😐 😑 😯 😦 😧 😮 😲 😵 😷".split(" "),
+            "👍 👎 👏 🙌 👐 🙏 👋 👌 👊 ✊ 💪 👈 👉 👆 👇 👀 👂 👃 👄 👶 👧 👦 👩 👨 👵 👴 👮 👷 👸 👼".split(" "),
+            "🐶 🐱 🐭 🐹 🐰 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🐤 🐺 🐗 🐴 🦄 🐝 🐛 🐌 🐞 🐜 🐢 🐍 🐙".split(" "),
+            "🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🍒 🍑 🍍 🥝 🍅 🍆 🌽 🍠 🍞 🧀 🍖 🍗 🍔 🍟 🍕 🍳 🍜 🍚 🍣 🍦 🍰 🍺".split(" "),
+            "🚗 🚕 🚌 🚎 🚓 🚑 🚒 🚚 🚲 🚂 🚆 🚇 🚊 🚉 🚀 🚁 🚢 🏠 🏡 🏢 🏥 🏫 🏪 🏨 🏭 🏰 🗼 🗽 🌋 🗻".split(" "),
+            "🎉 🎊 🎁 🎈 🎂 🎄 🎃 🎆 🎇 💐 🌸 🌹 🌻 🌷 🌱 🌲 🌳 🌴 🌵 🍀 🍁 🍂 🍃 🌈 🌙 🌞 🌍 🌎 🌏 🔥".split(" "),
+            "💖 💕 💞 💓 💗 💘 💝 💔 💜 💛 💚 💙 💯 💢 💥 💫 💦 💤 💬 💭 🔔 🎵 🎶 🎤 🎧 📷 📱 💻 🔑 💡".split(" "),
+        )
         private const val IME_SWITCH_KEY = "🌐"
         private const val BACKSPACE_INITIAL_DELAY_MS = 380L
         private const val BACKSPACE_REPEAT_INTERVAL_MS = 55L
@@ -503,6 +514,9 @@ class GannyuInputMethodService : InputMethodService() {
             KeyboardPage.NUMBERS -> renderAuxiliaryPage(NUM_ROW_1, NUM_ROW_2, NUM_ROW_3, keyWidth, gap)
             KeyboardPage.SYMBOLS -> renderAuxiliaryPage(SYM_ROW_1, SYM_ROW_2, SYM_ROW_3, keyWidth, gap)
             KeyboardPage.SYMBOLS_MORE -> renderAuxiliaryPage(MORE_ROW_1, MORE_ROW_2, MORE_ROW_3, keyWidth, gap)
+            KeyboardPage.EMOJI -> EMOJI_PAGES[emojiPageIndex].chunked(10).forEach { row ->
+                keyboardRows.addView(keyRow(row.map(::KeySpec), keyWidth, gap, bottomGap = gap))
+            }
         }
         renderBottomRow(keyWidth, gap)
     }
@@ -535,22 +549,30 @@ class GannyuInputMethodService : InputMethodService() {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46))
         }
-        val showImeSwitcher = shouldShowImeSwitchKey()
-        val mode = if (keyboardPage == KeyboardPage.LETTERS) if (englishMode) "中" else "英"
-            else if (keyboardPage == KeyboardPage.NUMBERS) "符号" else "123"
-        val nav = if (keyboardPage == KeyboardPage.LETTERS) "123" else "ABC"
-        val keys = (if (showImeSwitcher) listOf(IME_SWITCH_KEY) else emptyList()) +
-            listOf(mode, nav, "空格", if (englishMode) "," else "，", if (englishMode) "." else "。", "↵")
+        val keys = bottomRowLabels(shouldShowImeSwitchKey())
         keys.forEachIndexed { index, label ->
             val width = when (label) {
                 "空格" -> 0
                 "中", "英", "123", "ABC", "符号", IME_SWITCH_KEY -> functionKeyWidth(label, keyWidth)
                 "↵" -> (keyWidth * 1.6f).toInt()
+                "赣拼" -> (keyWidth * 1.5f).toInt()
                 else -> keyWidth
             }
             r4.addView(keyBtn(KeySpec(label), width, if (index == keys.lastIndex) 0 else gap))
         }
         keyboardRows.addView(r4)
+    }
+
+    private fun bottomRowLabels(showImeSwitcher: Boolean): List<String> {
+        val mode = if (keyboardPage == KeyboardPage.LETTERS) if (englishMode) "中" else "英"
+            else if (keyboardPage == KeyboardPage.NUMBERS) "符号" else "123"
+        val nav = if (keyboardPage == KeyboardPage.LETTERS) "123" else "ABC"
+        val pageKeys = if (keyboardPage == KeyboardPage.EMOJI) {
+            listOf("赣拼", "上一页", "下一页", "空格", "⌫", "↵")
+        } else {
+            listOf(mode, nav, "表情", "空格", if (englishMode) "," else "，", if (englishMode) "." else "。", "↵")
+        }
+        return (if (showImeSwitcher) listOf(IME_SWITCH_KEY) else emptyList()) + pageKeys
     }
 
     private fun spacer(width: Int): View = View(this).apply {
@@ -595,13 +617,20 @@ class GannyuInputMethodService : InputMethodService() {
         text = when {
             key.label == IME_SWITCH_KEY -> ""
             key.label == "空格" -> ""
-            key.label == "↵" -> if (englishMode) "return" else "换行"
+            key.label == "↵" -> if (englishMode) "return" else "回车"
+            key.label == "表情" -> "☺"
+            key.label == "上一页" -> "◀"
+            key.label == "下一页" -> "▶"
             key.isLetter && englishMode && englishShift -> key.label.uppercase()
             else -> key.label
         }
         isAllCaps = false; textSize = if (key.isLetter) 23f else if (key.label.length > 2) 12f else 15f
         if (key.isLetter) setTypeface(Typeface.DEFAULT_BOLD)
         if (key.label == "空格") contentDescription = "空格"
+        if (key.label == "↵") contentDescription = text
+        if (key.label == "表情") contentDescription = "表情"
+        if (key.label in setOf("上一页", "下一页")) contentDescription = "${key.label}，第${emojiPageIndex + 1}页，共${EMOJI_PAGES.size}页"
+        if (keyboardPage == KeyboardPage.EMOJI && key.label !in ACTION_KEYS && key.label != "空格") textSize = 23f
         layoutParams = LinearLayout.LayoutParams(width, dp(46), if (width == 0) 1f else 0f).apply {
             marginEnd = gap
         }
@@ -700,6 +729,23 @@ class GannyuInputMethodService : InputMethodService() {
             key.label == "更多"                            -> { keyboardPage = KeyboardPage.SYMBOLS_MORE; renderKeyboard() }
             key.label == "常用"                            -> { keyboardPage = KeyboardPage.SYMBOLS; renderKeyboard() }
             key.label == "ABC"                           -> { keyboardPage = KeyboardPage.LETTERS; renderKeyboard() }
+            key.label == "表情" -> {
+                resetState(clearAccumulated = true)
+                emojiPageIndex = 0
+                keyboardPage = KeyboardPage.EMOJI
+                renderKeyboard()
+            }
+            key.label == "赣拼" -> {
+                englishMode = false
+                englishShift = false
+                keyboardPage = KeyboardPage.LETTERS
+                renderKeyboard()
+            }
+            key.label == "上一页" || key.label == "下一页" -> {
+                val direction = if (key.label == "上一页") -1 else 1
+                emojiPageIndex = (emojiPageIndex + direction + EMOJI_PAGES.size) % EMOJI_PAGES.size
+                renderKeyboard()
+            }
             key.isLetter                                 -> if (englishMode) {
                 currentInputConnection?.commitText(if (englishShift) key.label.uppercase() else key.label, 1)
                 if (englishShift) { englishShift = false; renderKeyboard() }
@@ -713,7 +759,7 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private val PUNCT_AFTER_COMPOSE = setOf("，", "。", "？", "！", "：", "；", "、", ",", ".")
-    private val ACTION_KEYS = setOf("分词", "⇧", "⌫", "中", "英", "123", "ABC", "符号", "更多", "常用", "↵", IME_SWITCH_KEY)
+    private val ACTION_KEYS = setOf("分词", "⇧", "⌫", "中", "英", "123", "ABC", "符号", "更多", "常用", "↵", "表情", "赣拼", "上一页", "下一页", IME_SWITCH_KEY)
     private val FUNCTION_WIDTH_KEYS = setOf("分词", "⇧", "中", "英", "123", "ABC", "符号", "更多", "常用", IME_SWITCH_KEY)
 
     private fun shouldShowImeSwitchKey(): Boolean {
