@@ -107,7 +107,7 @@ internal class KeyboardRowLayout @JvmOverloads constructor(
             return
         }
         pointerKeys[pointerId] = target
-        pointerDownTimes[pointerId] = event.downTime
+        pointerDownTimes[pointerId] = if (event.actionMasked == MotionEvent.ACTION_POINTER_DOWN) event.eventTime else event.downTime
     }
 
     private fun nearestKey(x: Int): Button? {
