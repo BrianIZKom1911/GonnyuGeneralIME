@@ -652,7 +652,7 @@ The project references the [open-source version of Hamster](https://github.com/i
 
 ### Licensing and rights reservation
 
-The main project code is licensed under the GNU GPLv3; see `LICENSE` for details.
+The main project code and resource is licensed under the GNU GPLv3; see `LICENSE` for details.
 The name and branding “赣语通用输入法” (abbreviated as “赣语输入法”), together with the image at
 `resources/icon.png`, are not covered by the GPLv3. All related copyrights, trademark rights,
 and other rights are reserved by their respective rights holder. Use of the name or image in
