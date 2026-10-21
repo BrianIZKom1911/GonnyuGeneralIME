@@ -2051,7 +2051,7 @@
             "o",
             "eo"
           ],
-          "intent": "独立音节 o 单向兼容 eo",
+          "intent": "完整音节 o 单向匹配 eo；声母后的 -o 不套用",
           "origin": {
             "kind": "explicit"
           }
@@ -2210,7 +2210,11 @@
     },
     {
       "id": "plain_e_exclusion",
-      "description": "ir→e 可继续参与其他兼容；由 ir 生成的 e 不能参与 e/ee→ê，直接 e 与 ee 输入仍可匹配 ê。",
+      "description": "ir→e 的结果保留字符来源位置，可继续参加其他兼容；e/ee→ê 遇到含 ir 来源的匹配片段时跳过该次转换。直接输入的 e/ee 可匹配 ê，同一字符串中其他位置的直接 e/ee 按原规则处理。转换条件由 e/ee→ê 表项的 conversion_condition 管理。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ],
       "rules": [
         "F046",
         "F047",
@@ -2231,7 +2235,7 @@
     },
     {
       "id": "standalone_o",
-      "description": "o 匹配 eo 的规则限定独立音节 o。",
+      "description": "完整音节 o 单向匹配 eo，输出停止接续；声母后的 -o 不套用，eo 不反向匹配 o。F067 管理方向和接续，执行器限定完整音节匹配。",
       "rules": [
         "F067"
       ],
@@ -2242,7 +2246,7 @@
     },
     {
       "id": "after_initial_yu",
-      "description": "u/v 兼容 yu 使用表内声母起首限制；u 替换位置的前缀须为登记声母。",
+      "description": "u/v 兼容 yu 使用各自表项的起首限制。u→yu 在任意位置匹配时，替换位置左侧的完整字符串还须等于该规则登记的一个起首；v→yu 按其表项的位置和起首限制执行。检查对象为当前中间拼写。",
       "rules": [
         "F016",
         "F017",
@@ -2256,7 +2260,7 @@
     },
     {
       "id": "no_duplicate_initial",
-      "description": "音节开头扩写遇到目标前缀时停止重复扩写。",
+      "description": "作用位置为开头、目标比来源长且当前拼写已以完整目标开头时，跳过该次扩写；当前拼写保留，其他规则继续执行。本判断防止同一开头重复扩写，不涉及韵尾替换。",
       "implementation": [
         "platforms/rime/fuzzy.py",
         "crates/core/src/syllable.rs"
@@ -2265,7 +2269,7 @@
     },
     {
       "id": "no_duplicate_ieu",
-      "description": "eu 兼容 ieu 时，已以 ieu 结尾的形式不重复插入 i。",
+      "description": "F068 在登记的 g/k/ng 起首范围内将末尾 eu 匹配为 ieu；当前拼写已以 ieu 结尾时跳过该次转换，防止重复插入 i。其他规则和 F068 的可接续设置继续生效。",
       "rules": [
         "F068"
       ],
@@ -2276,7 +2280,7 @@
     },
     {
       "id": "no_double_entering",
-      "description": "已有 p/t/k 尾的输入不再添加第二个入声尾。",
+      "description": "省尾输入通过空来源到 p/t/k 的表项补尾。当前拼写已以任一 p/t/k 结尾时跳过补尾，避免叠加第二个入声尾；已有入声尾之间的互换按独立表项执行。",
       "implementation": [
         "platforms/rime/fuzzy.py",
         "crates/core/src/syllable.rs"
@@ -2285,8 +2289,17 @@
     },
     {
       "id": "regional_entering_codas",
-      "description": "入声省尾和互兼容采用现有地区启用配置。",
+      "description": "入声省尾、补尾和尾部互换采用当前地区启用的 p/t/k 配置及对应表项；地区未启用的尾部不由地区生成规则补入。管理地区配置时同步维护对应表项。",
       "configuration": "resources/regions/*/region.toml 与既有地区配置解析",
+      "rules": []
+    },
+    {
+      "id": "final_u_to_yu_guard",
+      "description": "作用位置为结尾且替换 u 为 yu 时，u 前面已以 y 或 w 结尾便跳过该次转换。当前规则表的 u→yu 使用任意位置匹配，结尾分支保留，当前没有表项触发。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ],
       "rules": []
     }
   ],
@@ -2294,6 +2307,86 @@
     "name": "jqx_u_to_yu",
     "description": "地区转写配置与 IPA 对应独立审查；不作为新增模糊规则。"
   },
+  "execution_controls": [
+    {
+      "field": "region",
+      "description": "加载 common 与当前地区表项；其他地区表项不参与当前地区转换。"
+    },
+    {
+      "field": "category / applies",
+      "description": "category 用于规则分类。applies 按当前字符串的开头、结尾或任意位置作字面匹配，不自动识别完整声母或韵母；完整音节 o 的限制另由 standalone_o 执行。"
+    },
+    {
+      "field": "starts_with",
+      "description": "匹配前检查当前中间字符串是否以任一登记项开头；检查对象随转换变化。前缀匹配不等于完整声母匹配，u→yu 的左侧完整起首检查另由 after_initial_yu 执行。"
+    },
+    {
+      "field": "bidirectional",
+      "description": "单向表项提供输入到目标的转换，双向表项同时登记反向关系。Rime 与 Rust 的搜索方向组织存在差异，见 direction_passes。"
+    },
+    {
+      "field": "chainable",
+      "description": "控制本条规则生成的整个中间结果是否继续接受其他转换。false 的结果保留为匹配形式但停止展开；本条规则可接收前序可接续规则生成的输入。接续停止范围不限于本次替换的位置。"
+    },
+    {
+      "field": "priority_tier",
+      "description": "转换路径继承途中较低的优先档，顺序为 primary、secondary、fallback。相同最终拼写合并时取已保留路径中的较高档；路径能否保留受 state_deduplication 影响。Rime 输出将 primary 编译为 derive，其余两档编译为 fuzz。"
+    },
+    {
+      "field": "conversion_condition",
+      "description": "none 表示没有额外来源条件。not-derived-from-ir 适用于 e/ee→ê，按字符来源限制匹配片段；普通位置、起首和接续设置同时生效。"
+    }
+  ],
+  "implementation_notes": [
+    {
+      "id": "rule_order",
+      "description": "规则按 fuzzy_scheme.tsv 行顺序展开，中间结果按生成顺序处理。调整行顺序可能改变到达上限前保留的路径和形式。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "direction_passes",
+      "description": "Rime 常规展开可混用单向正向边及双向表项的两个方向，编译时另跑一遍双向表项的反向搜索。Rust 分别执行正向和反向，正向搜索中没有混入反向边；部分检索入口合并两遍结果，部分入口使用正向结果。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs",
+        "crates/core/src/retrieval/query.rs",
+        "crates/core/src/retrieval/segmentation.rs"
+      ]
+    },
+    {
+      "id": "normalization_limit",
+      "description": "每次展开最多保留 64 个不同中间拼写；达到上限后停止处理剩余队列。上限限制中间拼写数量，不是候选词展示数量；规则顺序和分支数量会影响保留结果。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "state_deduplication",
+      "description": "当前按拼写和字符来源位置去重，同状态先到的路径保留。去重键未包含可接续标记和优先档，后到的可接续路径或更高优先档路径可能被跳过；这是现有搜索边界，不是语言对应限制。",
+      "implementation": [
+        "platforms/rime/fuzzy.py",
+        "crates/core/src/syllable.rs"
+      ]
+    },
+    {
+      "id": "inverse_candidate_limit",
+      "description": "Rime 从词典规范音节反向枚举输入，枚举最多 64 个形式。枚举阶段未完整检查起首、可接续及字符来源条件，之后再用正反展开过滤；被后续过滤的形式也会占用枚举额度。中间形式可以不在词典中，最终目标来自词典。",
+      "implementation": [
+        "platforms/rime/fuzzy.py"
+      ]
+    },
+    {
+      "id": "dictionary_code_limit",
+      "description": "Rime 词条代码生成另有 64 种组合的限制，分别用于赣官混合输入和成对读音展开；超过上限时跳过该组组合展开，已有基础代码保留。该限制与模糊中间拼写上限分别计算。",
+      "implementation": [
+        "platforms/rime/build.py"
+      ]
+    }
+  ],
   "execution_dimensions": [
     "region",
     "category",
@@ -2301,7 +2394,8 @@
     "bidirectional",
     "chainable",
     "priority_tier",
-    "starts_with"
+    "starts_with",
+    "conversion_condition"
   ],
   "execution_order": "fuzzy_scheme.tsv 的现有行顺序"
 }
