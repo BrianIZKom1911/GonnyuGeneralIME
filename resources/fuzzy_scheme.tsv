@@ -93,7 +93,6 @@ common	rime	ieu	yêu	iɛu	夭	syllable-final	false	true	primary	ieu	输入 ieu �
 xyucuenn	rime	yuin	yuinn			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法	none
 common	rime	i	yi	i	一	syllable-final	false	true	primary	i	单写 i→yi	none
 xyucuenn	rime	uan	uann			syllable-final	false	false	primary		遂川鼻化韵可由单 n 韵尾输入匹配 nn 规范写法	none
-common	rime	uek	yuet			syllable-final	false	true	secondary	juek,quek	普通 e／ir→e 级联组合兼容	none
 xyucuenn	rime	en	ênn			syllable-final	false	false	primary		鼻化韵帽子 e 使用 ee 输入兼容	none
 common	onset	u	w	u	乌	syllable-initial	false	true	primary	ua,ue,uo,uê,uiê	零声母 u 系旧写兼容；ua→wa、uen→wen、uon→won，可接续匹配ê形式	none
 yikyan-henfeng	rime	yun	yung			syllable-final	false	true	primary			none
@@ -161,7 +160,6 @@ lancong	rime	fi	fui			syllable-final	false	false	primary	fi	南昌整音节 fi�
 common	rime	iuek	yuêk			syllable-final	false	true	primary	iuek	零声母 iuek 匹配 yuêk	none
 common	rime	im	yim			syllable-final	false	true	primary	im	零声母 im 匹配 yim	none
 common	rime	uien	wiên			syllable-final	false	true	primary	uien	零声母 uien 匹配 wiên	none
-common	rime	ue	yuet			syllable-final	false	true	fallback	jue,que	普通 e／ir→e 级联组合兼容	none
 xyucuenn	rime	un	unn			syllable-final	false	false	primary	b,p,m,f,v,d,t,n,l,g,k,h,j,q,x,r,z,c,s,ng,zh,ch,sh	声母后 un 匹配规范鼻化韵 unn	none
 common	rime	ienn	yênn			syllable-final	false	true	primary	ienn	零声母 ienn 匹配 yênn	none
 common	rime	ie	yê			syllable-final	false	true	primary	ie	零声母 ie 匹配 yê	none

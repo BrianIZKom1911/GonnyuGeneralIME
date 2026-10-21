@@ -1666,40 +1666,6 @@
           }
         },
         {
-          "id": "F055",
-          "match": [
-            "common",
-            "ue",
-            "yuet"
-          ],
-          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与省尾输入组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F017",
-              "entering.omit"
-            ]
-          }
-        },
-        {
-          "id": "F058",
-          "match": [
-            "common",
-            "uek",
-            "yuet"
-          ],
-          "intent": "普通 e 输入或 ir→e 级联、声母后 u/v 拼写与入声尾互兼容组合",
-          "origin": {
-            "kind": "composition",
-            "parents": [
-              "F046",
-              "F017",
-              "entering.mutual"
-            ]
-          }
-        },
-        {
           "id": "F061",
           "match": [
             "common",
@@ -2224,8 +2190,6 @@
         "F051",
         "F052",
         "F054",
-        "F055",
-        "F058",
         "F061",
         "F062",
         "F063",
