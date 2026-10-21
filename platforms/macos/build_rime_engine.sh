@@ -64,19 +64,7 @@ mkdir -p "$build_root"
 run_with_heartbeat() {
   local label="$1"
   shift
-  local pid
-
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] starting: $label"
-  "$@" &
-  pid=$!
-  while kill -0 "$pid" 2>/dev/null; do
-    sleep 60
-    if kill -0 "$pid" 2>/dev/null; then
-      echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] still running: $label (pid $pid)"
-    fi
-  done
-  wait "$pid"
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] completed: $label"
+  "$python_bin" "$script_dir/run_with_heartbeat.py" "$label" "$@"
 }
 
 build_dependency() {
