@@ -726,6 +726,18 @@
           "origin": {
             "kind": "explicit"
           }
+        },
+        {
+          "id": "F201",
+          "match": [
+            "yikyan-henfeng",
+            "ok",
+            "wok"
+          ],
+          "intent": "弋阳零声母 ok 单向输入匹配 wok；沿用零声母规则接续设置",
+          "origin": {
+            "kind": "explicit"
+          }
         }
       ]
     },
@@ -1358,6 +1370,18 @@
             "ui"
           ],
           "intent": "oi 输入兼容 ui",
+          "origin": {
+            "kind": "explicit"
+          }
+        },
+        {
+          "id": "F200",
+          "match": [
+            "yikyan-henfeng",
+            "uok",
+            "ok"
+          ],
+          "intent": "弋阳 uok 与 ok 双向兼容，可接收前序规则输出但不继续扩展",
           "origin": {
             "kind": "explicit"
           }
@@ -2179,12 +2203,9 @@
   },
   "constraints": [
     {
-      "id": "yuo_identity",
-      "description": "含 yuo 的形式只允许按地区入声配置补尾或互兼容，停止其他兼容扩展。",
-      "implementation": [
-        "platforms/rime/fuzzy.py",
-        "crates/core/src/syllable.rs"
-      ],
+      "id": "yuo_nasal_distinction",
+      "description": "音节末尾 yuo 与 yuon、yuong 区分，yuo 输入不补鼻尾 n/ng；声母及其他声韵兼容按规则表执行，-p/-t/-k 省尾输入、补尾和互换按地区配置执行。",
+      "configuration": "resources/fuzzy_scheme.tsv",
       "rules": []
     },
     {

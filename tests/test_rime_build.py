@@ -153,26 +153,40 @@ def test_zero_initial_weik_never_becomes_uik() -> None:
 
 
 def test_eo_accepts_only_standalone_o_one_way() -> None:
-    entering_codas = {
-        "lancong": "tk", "fenni": "", "fungcen": "tpk", "tiqien": "pk",
-        "sinyi": "tk", "songau": "tk", "seusong": "", "jingon": "",
-        "yikyan-henfeng": "k",
-    }
-    for region, codas in entering_codas.items():
+    for region in active_regions():
         rules = load_rules(RULES_PATH, region)
+        codas = {rule.target for rule in rules
+                 if not rule.source and rule.target in {"p", "t", "k"}}
         assert "eo" in normalize("o6", rules)
         for source, target in (("e", "eo"), ("go", "geo"), ("oo", "oeo"), ("ot", "eot"), ("et", "eot"), ("got", "geot"), ("get", "geot"), ("gop", "geop"), ("gep", "geop"), ("gok", "geok"), ("gek", "geok"), ("yue", "yueo"), ("yuek", "yueok")):
             assert target not in normalize(source, rules), (region, source, target)
         for reverse in (False, True):
             forms = normalize("eo", rules, reverse=reverse)
             assert "o" not in forms and "e" not in forms
-        expected_yuo = {"yuo" + coda for coda in codas}
-        assert {"yuot", "yuop", "yuok"}.intersection(normalize("yuo", rules)) == expected_yuo
-        for source in ("yuot", "yuop", "yuok", "jyuot"):
-            for reverse in (False, True):
-                f = normalize(source, rules, reverse=reverse)
-                unexpected = {k for k in f if k != source and k[-1:] not in {"p", "t", "k"}}
-                assert not unexpected, (region, source, reverse, unexpected)
+        dictionary = RULES_PATH.parent / "regions" / region / "dictionaries" / "chars.tsv"
+        yuo_readings = {reading.rstrip("01234567*")
+                        for line in dictionary.read_text(encoding="utf-8").splitlines()[1:]
+                        for reading in line.split("\t")[2].split() if "yuo" in reading}
+        for source in yuo_readings:
+            stem = source[:-1] if source[-1:] in {"p", "t", "k"} else source
+            open_rime = source
+            for ending in ("ng", "n", "p", "t", "k"):
+                if source.endswith("yuo" + ending):
+                    open_rime = source[:-len(ending)]
+                    break
+            if open_rime.endswith("yuo"):
+                for reverse in (False, True):
+                    forms = normalize(open_rime, rules, reverse=reverse)
+                    assert open_rime + "n" not in forms, (region, open_rime, reverse)
+                    assert open_rime + "ng" not in forms, (region, open_rime, reverse)
+            if source[-1:] in codas:
+                assert source in normalize(stem, rules), (region, stem, source)
+                for coda in codas:
+                    alias = stem + coda
+                    assert source in normalize(alias, rules), (region, alias, source)
+        if region == "yikyan-henfeng":
+            assert {"yuon", "yuong"} <= yuo_readings
+            assert "yuong" in normalize("yuon", rules)
         algebra = compile_algebra({"eo", "geot", "yueok"}, rules)
         assert "    - derive/^Gyueok$/Fyuok/" not in algebra
         assert "    - derive/^Geo$/Fo/" in algebra

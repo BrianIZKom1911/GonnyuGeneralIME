@@ -15,6 +15,7 @@ common	rime	u	wu	u	乌	syllable-final	false	true	primary	u	单写 u→wu	none
 common	rime	ueng	wêng			syllable-final	false	true	primary	ueng	零声母 ueng 匹配 wêng	none
 common	rime	yuet	yuot	yot	月	syllable-final	false	true	primary	yue,jyue,lyue,nyue,qyue,xyue	正确 t 尾兼容到 yuot	none
 yikyan-henfeng	rime	oi	uoi			syllable-initial	true	true	primary			none
+yikyan-henfeng	rime	uok	ok			syllable-final	true	false	primary		弋阳 uok 与 ok 双向兼容；可接收前序规则输出，但本规则结果不继续扩展	none
 common	rime	e	ek			syllable-final	false	true	fallback	be,bue,ce,cue,de,due,fe,fue,ge,gue,he,hue,jyue,kue,le,lue,me,mue,nyue,pe,pue,qyue,se,sue,te,tue,we,xyue,ye,yue,ze,zue	普通 e／ir→e 级联组合兼容	none
 fungcen	rime	ing	en	ɨn		syllable-final	false	false	primary		丰城 ing 输入单向兼容 en	none
 common	rime	ueik	wêik	uɛiʔ	为	syllable-final	false	true	primary	ueik	零声母 uei 的 k 尾输入兼容独立 wêik	none
@@ -155,7 +156,7 @@ common	rime	ue	yuek			syllable-final	false	true	fallback	jue,nue,que,xue	普通 
 common	rime	iun	yun	iun		syllable-final	false	true	primary	iun	零声母 iu 系带韵尾时省去 i，与 yu 系共用拼写	none
 common	rime	it	yit			syllable-final	false	true	primary	it	零声母 it 单向匹配 yit	none
 sinyi	coda	k	t			syllable-final	true	true	secondary			none
-common	rime	ao	au	au	抱	syllable-final	true	true	primary		旧 ao 写法兼容	none
+common	rime	ao	au	au	抱	syllable-final	false	true	primary		旧 ao 写法兼容	none
 lancong	rime	fi	fui			syllable-final	false	false	primary	fi	南昌整音节 fi→fui，单向兼容	none
 common	rime	iuek	yuêk			syllable-final	false	true	primary	iuek	零声母 iuek 匹配 yuêk	none
 common	rime	im	yim			syllable-final	false	true	primary	im	零声母 im 匹配 yim	none
@@ -169,3 +170,4 @@ common	rime	yuek	yuot	yot	月	syllable-final	false	true	primary	yue,jyue,lyue,ny
 goungon	coda		k			syllable-final	false	true	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式	none
 goungon	coda		t			syllable-final	false	true	fallback		自动生成：完整音系检测到该入声韵尾，输入省略韵尾时匹配带尾形式	none
 goungon	coda	k	t			syllable-final	true	true	secondary		自动生成：完整音系检测到两种入声韵尾，允许互相模糊	none
+yikyan-henfeng	rime	ok	wok	uɔʔ	握、沃	syllable-final	false	true	primary	ok	弋阳零声母 ok 输入匹配 wok	none
