@@ -50,6 +50,7 @@ mod tests {
 
     #[test]
     fn composed_identity_keeps_distinct_readings_and_first_duplicate() {
+        // Source: Lancong chars.tsv, 公 has gung1 and gung0 readings.
         let mut candidates = vec![
             Candidate {
                 text: "公",

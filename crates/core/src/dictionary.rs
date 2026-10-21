@@ -1948,6 +1948,27 @@ impl Dictionary {
 mod tests {
     use super::*;
 
+    const SOURCES: &[&str] = &[
+        include_str!("../../../resources/regions/lancong/dictionaries/chars.tsv"),
+        include_str!("../../../resources/regions/lancong/dictionaries/words.tsv"),
+        include_str!("../../../resources/regions/lancong/dictionaries/gan_chars.tsv"),
+        include_str!("../../../resources/regions/lancong/dictionaries/gan_words.tsv"),
+    ];
+
+    fn source_fields(word: &str) -> Vec<String> {
+        let rows: Vec<Vec<String>> = SOURCES
+            .iter()
+            .flat_map(|source| source.lines().skip(1))
+            .map(|line| line.split('\t').map(str::to_owned).collect())
+            .filter(|fields: &Vec<String>| fields.first().is_some_and(|value| value == word))
+            .collect();
+        rows.iter()
+            .find(|fields| fields.get(5).is_some_and(|equivalent| !equivalent.is_empty()))
+            .or_else(|| rows.first())
+            .cloned()
+            .unwrap_or_else(|| panic!("{word} must come from the Lancong source dictionaries"))
+    }
+
     #[test]
     fn dictionary_entry_keeps_compact_immutable_text_headers() {
         assert!(std::mem::size_of::<DictionaryEntry>() <= 176);
@@ -1960,17 +1981,27 @@ mod tests {
         assert_eq!(strip_tone("qiek*"), "qiek*");
     }
 
-    fn entry(headword: &str, category: &str, mandarin_word: &str) -> DictionaryEntry {
+    fn entry(headword: &str, mandarin_word: &str) -> DictionaryEntry {
+        let fields = source_fields(headword);
+        let mandarin_word_pinyin = if fields[5] == mandarin_word {
+            fields[6].clone()
+        } else {
+            split_list_values(mandarin_word)
+                .iter()
+                .map(|word| source_fields(word)[3].clone())
+                .collect::<Vec<_>>()
+                .join("/")
+        };
         DictionaryEntry {
             headword: headword.into(),
-            ipa: "".into(),
-            dialect_pinyin: "kai1".into(),
-            mandarin_pinyin: "kai1".into(),
-            category: category.into(),
+            ipa: fields[1].clone().into(),
+            dialect_pinyin: fields[2].clone().into(),
+            mandarin_pinyin: fields[3].clone().into(),
+            category: fields[4].clone().into(),
             mandarin_word: mandarin_word.into(),
-            mandarin_word_pinyin: "kai1".into(),
-            frequency: Some(100000),
-            synonyms: "".into(),
+            mandarin_word_pinyin: mandarin_word_pinyin.into(),
+            frequency: fields[7].parse().ok(),
+            synonyms: fields[8].clone().into(),
             entry_index: 0,
             new_old: "".into(),
         }
@@ -1979,7 +2010,7 @@ mod tests {
     #[test]
     fn mandarin_word_text_index_ignores_self_reference() {
         let mut dictionary = Dictionary::default();
-        dictionary.extend_from_entries([entry("开", "赣", "开"), entry("开会", "赣", "会议")]);
+        dictionary.extend_from_entries([entry("开", "开"), entry("开会", "会议")]);
 
         assert!(dictionary.by_mandarin_word_text("开").is_empty());
         assert_eq!(dictionary.by_mandarin_word_text("会议").len(), 1);
@@ -1988,7 +2019,7 @@ mod tests {
     #[test]
     fn mandarin_word_text_index_ignores_self_reference_inside_multi_value_field() {
         let mut dictionary = Dictionary::default();
-        dictionary.extend_from_entries([entry("开", "赣", "开/会议")]);
+        dictionary.extend_from_entries([entry("开", "开/会议")]);
 
         assert!(dictionary.by_mandarin_word_text("开").is_empty());
         assert_eq!(dictionary.by_mandarin_word_text("会议").len(), 1);
@@ -1997,11 +2028,10 @@ mod tests {
     #[test]
     fn extend_from_entries_splits_multi_value_mandarin_word_pinyin() {
         let mut dictionary = Dictionary::default();
-        let mut entry = entry("青菜", "赣", "蔬菜/菜");
-        entry.mandarin_word_pinyin = "shu1 cai4/cai4".into();
+        let entry = entry("脱", "很/非常/极其");
         dictionary.extend_from_entries([entry]);
 
-        assert_eq!(dictionary.by_mandarin_word_pinyin("shucai").len(), 1);
-        assert_eq!(dictionary.by_mandarin_word_pinyin("cai").len(), 1);
+        assert_eq!(dictionary.by_mandarin_word_pinyin("hen3").len(), 1);
+        assert_eq!(dictionary.by_mandarin_word_pinyin("feichang").len(), 1);
     }
 }

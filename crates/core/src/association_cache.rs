@@ -256,7 +256,8 @@ mod tests {
     #[test]
     fn test_empty_cache() {
         let cache = AssociationCache::empty();
-        assert!(cache.associates_of("任何词").is_empty());
-        assert!(cache.mandarins_of_gan("任何词").is_empty());
+        // Both lookups use real Lancong dictionary entries absent from this cache.
+        assert!(cache.associates_of("车马").is_empty());
+        assert!(cache.mandarins_of_gan("明白").is_empty());
     }
 }
