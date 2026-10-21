@@ -17,8 +17,9 @@ Currently supports: **Lancong (Nanchang), Fenni (Fenyi), Fungcen (Fengcheng), Ti
 [![Rime Fungcen](https://img.shields.io/badge/Rime-Fungcen-e16a3d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Fungcen)
 [![Rime Yikyan-Henfeng](https://img.shields.io/badge/Rime-Yikyan--Henfeng-8250df?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Yikyan-Henfeng)
 [![Rime Sinyi (Xinyu)](https://img.shields.io/badge/Rime-Sinyi%20%28Xinyu%29-1f883d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Sinyi)
+[![Rime Goungon (Gao'an)](https://img.shields.io/badge/Rime-Goungon%20%28Gao%27an%29-0969da?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Goungon)
 
-Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fungcen, Yikyan-Henfeng, and Sinyi (Xinyu). Other installation options are available in the [Installation](#installation) section below.
+Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fungcen, Yikyan-Henfeng, Sinyi (Xinyu), and Goungon (Gao'an). Other installation options are available in the [Installation](#installation) section below.
 
 ## Release 1.2.3
 

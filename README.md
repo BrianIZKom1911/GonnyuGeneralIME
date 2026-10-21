@@ -17,6 +17,7 @@
 [![Rime 丰城话](https://img.shields.io/badge/Rime-%E4%B8%B0%E5%9F%8E%E8%AF%9D-e16a3d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Fungcen)
 [![Rime 弋阳-横峰话](https://img.shields.io/badge/Rime-%E5%BC%8B%E9%98%B3--%E6%A8%AA%E5%B3%B0%E8%AF%9D-8250df?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Yikyan-Henfeng)
 [![Rime 新余话](https://img.shields.io/badge/Rime-%E6%96%B0%E4%BD%99%E8%AF%9D-1f883d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Sinyi)
+[![Rime 高安话](https://img.shields.io/badge/Rime-%E9%AB%98%E5%AE%89%E8%AF%9D-0969da?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Doohaey/GonnyuGeneralIME-Rime-Goungon)
 
 上方按钮列出已发布的 Rime 方案仓库。其他安装方案请在下方[安装方法](#安装方法)小节找到对应平台内容下载并且安装。
 
