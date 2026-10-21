@@ -81,4 +81,3 @@ fn is_zero(n: &usize) -> bool {
 include!("retrieval/candidates.rs");
 include!("retrieval/segmentation.rs");
 include!("retrieval/query.rs");
-

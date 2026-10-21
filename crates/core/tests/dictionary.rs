@@ -31,12 +31,19 @@ fn source_row(word: &str) -> Vec<String> {
             text.lines().skip(1).filter_map(move |line| {
                 let fields: Vec<String> = line.split('\t').map(str::to_owned).collect();
                 let _ = origin;
-                fields.first().is_some_and(|value| value == word).then_some(fields)
+                fields
+                    .first()
+                    .is_some_and(|value| value == word)
+                    .then_some(fields)
             })
         })
         .collect();
     rows.iter()
-        .find(|fields| fields.get(5).is_some_and(|equivalent| !equivalent.is_empty()))
+        .find(|fields| {
+            fields
+                .get(5)
+                .is_some_and(|equivalent| !equivalent.is_empty())
+        })
         .or_else(|| rows.first())
         .cloned()
         .unwrap_or_else(|| panic!("{word} must come from the Lancong source dictionaries"))
@@ -72,7 +79,10 @@ fn loads_eight_column_rows_from_the_source_dictionary() {
 fn skips_comments_and_blank_lines() {
     // Source: resources/regions/lancong/dictionaries/words.tsv, 车马.
     let fields = source_row("车马");
-    let body = format!("# comment\n\n{HEADER}\n{}\n\n# another\n", row_text(&fields));
+    let body = format!(
+        "# comment\n\n{HEADER}\n{}\n\n# another\n",
+        row_text(&fields)
+    );
     let path = write_fixture("comments.tsv", &body);
     let dictionary = Dictionary::load_tsv(&path).expect("load dictionary");
     assert_eq!(dictionary.len(), 1);
@@ -102,7 +112,12 @@ fn lookup_by_dialect_pinyin() {
     // without introducing a new lexical item or pronunciation.
     // Source: resources/regions/lancong/dictionaries/gan_chars.tsv, 明.
     let fields = source_row("明");
-    let body = format!("{HEADER}\n{}\n{}\n{}\n", row_text(&fields), row_text(&fields), row_text(&fields));
+    let body = format!(
+        "{HEADER}\n{}\n{}\n{}\n",
+        row_text(&fields),
+        row_text(&fields),
+        row_text(&fields)
+    );
     let path = write_fixture("lookup.tsv", &body);
     let dictionary = Dictionary::load_tsv(&path).expect("load dictionary");
     assert_eq!(dictionary.by_dialect_pinyin("min4").len(), 3);
@@ -132,7 +147,10 @@ fn normalizes_case_and_separator_variants_of_source_spellings() {
 fn expands_mandarin_word_indexes_from_source_equivalents() {
     // Source: resources/regions/lancong/dictionaries/gan_chars.tsv, 脱.
     let fields = source_row("脱");
-    let path = write_fixture("multi-mandarin.tsv", &format!("{HEADER}\n{}\n", row_text(&fields)));
+    let path = write_fixture(
+        "multi-mandarin.tsv",
+        &format!("{HEADER}\n{}\n", row_text(&fields)),
+    );
     let dictionary = Dictionary::load_tsv(&path).expect("load dictionary");
 
     for equivalent in ["很", "非常", "极其"] {
@@ -162,13 +180,31 @@ fn runtime_cache_preserves_final_lookup_indexes() {
 
     let loaded = Dictionary::load_runtime_cache(&cache).expect("load cache");
     let texts = |entries: Vec<&gannyu_input_core::DictionaryEntry>| {
-        entries.into_iter().map(|entry| entry.headword.clone()).collect::<Vec<_>>()
+        entries
+            .into_iter()
+            .map(|entry| entry.headword.clone())
+            .collect::<Vec<_>>()
     };
-    assert_eq!(texts(loaded.by_dialect_pinyin("tot6")), texts(dictionary.by_dialect_pinyin("tot6")));
-    assert_eq!(texts(loaded.by_mandarin_pinyin("tuo1")), texts(dictionary.by_mandarin_pinyin("tuo1")));
-    assert_eq!(texts(loaded.by_mandarin_word_pinyin("fei1chang2")), texts(dictionary.by_mandarin_word_pinyin("fei1chang2")));
-    assert_eq!(texts(loaded.by_mandarin_word_text("非常")), texts(dictionary.by_mandarin_word_text("非常")));
-    assert_eq!(loaded.lookup_prefix_ids("tot"), dictionary.lookup_prefix_ids("tot"));
+    assert_eq!(
+        texts(loaded.by_dialect_pinyin("tot6")),
+        texts(dictionary.by_dialect_pinyin("tot6"))
+    );
+    assert_eq!(
+        texts(loaded.by_mandarin_pinyin("tuo1")),
+        texts(dictionary.by_mandarin_pinyin("tuo1"))
+    );
+    assert_eq!(
+        texts(loaded.by_mandarin_word_pinyin("fei1chang2")),
+        texts(dictionary.by_mandarin_word_pinyin("fei1chang2"))
+    );
+    assert_eq!(
+        texts(loaded.by_mandarin_word_text("非常")),
+        texts(dictionary.by_mandarin_word_text("非常"))
+    );
+    assert_eq!(
+        loaded.lookup_prefix_ids("tot"),
+        dictionary.lookup_prefix_ids("tot")
+    );
     let _ = fs::remove_file(cache);
 }
 

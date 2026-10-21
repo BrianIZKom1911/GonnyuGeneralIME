@@ -17,16 +17,18 @@ fn lancong_dictionary() -> Dictionary {
     let mut files = ["chars.tsv", "words.tsv", "gan_chars.tsv", "gan_words.tsv"]
         .into_iter()
         .map(|name| directory.join(name));
-    let mut dictionary = Dictionary::load_tsv(&files.next().unwrap()).expect("load source chars");
+    let mut dictionary = Dictionary::load_tsv(files.next().unwrap()).expect("load source chars");
     for path in files {
-        dictionary.extend_from_tsv(&path).expect("load source dictionary");
+        dictionary
+            .extend_from_tsv(&path)
+            .expect("load source dictionary");
     }
     dictionary
 }
 
 fn lancong_fuzzy() -> FuzzyMap {
     let root = PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/../../resources"));
-    FuzzyMap::load_tsv_for_region(&root.join("fuzzy_scheme.tsv"), "lancong")
+    FuzzyMap::load_tsv_for_region(root.join("fuzzy_scheme.tsv"), "lancong")
         .expect("load Lancong fuzzy rules")
 }
 
@@ -69,13 +71,11 @@ fn manual_segments_accept_the_source_word_syllables() {
 fn sentence_input_segments_a_source_dictionary_word() {
     // Source: resources/regions/lancong/dictionaries/words.tsv, 车马.
     let dictionary = lancong_dictionary();
-    let segments = segment_sentence(
-        &dictionary,
-        &lancong_fuzzy(),
-        &HashMap::new(),
-        "ca1ma1",
-    );
-    assert!(segments.iter().flatten().any(|candidate| candidate.text == "车马"));
+    let segments = segment_sentence(&dictionary, &lancong_fuzzy(), &HashMap::new(), "ca1ma1");
+    assert!(segments
+        .iter()
+        .flatten()
+        .any(|candidate| candidate.text == "车马"));
 }
 
 #[test]

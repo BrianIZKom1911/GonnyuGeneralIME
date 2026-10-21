@@ -1963,7 +1963,11 @@ mod tests {
             .filter(|fields: &Vec<String>| fields.first().is_some_and(|value| value == word))
             .collect();
         rows.iter()
-            .find(|fields| fields.get(5).is_some_and(|equivalent| !equivalent.is_empty()))
+            .find(|fields| {
+                fields
+                    .get(5)
+                    .is_some_and(|equivalent| !equivalent.is_empty())
+            })
             .or_else(|| rows.first())
             .cloned()
             .unwrap_or_else(|| panic!("{word} must come from the Lancong source dictionaries"))

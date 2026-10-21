@@ -1064,15 +1064,11 @@ mod tests {
     fn clear_user_data_respects_scopes() {
         let mut pipeline = pipeline_with_temp_user_dict();
         assert!(pipeline.add_user_word("车马", "ca1 ma1", "che1 ma3"));
-        pipeline
-            .frequency_boosts
-            .insert("明白".to_string(), 20000);
+        pipeline.frequency_boosts.insert("明白".to_string(), 20000);
         assert!(pipeline.clear_user_data(false, true));
         assert!(pipeline.user_dict.contains("车马"));
         assert!(pipeline.frequency_boosts.is_empty());
-        pipeline
-            .frequency_boosts
-            .insert("明白".to_string(), 20000);
+        pipeline.frequency_boosts.insert("明白".to_string(), 20000);
         assert!(pipeline.clear_user_data(true, false));
         assert!(!pipeline.user_dict.contains("车马"));
         assert!(!pipeline.frequency_boosts.is_empty());
