@@ -13,6 +13,10 @@ on:
       - resources/**
       - .github/workflows/windows.yml
 
+concurrency:
+  group: windows-${{ github.event_name == 'push' && github.ref_type == 'branch' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref_type == 'branch' }}
+
 permissions:
   contents: read
 

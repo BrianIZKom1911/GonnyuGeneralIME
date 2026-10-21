@@ -13,6 +13,10 @@ on:
       - resources/**
       - .github/workflows/fcitx5.yml
 
+concurrency:
+  group: fcitx5-${{ github.event_name == 'push' && github.ref_type == 'branch' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref_type == 'branch' }}
+
 permissions:
   contents: read
 
