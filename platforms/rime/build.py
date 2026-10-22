@@ -333,14 +333,14 @@ def suppress_neutral_displays(displays: dict[str, int]) -> dict[str, int]:
     }
 
 
-def build_metadata(entries: list[Entry], reading_mode: str = "both") -> tuple[dict[str, str], dict[str, list[str]], dict[str, list[str]]]:
+def build_metadata(entries: list[Entry], reading_mode: str = "both", include_synonyms: bool = True) -> tuple[dict[str, str], dict[str, list[str]], dict[str, list[str]]]:
     by_word: dict[str, list[Entry]] = defaultdict(list)
     associates: dict[str, set[str]] = defaultdict(set)
     gan_to_mandarin: dict[str, list[str]] = defaultdict(list)
     mandarin_to_gan: dict[str, list[str]] = defaultdict(list)
     for entry in entries:
         by_word[entry.word].append(entry)
-        for synonym in split_values(entry.synonyms):
+        for synonym in split_values(entry.synonyms) if include_synonyms else ():
             if synonym != entry.word:
                 associates[entry.word].add(synonym)
                 associates[synonym].add(entry.word)
@@ -430,6 +430,18 @@ def build_preferred_readings(entries: list[Entry]) -> dict[str, str]:
         if current is None or entry.frequency > current[0]:
             preferred[entry.word] = (entry.frequency, parts[0])
     return {word: reading for word, (_, reading) in preferred.items()}
+
+
+def build_synonym_relations(entries: list[Entry], known_only: bool = False) -> dict[str, list[str]]:
+    relations: dict[str, set[str]] = defaultdict(set)
+    for entry in entries:
+        for synonym in split_values(entry.synonyms):
+            if synonym != entry.word:
+                relations[entry.word].add(synonym)
+                relations[synonym].add(entry.word)
+    known = {entry.word for entry in entries}
+    return {word: sorted(item for item in words if not known_only or item in known)
+            for word, words in relations.items()}
 
 
 def entry_codes(entry: Entry, paired_readings: dict[str, list[tuple[str, str, str]]]) -> set[str]:
@@ -523,6 +535,8 @@ def write_lua_data(
     after: dict[str, list[str]],
     single_character_frequencies: dict[str, int],
     forbidden_words: list[str] | None = None,
+    synonyms: dict[str, list[str]] | None = None,
+    synonym_candidates: dict[str, list[str]] | None = None,
 ) -> None:
     name = path.stem.removesuffix("_data")
     write_annotation_store(path.with_name(f"{name}_annotations.bin"), name, annotations)
@@ -542,9 +556,13 @@ def write_lua_data(
     forbidden = ""
     if forbidden_words:
         forbidden = " forbidden_words = {\n" + "\n".join(f"  [{lua_quote(word)}] = true," for word in sorted(forbidden_words)) + "\n },\n"
+    synonym_table = "" if synonyms is None else f" synonyms = {{\n{list_map(synonyms)}\n }},\n"
+    if synonym_candidates is not None:
+        synonym_table += f" synonym_candidates = {{\n{list_map(synonym_candidates)}\n }},\n"
     path.write_text(
         "return {\n"
         + forbidden
+        + synonym_table
         + f" annotations = require(\"gannyu_annotation_store\").open({lua_quote(name)}),\n"
         f" readings = {{\n{table_map(readings)}\n }},\n"
         f" before = {{\n{list_map(before)}\n }},\n"
@@ -556,7 +574,7 @@ def write_lua_data(
 
 
 OPTION_NAMES = (
-    "gannyu_no_annotations", "gannyu_no_relations", "gannyu_no_fuzzy",
+    "gannyu_no_annotations", "gannyu_no_relations", "gannyu_no_synonyms", "gannyu_no_fuzzy",
     "gannyu_no_mandarin", "gannyu_no_fuzzy_rules", "gannyu_both", "gannyu_new", "gannyu_old",
 )
 
@@ -566,7 +584,7 @@ def selected_entries(entries: list[Entry], mode: str, relations: bool) -> list[E
     mandarin_words = {word for entry in entries for word in split_values(entry.mandarin_word) if word != entry.word}
     selected = []
     for entry in entries:
-        if not relations and (entry.category == "官" or entry.word in mandarin_words):
+        if not relations and len(entry.word) > 1 and (entry.category == "官" or entry.word in mandarin_words):
             continue
         if (mode == "new" and entry.new_old.startswith("老")) or (mode == "old" and entry.new_old.startswith("新")):
             continue
@@ -580,7 +598,7 @@ def selected_entries(entries: list[Entry], mode: str, relations: bool) -> list[E
                     parts[index] = strip_tone(reading) + "0" if trailing_tone(parts[index]) == "0" else reading
             entry = replace(entry, gan=" ".join(parts))
         if not relations:
-            entry = replace(entry, mandarin_word="")
+            entry = replace(entry, mandarin_word="", category="赣" if entry.category == "官" else entry.category)
         selected.append(entry)
     return selected
 
@@ -589,18 +607,20 @@ def write_option_resources(region: str, entries: list[Entry], output: Path,
                            full_algebra: list[str], special_algebra: list[str]) -> list[str]:
     dependencies = []
     root = f"gannyu_{region}"
-    forbidden_words = sorted({entry.word for entry in entries if entry.category == "官"}
-                             | {word for entry in entries for word in split_values(entry.mandarin_word) if word != entry.word})
+    forbidden_words = sorted({entry.word for entry in entries if entry.category == "官" and len(entry.word) > 1}
+                             | {word for entry in entries for word in split_values(entry.mandarin_word) if word != entry.word and len(word) > 1})
     for mode, relations in itertools.product(("both", "new", "old"), (True, False)):
         suffix = "" if mode == "both" and relations else f"_{mode}_" + ("rel" if relations else "norel")
         name = root + suffix
         selected = entries if not suffix else selected_entries(entries, mode, relations)
         if suffix:
             write_dictionary(output / f"{name}.dict.yaml", selected, region, name)
-            annotations, before, after = build_metadata(selected, mode)
+            annotations, before, after = build_metadata(selected, mode, include_synonyms=False)
             write_lua_data(output / "lua" / f"{name}_data.lua", annotations,
                            build_preferred_readings(selected), before, after,
-                           build_single_character_frequencies(selected), None if relations else forbidden_words)
+                           build_single_character_frequencies(selected), None if relations else forbidden_words,
+                           synonyms=build_synonym_relations(selected),
+                           synonym_candidates=build_synonym_relations(selected, known_only=True))
         for full, mandarin in itertools.product((True, False), repeat=2):
             prism_suffix = "" if full and mandarin else ("_full" if full else "_special") + ("_mix" if mandarin else "_gan")
             schema_id = name + prism_suffix
@@ -721,7 +741,7 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
     (output / "lua").mkdir(exist_ok=True)
     shutil.copy2(ROOT / "LICENSE", output / "LICENSE")
     dictionary_count = write_dictionary(output / f"gannyu_{region}.dict.yaml", entries, region)
-    annotations, before, after = build_metadata(entries)
+    annotations, before, after = build_metadata(entries, include_synonyms=False)
     readings = build_preferred_readings(entries)
     single_character_frequencies = build_single_character_frequencies(entries)
     schema_id = f"gannyu_{region}"
@@ -732,6 +752,8 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
         before,
         after,
         single_character_frequencies,
+        synonyms=build_synonym_relations(entries),
+        synonym_candidates=build_synonym_relations(entries, known_only=True),
     )
     for name, content in LUA_SOURCES.items():
         (output / "lua" / name).write_bytes(content)

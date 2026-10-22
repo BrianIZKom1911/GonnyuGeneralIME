@@ -13,6 +13,7 @@ from platforms.rime.build import (
     active_regions,
     build,
     build_metadata,
+    build_synonym_relations,
     build_preferred_readings,
     build_single_character_frequencies,
     load_entries,
@@ -43,11 +44,15 @@ def literal(value):
     return str(value)
 
 
-def reference(path, annotations, readings, before, after, frequencies):
-    path.write_text("return " + literal({
+def reference(path, annotations, readings, before, after, frequencies, synonyms=None, synonym_candidates=None):
+    values = {
         "annotations": annotations, "readings": readings, "before": before,
         "after": after, "single_character_frequencies": frequencies,
-    }), encoding="utf-8")
+    }
+    if synonyms is not None:
+        values["synonyms"] = synonyms
+        values["synonym_candidates"] = synonym_candidates
+    path.write_text("return " + literal(values), encoding="utf-8")
 
 
 def check(lua, directory, expected, name):
@@ -77,9 +82,9 @@ def fixture_store(directory, annotations):
 def test_all_canonical_annotations_and_filters_match(lua, tmp_path, region):
     build(region, tmp_path)
     _, entries = load_entries(region)
-    annotations, before, after = build_metadata(entries)
+    annotations, before, after = build_metadata(entries, include_synonyms=False)
     expected = tmp_path / "reference.lua"
-    reference(expected, annotations, build_preferred_readings(entries), before, after, build_single_character_frequencies(entries))
+    reference(expected, annotations, build_preferred_readings(entries), before, after, build_single_character_frequencies(entries), build_synonym_relations(entries), build_synonym_relations(entries, known_only=True))
     check(lua, tmp_path, expected, "gannyu_" + region)
 
 

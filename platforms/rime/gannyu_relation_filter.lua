@@ -10,7 +10,7 @@ local function emit_relations(source, words, seen, offset, data)
     return
   end
   for _, word in ipairs(words) do
-    if not seen[word] then
+    if not seen[word] and (not data.forbidden_words or not data.forbidden_words[word]) then
       seen[word] = true
       yield(related(source, word, source.quality + offset, data))
     end
@@ -22,6 +22,7 @@ local M = {}
 function M.func(input, env)
   local data = require("gannyu_data_lifecycle").current(env)
   local annotations = require("gannyu_input_options").enabled(env, "annotations")
+  local synonyms = annotations and require("gannyu_input_options").enabled(env, "synonyms")
   local seen = {}
   for candidate in input:iter() do
     if not seen[candidate.text] then
@@ -34,9 +35,12 @@ function M.func(input, env)
       end
       if annotations then
         emit_relations(candidate, data.after[candidate.text], seen, -0.02, data)
-      else
+      elseif not data.synonyms then
         local hidden = { annotations = {} }
         emit_relations(candidate, data.after[candidate.text], seen, -0.02, hidden)
+      end
+      if data.synonyms and synonyms then
+        emit_relations(candidate, data.synonym_candidates[candidate.text], seen, -0.02, data)
       end
     end
   end

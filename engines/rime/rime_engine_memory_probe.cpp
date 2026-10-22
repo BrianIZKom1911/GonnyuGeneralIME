@@ -63,11 +63,14 @@ int main(int argc, char** argv) {
         for (int relations = 0; relations < 2; ++relations) {
           for (int rules = 0; rules < 2; ++rules) {
             for (int mandarin = 0; mandarin < 2; ++mandarin) {
-              snapshot = nullptr;
               snapshot_ok = snapshot_ok && gannyu_engine_set_input_options(handle, 1, relations, 1, mandarin, rules, mode) == 0;
-              snapshot_ok = snapshot_ok && gannyu_engine_snapshot(handle, &snapshot) == 0 && snapshot != nullptr;
-              gannyu_string_destroy(snapshot);
-              if (Footprint(&latest) && latest > peak) peak = latest;
+              for (int synonyms = 0; synonyms < 2; ++synonyms) {
+                snapshot = nullptr;
+                snapshot_ok = snapshot_ok && gannyu_engine_set_synonyms_enabled(handle, synonyms) == 0;
+                snapshot_ok = snapshot_ok && gannyu_engine_snapshot(handle, &snapshot) == 0 && snapshot != nullptr;
+                gannyu_string_destroy(snapshot);
+                if (Footprint(&latest) && latest > peak) peak = latest;
+              }
             }
           }
         }

@@ -8,6 +8,7 @@ from platforms.rime.build import (
     active_regions,
     build,
     build_metadata,
+    build_synonym_relations,
     build_single_character_frequencies,
     build_new_old,
     build_paired_readings,
@@ -57,6 +58,27 @@ def test_special_vowel_inputs_survive_without_optional_rules() -> None:
     forms = normalize(plain.replace("e", "ir"), rules)
     assert plain in forms
     assert plain.replace("e", "ê") not in forms
+
+
+def test_synonyms_are_separate_from_gan_mandarin_relations_and_characters_survive() -> None:
+    _, source = load_entries("lancong")
+    source = [entry for entry in source if entry.word in {"几多", "多少", "䁐牛", "放牛", "这"}]
+    for relations in (True, False):
+        entries = selected_entries(source, "both", relations)
+        annotations, before, after = build_metadata(entries, include_synonyms=False)
+        synonyms = build_synonym_relations(entries)
+        assert synonyms["几多"] == ["多少"]
+        assert synonyms["多少"] == ["几多"]
+        assert "[联]" not in annotations["几多"]
+        assert "多少" not in after.get("几多", [])
+        assert "这" in annotations
+        assert ("[不习用]" in annotations["这"]) == relations
+        assert ("放牛" in annotations) == relations
+        if relations:
+            assert after["䁐牛"] == ["放牛"]
+        else:
+            assert "放牛" not in annotations["䁐牛"]
+            assert not before and not after
 
 
 def test_active_regions_use_canonical_default_order() -> None:

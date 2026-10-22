@@ -17,6 +17,8 @@ switches:
     states: [副标题开, 副标题关]
   - name: gannyu_no_relations
     states: ["  赣普连带开", "  赣普连带关"]
+  - name: gannyu_no_synonyms
+    states: ["  同义词连带开", "  同义词连带关"]
   - name: gannyu_no_fuzzy
     states: [模糊匹配开, 模糊匹配关]
   - name: gannyu_no_mandarin
@@ -46,9 +48,9 @@ engine:
     - punct_translator
     - lua_translator@*gannyu_options_translator
   filters:
-    - lua_filter@*gannyu_annotation_filter
     - lua_filter@*gannyu_single_char_filter
     - lua_filter@*gannyu_relation_filter
+    - lua_filter@*gannyu_annotation_filter
     - uniquifier
 
 speller:

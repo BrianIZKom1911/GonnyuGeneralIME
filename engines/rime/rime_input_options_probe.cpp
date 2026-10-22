@@ -64,6 +64,32 @@ int main(int argc, char** argv) {
     check(result.find("\"text\":\"车马\"") != std::string::npos, "Gan word lost after annotation toggle");
     check(gannyu_engine_set_input_options(handle, 1, 1, 1, 1, 1, 0) == 0, "final restore failed");
     check(snapshot().find("\"annotation\"") != std::string::npos, "restored annotations missing");
+    for (int relations : {0, 1}) {
+      for (int synonyms : {0, 1}) {
+        check(gannyu_engine_set_input_options(handle, 1, relations, 1, 1, 1, 0) == 0, "relation setting failed");
+        check(gannyu_engine_set_synonyms_enabled(handle, synonyms) == 0, "synonym setting failed");
+        result = input("jido");
+        check(result.find("\"text\":\"几多\"") != std::string::npos, "source synonym headword missing");
+        check((result.find("\"text\":\"多少\"") != std::string::npos) == (synonyms != 0), "synonym candidate dependency failed");
+        check((result.find("[联]多少") != std::string::npos) == (synonyms != 0), "synonym annotation dependency failed");
+        check(gannyu_engine_set_synonyms_enabled(handle, !synonyms) == 0, "hot synonym toggle failed");
+        result = snapshot();
+        check(result.find("\"rawInput\":\"jido\"") != std::string::npos, "synonym toggle lost input");
+        check((result.find("\"text\":\"多少\"") != std::string::npos) == (synonyms == 0), "hot synonym toggle failed to refresh");
+        check(input("doseu").find("\"text\":\"多少\"") != std::string::npos, "independent synonym lookup lost");
+        result = input("za");
+        check(result.find("\"text\":\"这\"") != std::string::npos, "Mandarin character was filtered");
+        if (!relations) {
+          check(result.find("[不习用]") == std::string::npos, "Mandarin character usage label leaked");
+          check(input("yangniu").find("放牛") == std::string::npos, "Mandarin word leaked with synonyms enabled");
+        }
+      }
+    }
+    check(gannyu_engine_set_synonyms_enabled(handle, 1) == 0, "restore synonyms failed");
+    check(gannyu_engine_set_input_options(handle, 0, 1, 1, 1, 1, 0) == 0, "synonym parent toggle failed");
+    check(input("jido").find("多少") == std::string::npos, "disabled parent leaked synonyms");
+    check(gannyu_engine_set_input_options(handle, 1, 1, 1, 1, 1, 0) == 0, "restore parent failed");
+    check(snapshot().find("\"text\":\"多少\"") != std::string::npos, "parent toggle lost saved synonym setting");
     result = input("yangniu");
     check(result.find("\"text\":\"放牛\"") != std::string::npos, "source relation missing");
     check(gannyu_engine_set_input_options(handle, 1, 0, 1, 1, 1, 0) == 0, "relation toggle failed");

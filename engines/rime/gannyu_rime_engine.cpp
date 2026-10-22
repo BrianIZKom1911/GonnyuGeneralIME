@@ -22,6 +22,7 @@ struct GannyuPipelineHandle {
   std::string schema_id;
   size_t candidate_limit = 0;
   std::array<int, 6> input_options{{1, 1, 1, 1, 1, 0}};
+  bool synonyms_enabled = true;
 };
 
 namespace {
@@ -231,6 +232,7 @@ void ApplyInputOptions(GannyuPipelineHandle* handle) {
   Api()->set_option(handle->session, "gannyu_both", handle->input_options[5] == 0 ? True : False);
   Api()->set_option(handle->session, "gannyu_new", handle->input_options[5] == 1 ? True : False);
   Api()->set_option(handle->session, "gannyu_old", handle->input_options[5] == 2 ? True : False);
+  Api()->set_option(handle->session, "gannyu_no_synonyms", handle->synonyms_enabled ? False : True);
   Api()->set_option(handle->session, "gannyu_batch", False);
 }
 
@@ -658,6 +660,19 @@ int gannyu_engine_set_input_options(GannyuPipelineHandle* handle, int annotation
     const std::array<int, 6> values{{annotations, relations, fuzzy, mandarin, fuzzy_rules, reading_mode}};
     if (handle->input_options == values) return kOk;
     handle->input_options = values;
+    ApplyInputOptions(handle);
+    return kOk;
+  });
+}
+
+int gannyu_engine_set_synonyms_enabled(GannyuPipelineHandle* handle, int enabled) {
+  return AbiStatus([&] {
+    if (handle == nullptr) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
+    if (handle->synonyms_enabled == (enabled != 0)) return kOk;
+    handle->synonyms_enabled = enabled != 0;
     ApplyInputOptions(handle);
     return kOk;
   });
