@@ -48,14 +48,11 @@ from build import write_resource_manifest
 
 archive = Path(sys.argv[1])
 region = sys.argv[2]
-files = (
-    "default.custom.yaml", f"gannyu_{region}.schema.yaml", f"gannyu_{region}.dict.yaml",
-    "resource-manifest.json", "lua/gannyu_data_lifecycle.lua", "lua/gannyu_annotation_store.lua",
-    f"lua/gannyu_{region}_annotations.bin",
-    "lua/gannyu_annotation_filter.lua", "lua/gannyu_single_char_filter.lua", "lua/gannyu_relation_filter.lua",
-    f"lua/gannyu_{region}_data.lua",
-    "LICENSE",
-)
+files = tuple(sorted(
+    str(path.relative_to(Path.cwd())) for path in Path.cwd().rglob("*")
+    if path.is_file() and (path.name in {"default.custom.yaml", "resource-manifest.json", "LICENSE"}
+        or path.name.startswith("gannyu_"))
+))
 write_resource_manifest(Path.cwd(), (region,), files)
 with ZipFile(archive, "w", ZIP_DEFLATED) as package:
     for name in files:

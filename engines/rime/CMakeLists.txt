@@ -42,6 +42,9 @@ if(GANNYU_RIME_BUILD_PROBES)
   add_executable(gannyu_rime_engine_probe rime_engine_probe.cpp)
   target_link_libraries(gannyu_rime_engine_probe PRIVATE gannyu_rime_engine)
 
+  add_executable(gannyu_rime_input_options_probe rime_input_options_probe.cpp)
+  target_link_libraries(gannyu_rime_input_options_probe PRIVATE gannyu_rime_engine)
+
   add_executable(gannyu_rime_engine_concurrency_probe rime_engine_concurrency_probe.cpp)
   target_link_libraries(gannyu_rime_engine_concurrency_probe PRIVATE gannyu_rime_engine)
 
@@ -49,7 +52,7 @@ if(GANNYU_RIME_BUILD_PROBES)
     add_executable(gannyu_rime_engine_memory_probe rime_engine_memory_probe.cpp)
     target_link_libraries(gannyu_rime_engine_memory_probe PRIVATE gannyu_rime_engine)
     if(RIME_LIBRARY MATCHES "\\.a$")
-      foreach(probe IN ITEMS gannyu_rime_engine_probe gannyu_rime_engine_concurrency_probe gannyu_rime_engine_memory_probe)
+      foreach(probe IN ITEMS gannyu_rime_engine_probe gannyu_rime_input_options_probe gannyu_rime_engine_concurrency_probe gannyu_rime_engine_memory_probe)
         target_link_options(${probe} PRIVATE "LINKER:-force_load,${RIME_LIBRARY}")
       endforeach()
     endif()

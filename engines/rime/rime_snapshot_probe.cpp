@@ -242,6 +242,7 @@ int main() {
   std::cout << "100 last-handle shutdown/reinitialization cycles passed\n";
   test_api.create_session = CreateSession;
   test_api.select_schema = SelectSchema;
+  test_api.set_option = [](RimeSessionId, const char*, Bool) {};
   std::vector<std::thread> workers;
   for (int worker = 0; worker < 4; ++worker) {
     workers.emplace_back([] {

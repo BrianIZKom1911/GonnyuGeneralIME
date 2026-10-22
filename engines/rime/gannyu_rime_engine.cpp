@@ -3,6 +3,7 @@
 #include <rime_api.h>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
@@ -20,6 +21,7 @@ struct GannyuPipelineHandle {
   RimeSessionId session = 0;
   std::string schema_id;
   size_t candidate_limit = 0;
+  std::array<int, 6> input_options{{1, 1, 1, 1, 1, 0}};
 };
 
 namespace {
@@ -219,6 +221,19 @@ bool EnsureRuntimeLocked(const char* shared_data_dir, const char* prebuilt_data_
 
 RimeApi* Api() { return GlobalRuntime().api; }
 
+void ApplyInputOptions(GannyuPipelineHandle* handle) {
+  Api()->set_option(handle->session, "gannyu_batch", True);
+  const char* names[] = {"gannyu_no_annotations", "gannyu_no_relations", "gannyu_no_fuzzy",
+                         "gannyu_no_mandarin", "gannyu_no_fuzzy_rules"};
+  for (size_t index = 0; index < 5; ++index) {
+    Api()->set_option(handle->session, names[index], handle->input_options[index] ? False : True);
+  }
+  Api()->set_option(handle->session, "gannyu_both", handle->input_options[5] == 0 ? True : False);
+  Api()->set_option(handle->session, "gannyu_new", handle->input_options[5] == 1 ? True : False);
+  Api()->set_option(handle->session, "gannyu_old", handle->input_options[5] == 2 ? True : False);
+  Api()->set_option(handle->session, "gannyu_batch", False);
+}
+
 bool StartSessionLocked(GannyuPipelineHandle* handle) {
   handle->session = Api()->create_session();
   if (handle->session == 0) {
@@ -231,6 +246,7 @@ bool StartSessionLocked(GannyuPipelineHandle* handle) {
     SetError("failed to select Rime schema: " + handle->schema_id);
     return false;
   }
+  ApplyInputOptions(handle);
   return true;
 }
 
@@ -612,7 +628,10 @@ int gannyu_engine_switch_region(GannyuPipelineHandle* handle, const char* region
     if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     const std::string schema = "gannyu_" + std::string(region_id);
     const bool handled = Api()->select_schema(handle->session, schema.c_str());
-    if (handled) handle->schema_id = schema;
+    if (handled) {
+      handle->schema_id = schema;
+      ApplyInputOptions(handle);
+    }
     return WriteSnapshot(handle, handled, std::nullopt, out_json);
   });
 }
@@ -625,6 +644,22 @@ int gannyu_engine_set_ascii_mode(GannyuPipelineHandle* handle, int enabled, char
     if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     Api()->set_option(handle->session, "ascii_mode", enabled ? True : False);
     return WriteSnapshot(handle, true, std::nullopt, out_json);
+  });
+}
+
+int gannyu_engine_set_input_options(GannyuPipelineHandle* handle, int annotations,
+                                   int relations, int fuzzy, int mandarin,
+                                   int fuzzy_rules, int reading_mode) {
+  return AbiStatus([&] {
+    if (handle == nullptr || reading_mode < 0 || reading_mode > 2) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
+    const std::array<int, 6> values{{annotations, relations, fuzzy, mandarin, fuzzy_rules, reading_mode}};
+    if (handle->input_options == values) return kOk;
+    handle->input_options = values;
+    ApplyInputOptions(handle);
+    return kOk;
   });
 }
 
@@ -665,9 +700,16 @@ int gannyu_engine_reset_user_data(GannyuPipelineHandle* handle, int scope, char*
     }
 
     std::error_code remove_error;
-    const std::filesystem::path userdb =
-        std::filesystem::path(runtime.user_data_dir) / (handle->schema_id + ".userdb");
-    std::filesystem::remove_all(userdb, remove_error);
+    std::filesystem::path userdb;
+    for (const char* suffix : {"", "_both_norel", "_new_rel", "_new_norel", "_old_rel", "_old_norel"}) {
+      const auto path = std::filesystem::path(runtime.user_data_dir) / (handle->schema_id + suffix + ".userdb");
+      std::error_code error;
+      std::filesystem::remove_all(path, error);
+      if (error && !remove_error) {
+        remove_error = error;
+        userdb = path;
+      }
+    }
 
     bool sessions_restored = true;
     for (GannyuPipelineHandle* candidate : affected) {

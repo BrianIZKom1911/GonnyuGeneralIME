@@ -20,16 +20,24 @@ end
 local M = {}
 
 function M.func(input, env)
-  local data = env.data
+  local data = require("gannyu_data_lifecycle").current(env)
+  local annotations = require("gannyu_input_options").enabled(env, "annotations")
   local seen = {}
   for candidate in input:iter() do
     if not seen[candidate.text] then
-      emit_relations(candidate, data.before[candidate.text], seen, 0.01, data)
+      if annotations then
+        emit_relations(candidate, data.before[candidate.text], seen, 0.01, data)
+      end
       if not seen[candidate.text] then
         seen[candidate.text] = true
         yield(candidate)
       end
-      emit_relations(candidate, data.after[candidate.text], seen, -0.02, data)
+      if annotations then
+        emit_relations(candidate, data.after[candidate.text], seen, -0.02, data)
+      else
+        local hidden = { annotations = {} }
+        emit_relations(candidate, data.after[candidate.text], seen, -0.02, hidden)
+      end
     end
   end
 end

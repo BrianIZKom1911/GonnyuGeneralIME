@@ -14,12 +14,49 @@ from platforms.rime.build import (
     entry_codes,
     build_preferred_readings,
     load_entries,
+    selected_entries,
+    syllables,
+    strip_tone,
     write_resource_manifest,
 )
-from platforms.rime.fuzzy import compile_algebra, load_rules, normalize
+from platforms.rime.fuzzy import compile_algebra, essential_rules, load_rules, normalize
 
 
 RULES_PATH = Path(__file__).resolve().parents[1] / "resources" / "fuzzy_scheme.tsv"
+
+
+def test_selected_modes_use_source_pairs_in_words_and_keep_only_selected_annotations() -> None:
+    _, source = load_entries("lancong")
+    source = [entry for entry in source if entry.word in {"义", "主义"}]
+    for mode, expected, excluded, label in (("new", "zu3 yi5", "老", "新"), ("old", "zu3 ni5", "新", "老")):
+        entries = selected_entries(source, mode, True)
+        assert next(entry.gan for entry in entries if entry.word == "主义") == expected
+        assert all(not entry.new_old.startswith(excluded) for entry in entries)
+        annotations, _, _ = build_metadata(entries, mode)
+        assert f"[{label}]" in annotations["义"]
+        assert f"[{excluded}]" not in annotations["义"]
+
+
+def test_disabled_relations_remove_source_mandarin_entries_and_references() -> None:
+    _, source = load_entries("lancong")
+    source = [entry for entry in source if entry.word in {"䁐牛", "放牛"}]
+    entries = selected_entries(source, "both", False)
+    assert [entry.word for entry in entries] == ["䁐牛"]
+    annotations, before, after = build_metadata(entries)
+    assert "放牛" not in annotations["䁐牛"]
+    assert not before and not after
+
+
+def test_special_vowel_inputs_survive_without_optional_rules() -> None:
+    rules = essential_rules(load_rules(RULES_PATH, "lancong"))
+    assert {(rule.source, rule.target) for rule in rules} == {("ir", "e"), ("e", "ê"), ("ee", "ê"), ("i", "ï")}
+    _, entries = load_entries("lancong")
+    special = next(strip_tone(entry.gan) for entry in entries if entry.word == "且" and entry.new_old.startswith("新"))
+    assert special in normalize(special.replace("ê", "ee"), rules)
+    plain = next(strip_tone(part) for entry in entries for part in syllables(entry.gan) if "e" in part and "ê" not in part)
+    forms = normalize(plain.replace("e", "ir"), rules)
+    assert plain in forms
+    assert plain.replace("e", "ê") not in forms
 
 
 def test_active_regions_use_canonical_default_order() -> None:

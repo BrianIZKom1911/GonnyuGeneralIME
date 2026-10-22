@@ -61,7 +61,7 @@ def check(lua, directory, expected, name):
 def fixture_store(directory, annotations):
     data = directory / "lua"
     data.mkdir(parents=True)
-    for name in ("gannyu_annotation_store", "gannyu_data_lifecycle", "gannyu_annotation_filter", "gannyu_single_char_filter", "gannyu_relation_filter"):
+    for name in ("gannyu_input_options", "gannyu_annotation_store", "gannyu_data_lifecycle", "gannyu_annotation_filter", "gannyu_single_char_filter", "gannyu_relation_filter"):
         shutil.copyfile(PLATFORM_DIR / f"{name}.lua", data / f"{name}.lua")
     readings = {"我": "ngo3", "们": "men4", "嗰": "go0"}
     before = {"蔬菜": ["青菜"]}

@@ -17,11 +17,13 @@ end
 local M = {}
 
 function M.func(input, env)
-  local data = env.data
+  local lifecycle = require("gannyu_data_lifecycle")
+  local data = lifecycle.current(env)
+  local enabled = require("gannyu_input_options").enabled(env, "annotations")
   for candidate in input:iter() do
-    candidate.comment = data.annotations[candidate.text]
+    candidate.comment = enabled and (data.annotations[candidate.text]
       or sentence_reading(candidate.text, data)
-      or clean_spelling(candidate.comment)
+      or clean_spelling(candidate.comment)) or ""
     yield(candidate)
   end
 end
