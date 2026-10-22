@@ -34,6 +34,7 @@ final class GannyuInputController: IMKInputController {
             guard let self else { return }
             _ = self.page(direction, client: self.client())
         }
+        NotificationCenter.default.addObserver(self, selector: #selector(inputOptionsDidChange), name: GannyuRegionStore.optionsDidChange, object: nil)
         if diagnosticsEnabled { log.notice("IMK input controller created") }
         NotificationCenter.default.addObserver(
             self,
@@ -214,7 +215,47 @@ final class GannyuInputController: IMKInputController {
             item.state = region.id == current ? .on : .off
             menu.addItem(item)
         }
+        menu.addItem(.separator())
+        let settings = NSMenu(title: "输入设置")
+        settings.autoenablesItems = false
+        let values = GannyuRegionStore.shared.inputOptions
+        for (index, title) in GannyuRegionStore.optionTitles.enumerated() {
+            let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
+            item.target = self
+            item.tag = index
+            item.indentationLevel = [1, 3, 4].contains(index) ? 1 : 0
+            item.state = values[index] != 0 ? .on : .off
+            item.isEnabled = index == 1 ? values[0] != 0 : (index == 3 || index == 4 ? values[2] != 0 : true)
+            settings.addItem(item)
+        }
+        settings.addItem(.separator())
+        for (index, title) in ["新老兼有", "新派", "老派"].enumerated() {
+            let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
+            item.target = self
+            item.tag = 5 + index
+            item.state = values[5] == Int32(index) ? .on : .off
+            settings.addItem(item)
+        }
+        let entry = NSMenuItem(title: "输入设置", action: nil, keyEquivalent: "")
+        entry.submenu = settings
+        menu.addItem(entry)
         return menu
+    }
+
+    @objc private func selectInputOption(_ item: NSMenuItem) {
+        let values = GannyuRegionStore.shared.inputOptions
+        GannyuRegionStore.shared.setInputOption(item.tag < 5 ? item.tag : 5, value: item.tag < 5 ? (values[item.tag] == 0 ? 1 : 0) : Int32(item.tag - 5))
+    }
+
+    @objc private func inputOptionsDidChange() {
+        guard let engine else { return }
+        do {
+            try engine.setInputOptions(GannyuRegionStore.shared.inputOptions)
+            selectedLine = 0
+            render(try engine.snapshot(), client: client())
+        } catch {
+            log.error("input options failed: \(String(describing: error), privacy: .public)")
+        }
     }
 
     @objc(commitComposition:)
