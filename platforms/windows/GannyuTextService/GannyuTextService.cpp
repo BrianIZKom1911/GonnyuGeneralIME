@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <array>
 #include <cwctype>
 #include <cstdint>
 #include <functional>
@@ -1061,6 +1062,7 @@ public:
         searchProvider_ = new (std::nothrow) GannyuSearchCandidateProvider([this](const std::wstring &query) {
             std::vector<std::wstring> values;
             if (!pipeline_) return values;
+            ApplyStoredInputOptions();
             const std::string input = WideToUtf8(query);
             char *json = nullptr;
             if (gannyu_pipeline_retrieve(pipeline_, input.c_str(), &json) == 0 && json) {
@@ -1426,6 +1428,25 @@ public:
 
     const std::string &CurrentRegionId() const { return regionId_; }
 
+    int InputOption(size_t index) const { return inputOptions_[index]; }
+
+    void SelectInputOption(UINT itemId) {
+        if (itemId < 1000 || itemId > 1007) return;
+        const size_t index = itemId < 1005 ? itemId - 1000 : 5;
+        inputOptions_[index] = index == 5 ? static_cast<int>(itemId - 1005) : !inputOptions_[index];
+        DWORD encoded = static_cast<DWORD>(inputOptions_[5]) << 5;
+        for (size_t i = 0; i < 5; ++i) encoded |= static_cast<DWORD>(inputOptions_[i] != 0) << i;
+        HKEY key = nullptr;
+        if (RegCreateKeyExW(HKEY_CURRENT_USER, kRegionRegistryPath, 0, nullptr, 0, KEY_WRITE, nullptr, &key, nullptr) == ERROR_SUCCESS) {
+            RegSetValueExW(key, L"InputOptions", 0, REG_DWORD, reinterpret_cast<const BYTE *>(&encoded), sizeof(encoded));
+            RegCloseKey(key);
+        }
+        if (pipeline_) gannyu_engine_set_input_options(pipeline_, inputOptions_[0], inputOptions_[1], inputOptions_[2], inputOptions_[3], inputOptions_[4], inputOptions_[5]);
+        selectedIndex_ = 0;
+        RefreshCandidates();
+        NotifyLangBarItemUpdate();
+    }
+
     void SwitchRegion(const std::string &regionId) {
         if (regionId.empty() || regionId == regionId_) {
             return;
@@ -1442,6 +1463,7 @@ public:
             gannyu_pipeline_destroy(pipeline_);
         }
         pipeline_ = replacement;
+        ApplyStoredInputOptions();
         regionId_ = regionId;
         SaveRegionId(regionId_);
         if (statusWindow_) {
@@ -1528,7 +1550,7 @@ public:
                     }
                     return 0;
                 }
-                if (!PtInRect(&regionButtonRect_, point) || regionIds_.size() <= 1) return 0;
+                if (!PtInRect(&regionButtonRect_, point)) return 0;
                 HMENU menu = CreatePopupMenu();
                 for (size_t i = 0; i < regionIds_.size(); ++i) {
                     UINT flags = MF_STRING;
@@ -1536,10 +1558,20 @@ public:
                     std::wstring label = RegionLabel(i);
                     AppendMenuW(menu, flags, (UINT_PTR)(i + 1), label.c_str());
                 }
+                AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+                AppendMenuW(menu, MF_STRING | MF_GRAYED, 999, L"输入设置");
+                const wchar_t *titles[] = {L"副标题", L"　赣普词语连带", L"模糊匹配", L"　普拼兼容", L"　其他模糊规则", L"新老兼有", L"新派", L"老派"};
+                for (UINT option = 0; option < 8; ++option) {
+                    UINT flags = MF_STRING;
+                    if (option < 5 ? inputOptions_[option] != 0 : inputOptions_[5] == static_cast<int>(option - 5)) flags |= MF_CHECKED;
+                    if ((option == 1 && !inputOptions_[0]) || ((option == 3 || option == 4) && !inputOptions_[2])) flags |= MF_GRAYED;
+                    AppendMenuW(menu, flags, 1000 + option, titles[option]);
+                }
                 POINT pt;
                 GetCursorPos(&pt);
                 UINT selected = TrackPopupMenu(menu, TPM_RETURNCMD | TPM_NONOTIFY, pt.x, pt.y, 0, hwnd, nullptr);
                 DestroyMenu(menu);
+                if (selected >= 1000) SelectInputOption(selected);
                 if (selected >= 1 && selected <= regionIds_.size()) {
                     SwitchRegion(regionIds_[selected - 1]);
                 }
@@ -1601,14 +1633,25 @@ private:
         }
     }
 
+    void ApplyStoredInputOptions() {
+        DWORD encoded = 31;
+        DWORD size = sizeof(encoded);
+        if (RegGetValueW(HKEY_CURRENT_USER, kRegionRegistryPath, L"InputOptions", RRF_RT_REG_DWORD, nullptr, &encoded, &size) != ERROR_SUCCESS || encoded > 95) encoded = 31;
+        for (size_t index = 0; index < 5; ++index) inputOptions_[index] = (encoded >> index) & 1;
+        inputOptions_[5] = static_cast<int>((encoded >> 5) & 3);
+        if (pipeline_) gannyu_engine_set_input_options(pipeline_, inputOptions_[0], inputOptions_[1], inputOptions_[2], inputOptions_[3], inputOptions_[4], inputOptions_[5]);
+    }
+
     void EnsurePipeline() {
         if (pipeline_) {
+            ApplyStoredInputOptions();
             return;
         }
         GannyuPipelineHandle *handle = nullptr;
         const char *requested = regionId_.empty() ? nullptr : regionId_.c_str();
         if (gannyu_pipeline_create(nullptr, requested, &handle) == 0) {
             pipeline_ = handle;
+            ApplyStoredInputOptions();
         }
     }
 
@@ -2487,7 +2530,7 @@ private:
             contentWidth = std::max(contentWidth, MeasureTextWidth(measureHdc, preeditFont_, preedit) + ScaleForDpi(8, dpi));
             for (size_t index = pageStart; index < pageEnd; ++index) {
                 std::wstring text = LimitDisplayText(candidates_[index].text);
-                std::wstring note = CandidateNote(candidates_[index]);
+                std::wstring note = inputOptions_[0] ? CandidateNote(candidates_[index]) : std::wstring{};
                 int textWidth = MeasureTextWidth(measureHdc, candidateFont_, text);
                 int itemWidth = numberPaddingLeft + numberSlotWidth + numberGap + textWidth + itemPaddingRight;
                 if (!note.empty()) {
@@ -2605,7 +2648,7 @@ private:
             textRect.left = numberRect.right + numberGap;
             textRect.right = row.right - itemPaddingRight;
             std::wstring text = LimitDisplayText(candidates_[absoluteIndex].text);
-            std::wstring note = CandidateNote(candidates_[absoluteIndex]);
+            std::wstring note = inputOptions_[0] ? CandidateNote(candidates_[absoluteIndex]) : std::wstring{};
             int noteWidth = 0;
             if (!note.empty()) {
                 int textWidth = MeasureTextWidth(hdc, candidateFont_, text);
@@ -2793,6 +2836,7 @@ private:
     DWORD keyboardOpenCookie_ = TF_INVALID_COOKIE;
     DWORD conversionCookie_ = TF_INVALID_COOKIE;
     GannyuPipelineHandle *pipeline_ = nullptr;
+    std::array<int, 6> inputOptions_{{1, 1, 1, 1, 1, 0}};
     GannyuSearchCandidateProvider *searchProvider_ = nullptr;
     GannyuFunctionProvider *functionProvider_ = nullptr;
     GannyuRegionButton *langBarButton_ = nullptr;
@@ -2931,10 +2975,19 @@ STDMETHODIMP GannyuRegionButton::InitMenu(ITfMenu *menu) {
         );
         menuRegionIds_.push_back(ids[index]);
     }
+    menu->AddMenuItem(999, TF_LBMENUF_SEPARATOR, nullptr, nullptr, L"", 0, nullptr);
+    menu->AddMenuItem(998, TF_LBMENUF_GRAYED, nullptr, nullptr, L"输入设置", 4, nullptr);
+    const wchar_t *titles[] = {L"副标题", L"　赣普词语连带", L"模糊匹配", L"　普拼兼容", L"　其他模糊规则", L"新老兼有", L"新派", L"老派"};
+    for (UINT option = 0; option < 8; ++option) {
+        DWORD flags = (option < 5 ? owner_->InputOption(option) != 0 : owner_->InputOption(5) == static_cast<int>(option - 5)) ? TF_LBMENUF_CHECKED : 0;
+        if ((option == 1 && !owner_->InputOption(0)) || ((option == 3 || option == 4) && !owner_->InputOption(2))) flags |= TF_LBMENUF_GRAYED;
+        menu->AddMenuItem(1000 + option, flags, nullptr, nullptr, titles[option], static_cast<ULONG>(wcslen(titles[option])), nullptr);
+    }
     return S_OK;
 }
 
 STDMETHODIMP GannyuRegionButton::OnMenuSelect(UINT itemId) {
+    if (owner_ && itemId >= 1000) owner_->SelectInputOption(itemId);
     if (owner_ && itemId < menuRegionIds_.size()) {
         owner_->SwitchRegion(menuRegionIds_[itemId]);
     }
