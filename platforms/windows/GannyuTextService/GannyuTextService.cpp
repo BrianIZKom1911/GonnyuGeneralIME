@@ -43,6 +43,8 @@ static const GUID GannyuProfileGuid =
 // {7A6B9C40-4A1F-4D58-8B2E-9A1C7D3A2F12}
 static const GUID GannyuRegionButtonGuid =
     {0x7a6b9c40, 0x4a1f, 0x4d58, {0x8b, 0x2e, 0x9a, 0x1c, 0x7d, 0x3a, 0x2f, 0x12}};
+static const GUID GannyuSettingsButtonGuid =
+    {0x7a6b9c42, 0x4a1f, 0x4d58, {0x8b, 0x2e, 0x9a, 0x1c, 0x7d, 0x3a, 0x2f, 0x14}};
 // Stable identity for the candidate UI element instance type.
 static const GUID GannyuCandidateUiGuid =
     {0x7a6b9c41, 0x4a1f, 0x4d58, {0x8b, 0x2e, 0x9a, 0x1c, 0x7d, 0x3a, 0x2f, 0x13}};
@@ -953,7 +955,7 @@ void SaveToolbarPosition(POINT point) {
     RegSetValueExW(key, kToolbarYRegistryValue, 0, REG_DWORD, reinterpret_cast<const BYTE *>(&y), sizeof(y)); RegCloseKey(key);
 }
 
-class GannyuRegionButton;
+class GannyuMenuButton;
 
 LRESULT CALLBACK CandidateWindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK StatusBarProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -1008,9 +1010,9 @@ void SaveRegionId(const std::string &regionId) {
     RegCloseKey(key);
 }
 
-class GannyuRegionButton final : public ITfLangBarItemButton, public ITfSource {
+class GannyuMenuButton final : public ITfLangBarItemButton, public ITfSource {
 public:
-    explicit GannyuRegionButton(GannyuTextService *owner);
+    explicit GannyuMenuButton(GannyuTextService *owner, bool settings = false);
 
     void NotifyUpdate();
 
@@ -1035,6 +1037,7 @@ public:
 private:
     LONG refs_ = 1;
     GannyuTextService *owner_ = nullptr;
+    bool settings_ = false;
     ITfLangBarItemSink *sink_ = nullptr;
     TF_LANGBARITEMINFO info_{};
     std::vector<std::string> menuRegionIds_;
@@ -1072,10 +1075,15 @@ public:
             return values;
         });
         if (searchProvider_) functionProvider_ = new (std::nothrow) GannyuFunctionProvider(searchProvider_);
-        langBarButton_ = new (std::nothrow) GannyuRegionButton(this);
+        langBarButton_ = new (std::nothrow) GannyuMenuButton(this);
+        settingsBarButton_ = new (std::nothrow) GannyuMenuButton(this, true);
     }
 
     ~GannyuTextService() {
+        if (settingsBarButton_) {
+            settingsBarButton_->Release();
+            settingsBarButton_ = nullptr;
+        }
         if (langBarButton_) {
             langBarButton_->Release();
             langBarButton_ = nullptr;
@@ -1206,15 +1214,17 @@ public:
             englishMode_ = false;
             SetKeyboardConversionMode(false);
         }
-        if (langBarButton_ && regionIds_.size() > 1) {
-            ITfLangBarItemMgr *langBarMgr = nullptr;
-            if (SUCCEEDED(threadMgr_->QueryInterface(IID_ITfLangBarItemMgr, reinterpret_cast<void **>(&langBarMgr))) && langBarMgr) {
+        ITfLangBarItemMgr *langBarMgr = nullptr;
+        if (SUCCEEDED(threadMgr_->QueryInterface(IID_ITfLangBarItemMgr, reinterpret_cast<void **>(&langBarMgr))) && langBarMgr) {
+            if (langBarButton_ && regionIds_.size() > 1) {
                 const HRESULT hr = langBarMgr->AddItem(langBarButton_);
-                if (SUCCEEDED(hr) || hr == TF_E_ALREADY_EXISTS) {
-                    langBarItemAdded_ = true;
-                }
-                langBarMgr->Release();
+                langBarItemAdded_ = SUCCEEDED(hr) || hr == TF_E_ALREADY_EXISTS;
             }
+            if (settingsBarButton_) {
+                const HRESULT hr = langBarMgr->AddItem(settingsBarButton_);
+                settingsBarItemAdded_ = SUCCEEDED(hr) || hr == TF_E_ALREADY_EXISTS;
+            }
+            langBarMgr->Release();
         }
         if (foregroundFocused_ && EnsureStatusBar()) UpdateStatusBar();
         return S_OK;
@@ -1227,13 +1237,15 @@ public:
         UnadviseInputModeCompartments();
         SetActiveContext(nullptr);
         DestroyCandidateWindow();
-        if (threadMgr_ && langBarButton_ && langBarItemAdded_) {
+        if (threadMgr_ && (langBarItemAdded_ || settingsBarItemAdded_)) {
             ITfLangBarItemMgr *langBarMgr = nullptr;
             if (SUCCEEDED(threadMgr_->QueryInterface(IID_ITfLangBarItemMgr, reinterpret_cast<void **>(&langBarMgr))) && langBarMgr) {
-                langBarMgr->RemoveItem(langBarButton_);
+                if (langBarButton_ && langBarItemAdded_) langBarMgr->RemoveItem(langBarButton_);
+                if (settingsBarButton_ && settingsBarItemAdded_) langBarMgr->RemoveItem(settingsBarButton_);
                 langBarMgr->Release();
             }
             langBarItemAdded_ = false;
+            settingsBarItemAdded_ = false;
         }
         if (keystrokeMgr_) {
             keystrokeMgr_->UnadviseKeyEventSink(clientId_);
@@ -1431,17 +1443,21 @@ public:
     int InputOption(size_t index) const { return inputOptions_[index]; }
 
     void SelectInputOption(UINT itemId) {
-        if (itemId < 1000 || itemId > 1007) return;
-        const size_t index = itemId < 1005 ? itemId - 1000 : 5;
-        inputOptions_[index] = index == 5 ? static_cast<int>(itemId - 1005) : !inputOptions_[index];
-        DWORD encoded = static_cast<DWORD>(inputOptions_[5]) << 5;
+        if (itemId < 1000 || itemId > 1008) return;
+        const size_t indices[] = {0, 1, 6, 2, 3, 4};
+        const size_t index = itemId < 1006 ? indices[itemId - 1000] : 5;
+        inputOptions_[index] = index == 5 ? static_cast<int>(itemId - 1006) : !inputOptions_[index];
+        DWORD encoded = (static_cast<DWORD>(inputOptions_[5]) << 5) | (static_cast<DWORD>(inputOptions_[6] != 0) << 7) | 256;
         for (size_t i = 0; i < 5; ++i) encoded |= static_cast<DWORD>(inputOptions_[i] != 0) << i;
         HKEY key = nullptr;
         if (RegCreateKeyExW(HKEY_CURRENT_USER, kRegionRegistryPath, 0, nullptr, 0, KEY_WRITE, nullptr, &key, nullptr) == ERROR_SUCCESS) {
             RegSetValueExW(key, L"InputOptions", 0, REG_DWORD, reinterpret_cast<const BYTE *>(&encoded), sizeof(encoded));
             RegCloseKey(key);
         }
-        if (pipeline_) gannyu_engine_set_input_options(pipeline_, inputOptions_[0], inputOptions_[1], inputOptions_[2], inputOptions_[3], inputOptions_[4], inputOptions_[5]);
+        if (pipeline_) {
+            gannyu_engine_set_input_options(pipeline_, inputOptions_[0], inputOptions_[1], inputOptions_[2], inputOptions_[3], inputOptions_[4], inputOptions_[5]);
+            gannyu_engine_set_synonyms_enabled(pipeline_, inputOptions_[6]);
+        }
         selectedIndex_ = 0;
         RefreshCandidates();
         NotifyLangBarItemUpdate();
@@ -1475,6 +1491,7 @@ public:
     }
 
     void NotifyLangBarItemUpdate() {
+        if (settingsBarButton_) settingsBarButton_->NotifyUpdate();
         if (langBarButton_) {
             langBarButton_->NotifyUpdate();
         }
@@ -1550,22 +1567,25 @@ public:
                     }
                     return 0;
                 }
-                if (!PtInRect(&regionButtonRect_, point)) return 0;
+                const bool settings = PtInRect(&settingsButtonRect_, point) != FALSE;
+                if (!settings && !PtInRect(&regionButtonRect_, point)) return 0;
                 HMENU menu = CreatePopupMenu();
-                for (size_t i = 0; i < regionIds_.size(); ++i) {
-                    UINT flags = MF_STRING;
-                    if (regionIds_[i] == regionId_) flags |= MF_CHECKED;
-                    std::wstring label = RegionLabel(i);
-                    AppendMenuW(menu, flags, (UINT_PTR)(i + 1), label.c_str());
-                }
-                AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
-                AppendMenuW(menu, MF_STRING | MF_GRAYED, 999, L"输入设置");
-                const wchar_t *titles[] = {L"副标题", L"　赣普词语连带", L"模糊匹配", L"　普拼兼容", L"　其他模糊规则", L"新老兼有", L"新派", L"老派"};
-                for (UINT option = 0; option < 8; ++option) {
-                    UINT flags = MF_STRING;
-                    if (option < 5 ? inputOptions_[option] != 0 : inputOptions_[5] == static_cast<int>(option - 5)) flags |= MF_CHECKED;
-                    if ((option == 1 && !inputOptions_[0]) || ((option == 3 || option == 4) && !inputOptions_[2])) flags |= MF_GRAYED;
-                    AppendMenuW(menu, flags, 1000 + option, titles[option]);
+                if (settings) {
+                    const wchar_t *titles[] = {L"副标题", L"　赣普词语连带", L"　同义词连带", L"模糊匹配", L"　普拼兼容", L"　其他模糊规则", L"新老兼有", L"新派", L"老派"};
+                    const size_t indices[] = {0, 1, 6, 2, 3, 4};
+                    for (UINT option = 0; option < 9; ++option) {
+                        UINT flags = MF_STRING;
+                        if (option < 6 ? inputOptions_[indices[option]] != 0 : inputOptions_[5] == static_cast<int>(option - 6)) flags |= MF_CHECKED;
+                        if (((option == 1 || option == 2) && !inputOptions_[0]) || ((option == 4 || option == 5) && !inputOptions_[2])) flags |= MF_GRAYED;
+                        AppendMenuW(menu, flags, 1000 + option, titles[option]);
+                    }
+                } else {
+                    for (size_t i = 0; i < regionIds_.size(); ++i) {
+                        UINT flags = MF_STRING;
+                        if (regionIds_[i] == regionId_) flags |= MF_CHECKED;
+                        std::wstring label = RegionLabel(i);
+                        AppendMenuW(menu, flags, (UINT_PTR)(i + 1), label.c_str());
+                    }
                 }
                 POINT pt;
                 GetCursorPos(&pt);
@@ -1608,6 +1628,7 @@ public:
                 drawButton(englishMode_ ? L"英" : L"中", englishButtonRect_);
                 drawButton(fullwidthPunctuation_ ? L"全" : L"半", punctuationButtonRect_);
                 drawButton(CurrentRegionLabel() + L" ▾", regionButtonRect_);
+                drawButton(L"输入设置 ▾", settingsButtonRect_);
                 drawButton(L"词库 ▾   ⚙", userDataButtonRect_);
                 drawButton(L"ⓘ", tutorialButtonRect_);
                 DeleteObject(font);
@@ -1636,10 +1657,14 @@ private:
     void ApplyStoredInputOptions() {
         DWORD encoded = 31;
         DWORD size = sizeof(encoded);
-        if (RegGetValueW(HKEY_CURRENT_USER, kRegionRegistryPath, L"InputOptions", RRF_RT_REG_DWORD, nullptr, &encoded, &size) != ERROR_SUCCESS || encoded > 95) encoded = 31;
+        if (RegGetValueW(HKEY_CURRENT_USER, kRegionRegistryPath, L"InputOptions", RRF_RT_REG_DWORD, nullptr, &encoded, &size) != ERROR_SUCCESS || (encoded & ~511u) != 0 || ((encoded >> 5) & 3) > 2) encoded = 31;
         for (size_t index = 0; index < 5; ++index) inputOptions_[index] = (encoded >> index) & 1;
         inputOptions_[5] = static_cast<int>((encoded >> 5) & 3);
-        if (pipeline_) gannyu_engine_set_input_options(pipeline_, inputOptions_[0], inputOptions_[1], inputOptions_[2], inputOptions_[3], inputOptions_[4], inputOptions_[5]);
+        inputOptions_[6] = (encoded & 256) ? static_cast<int>((encoded >> 7) & 1) : 1;
+        if (pipeline_) {
+            gannyu_engine_set_input_options(pipeline_, inputOptions_[0], inputOptions_[1], inputOptions_[2], inputOptions_[3], inputOptions_[4], inputOptions_[5]);
+            gannyu_engine_set_synonyms_enabled(pipeline_, inputOptions_[6]);
+        }
     }
 
     void EnsurePipeline() {
@@ -2434,7 +2459,7 @@ private:
         }
         UINT dpi = GetDpiForWindow(statusWindow_);
         if (dpi == 0) dpi = 96;
-        int barW = ScaleForDpi(330, dpi);
+        int barW = ScaleForDpi(430, dpi);
         int barH = ScaleForDpi(26, dpi);
         RECT workArea{};
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0);
@@ -2836,10 +2861,12 @@ private:
     DWORD keyboardOpenCookie_ = TF_INVALID_COOKIE;
     DWORD conversionCookie_ = TF_INVALID_COOKIE;
     GannyuPipelineHandle *pipeline_ = nullptr;
-    std::array<int, 6> inputOptions_{{1, 1, 1, 1, 1, 0}};
+    std::array<int, 7> inputOptions_{{1, 1, 1, 1, 1, 0, 1}};
     GannyuSearchCandidateProvider *searchProvider_ = nullptr;
     GannyuFunctionProvider *functionProvider_ = nullptr;
-    GannyuRegionButton *langBarButton_ = nullptr;
+    GannyuMenuButton *langBarButton_ = nullptr;
+    GannyuMenuButton *settingsBarButton_ = nullptr;
+    bool settingsBarItemAdded_ = false;
     bool langBarItemAdded_ = false;
     std::string regionId_;
     std::vector<std::string> regionIds_;
@@ -2870,6 +2897,7 @@ private:
     RECT englishButtonRect_{};
     RECT punctuationButtonRect_{};
     RECT regionButtonRect_{};
+    RECT settingsButtonRect_{};
     RECT userDataButtonRect_{};
     RECT tutorialButtonRect_{};
     HFONT preeditFont_ = nullptr;
@@ -2880,21 +2908,21 @@ private:
     SIZE popupSize_{};
 };
 
-GannyuRegionButton::GannyuRegionButton(GannyuTextService *owner) : owner_(owner) {
+GannyuMenuButton::GannyuMenuButton(GannyuTextService *owner, bool settings) : owner_(owner), settings_(settings) {
     info_.clsidService = CLSID_GannyuTextService;
-    info_.guidItem = GannyuRegionButtonGuid;
+    info_.guidItem = settings_ ? GannyuSettingsButtonGuid : GannyuRegionButtonGuid;
     info_.dwStyle = TF_LBI_STYLE_BTN_MENU | TF_LBI_STYLE_SHOWNINTRAY;
-    info_.ulSort = 0;
-    StringCchCopyW(info_.szDescription, _countof(info_.szDescription), L"Gannyu Region");
+    info_.ulSort = settings_ ? 1 : 0;
+    StringCchCopyW(info_.szDescription, _countof(info_.szDescription), settings_ ? L"输入设置" : L"Gannyu Region");
 }
 
-void GannyuRegionButton::NotifyUpdate() {
+void GannyuMenuButton::NotifyUpdate() {
     if (sink_) {
         sink_->OnUpdate(TF_LBI_TEXT | TF_LBI_STATUS);
     }
 }
 
-STDMETHODIMP GannyuRegionButton::QueryInterface(REFIID riid, void **ppv) {
+STDMETHODIMP GannyuMenuButton::QueryInterface(REFIID riid, void **ppv) {
     if (!ppv) {
         return E_POINTER;
     }
@@ -2912,11 +2940,11 @@ STDMETHODIMP GannyuRegionButton::QueryInterface(REFIID riid, void **ppv) {
     return S_OK;
 }
 
-STDMETHODIMP_(ULONG) GannyuRegionButton::AddRef() {
+STDMETHODIMP_(ULONG) GannyuMenuButton::AddRef() {
     return static_cast<ULONG>(InterlockedIncrement(&refs_));
 }
 
-STDMETHODIMP_(ULONG) GannyuRegionButton::Release() {
+STDMETHODIMP_(ULONG) GannyuMenuButton::Release() {
     LONG refs = InterlockedDecrement(&refs_);
     if (refs == 0) {
         if (sink_) {
@@ -2927,7 +2955,7 @@ STDMETHODIMP_(ULONG) GannyuRegionButton::Release() {
     return static_cast<ULONG>(refs);
 }
 
-STDMETHODIMP GannyuRegionButton::GetInfo(TF_LANGBARITEMINFO *info) {
+STDMETHODIMP GannyuMenuButton::GetInfo(TF_LANGBARITEMINFO *info) {
     if (!info) {
         return E_POINTER;
     }
@@ -2935,7 +2963,7 @@ STDMETHODIMP GannyuRegionButton::GetInfo(TF_LANGBARITEMINFO *info) {
     return S_OK;
 }
 
-STDMETHODIMP GannyuRegionButton::GetStatus(DWORD *status) {
+STDMETHODIMP GannyuMenuButton::GetStatus(DWORD *status) {
     if (!status) {
         return E_POINTER;
     }
@@ -2943,58 +2971,60 @@ STDMETHODIMP GannyuRegionButton::GetStatus(DWORD *status) {
     return S_OK;
 }
 
-STDMETHODIMP GannyuRegionButton::Show(BOOL) { return S_OK; }
+STDMETHODIMP GannyuMenuButton::Show(BOOL) { return S_OK; }
 
-STDMETHODIMP GannyuRegionButton::GetTooltipString(BSTR *tooltip) {
+STDMETHODIMP GannyuMenuButton::GetTooltipString(BSTR *tooltip) {
     if (!tooltip) {
         return E_POINTER;
     }
-    *tooltip = SysAllocString(L"切换赣语地区");
+    *tooltip = SysAllocString(settings_ ? L"输入设置" : L"切换赣语地区");
     return *tooltip ? S_OK : E_OUTOFMEMORY;
 }
 
-STDMETHODIMP GannyuRegionButton::OnClick(TfLBIClick, POINT, const RECT *) { return S_OK; }
+STDMETHODIMP GannyuMenuButton::OnClick(TfLBIClick, POINT, const RECT *) { return S_OK; }
 
-STDMETHODIMP GannyuRegionButton::InitMenu(ITfMenu *menu) {
+STDMETHODIMP GannyuMenuButton::InitMenu(ITfMenu *menu) {
     if (!menu || !owner_) {
         return E_INVALIDARG;
     }
     menuRegionIds_.clear();
-    const auto &ids = owner_->RegionIds();
-    for (size_t index = 0; index < ids.size(); ++index) {
-        const std::wstring label = owner_->RegionLabel(index);
-        const DWORD flags = ids[index] == owner_->CurrentRegionId() ? TF_LBMENUF_CHECKED : 0;
-        menu->AddMenuItem(
-            static_cast<UINT>(index),
-            flags,
-            nullptr,
-            nullptr,
-            label.c_str(),
-            static_cast<ULONG>(label.size()),
-            nullptr
-        );
-        menuRegionIds_.push_back(ids[index]);
+    if (!settings_) {
+        const auto &ids = owner_->RegionIds();
+        for (size_t index = 0; index < ids.size(); ++index) {
+            const std::wstring label = owner_->RegionLabel(index);
+            const DWORD flags = ids[index] == owner_->CurrentRegionId() ? TF_LBMENUF_CHECKED : 0;
+            menu->AddMenuItem(
+                static_cast<UINT>(index),
+                flags,
+                nullptr,
+                nullptr,
+                label.c_str(),
+                static_cast<ULONG>(label.size()),
+                nullptr
+            );
+            menuRegionIds_.push_back(ids[index]);
+        }
+        return S_OK;
     }
-    menu->AddMenuItem(999, TF_LBMENUF_SEPARATOR, nullptr, nullptr, L"", 0, nullptr);
-    menu->AddMenuItem(998, TF_LBMENUF_GRAYED, nullptr, nullptr, L"输入设置", 4, nullptr);
-    const wchar_t *titles[] = {L"副标题", L"　赣普词语连带", L"模糊匹配", L"　普拼兼容", L"　其他模糊规则", L"新老兼有", L"新派", L"老派"};
-    for (UINT option = 0; option < 8; ++option) {
-        DWORD flags = (option < 5 ? owner_->InputOption(option) != 0 : owner_->InputOption(5) == static_cast<int>(option - 5)) ? TF_LBMENUF_CHECKED : 0;
-        if ((option == 1 && !owner_->InputOption(0)) || ((option == 3 || option == 4) && !owner_->InputOption(2))) flags |= TF_LBMENUF_GRAYED;
+    const wchar_t *titles[] = {L"副标题", L"　赣普词语连带", L"　同义词连带", L"模糊匹配", L"　普拼兼容", L"　其他模糊规则", L"新老兼有", L"新派", L"老派"};
+    const size_t indices[] = {0, 1, 6, 2, 3, 4};
+    for (UINT option = 0; option < 9; ++option) {
+        DWORD flags = (option < 6 ? owner_->InputOption(indices[option]) != 0 : owner_->InputOption(5) == static_cast<int>(option - 6)) ? TF_LBMENUF_CHECKED : 0;
+        if (((option == 1 || option == 2) && !owner_->InputOption(0)) || ((option == 4 || option == 5) && !owner_->InputOption(2))) flags |= TF_LBMENUF_GRAYED;
         menu->AddMenuItem(1000 + option, flags, nullptr, nullptr, titles[option], static_cast<ULONG>(wcslen(titles[option])), nullptr);
     }
     return S_OK;
 }
 
-STDMETHODIMP GannyuRegionButton::OnMenuSelect(UINT itemId) {
-    if (owner_ && itemId >= 1000) owner_->SelectInputOption(itemId);
-    if (owner_ && itemId < menuRegionIds_.size()) {
+STDMETHODIMP GannyuMenuButton::OnMenuSelect(UINT itemId) {
+    if (owner_ && settings_ && itemId >= 1000) owner_->SelectInputOption(itemId);
+    if (owner_ && !settings_ && itemId < menuRegionIds_.size()) {
         owner_->SwitchRegion(menuRegionIds_[itemId]);
     }
     return S_OK;
 }
 
-STDMETHODIMP GannyuRegionButton::GetIcon(HICON *icon) {
+STDMETHODIMP GannyuMenuButton::GetIcon(HICON *icon) {
     if (!icon) {
         return E_POINTER;
     }
@@ -3002,16 +3032,16 @@ STDMETHODIMP GannyuRegionButton::GetIcon(HICON *icon) {
     return E_FAIL;
 }
 
-STDMETHODIMP GannyuRegionButton::GetText(BSTR *text) {
+STDMETHODIMP GannyuMenuButton::GetText(BSTR *text) {
     if (!text) {
         return E_POINTER;
     }
-    const std::wstring label = owner_ ? owner_->CurrentRegionLabel() : std::wstring(kTextServiceDescription);
+    const std::wstring label = settings_ ? L"输入设置" : (owner_ ? owner_->CurrentRegionLabel() : std::wstring(kTextServiceDescription));
     *text = SysAllocString(label.c_str());
     return *text ? S_OK : E_OUTOFMEMORY;
 }
 
-STDMETHODIMP GannyuRegionButton::AdviseSink(REFIID riid, IUnknown *unknown, DWORD *cookie) {
+STDMETHODIMP GannyuMenuButton::AdviseSink(REFIID riid, IUnknown *unknown, DWORD *cookie) {
     if (!cookie) {
         return E_POINTER;
     }
@@ -3030,7 +3060,7 @@ STDMETHODIMP GannyuRegionButton::AdviseSink(REFIID riid, IUnknown *unknown, DWOR
     return S_OK;
 }
 
-STDMETHODIMP GannyuRegionButton::UnadviseSink(DWORD cookie) {
+STDMETHODIMP GannyuMenuButton::UnadviseSink(DWORD cookie) {
     if (cookie != 1 || !sink_) {
         return CONNECT_E_NOCONNECTION;
     }
