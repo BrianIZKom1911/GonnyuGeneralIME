@@ -190,10 +190,11 @@ Java_io_gannyu_input_NativePipelineBridge_nativeDestroy(JNIEnv* env, jobject thi
 JNIEXPORT jboolean JNICALL
 Java_io_gannyu_input_NativePipelineBridge_nativeSetInputOptions(JNIEnv* env, jobject thiz, jlong handle, jintArray values) {
     (void)thiz;
-    if (values == NULL || (*env)->GetArrayLength(env, values) != 6) return JNI_FALSE;
-    jint options[6];
-    (*env)->GetIntArrayRegion(env, values, 0, 6, options);
+    if (values == NULL || (*env)->GetArrayLength(env, values) != 7) return JNI_FALSE;
+    jint options[7];
+    (*env)->GetIntArrayRegion(env, values, 0, 7, options);
     if ((*env)->ExceptionCheck(env)) return JNI_FALSE;
     return gannyu_engine_set_input_options((GannyuPipelineHandle*)(intptr_t)handle,
-        options[0], options[1], options[2], options[3], options[4], options[5]) == 0 ? JNI_TRUE : JNI_FALSE;
+        options[0], options[1], options[2], options[3], options[4], options[5]) == 0 &&
+        gannyu_engine_set_synonyms_enabled((GannyuPipelineHandle*)(intptr_t)handle, options[6]) == 0 ? JNI_TRUE : JNI_FALSE;
 }
