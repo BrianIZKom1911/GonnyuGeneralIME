@@ -33,6 +33,7 @@ private class NativePipelineBridge {
 
     external fun nativeCreate(manifestPath: String?, regionId: String?, dataDir: String): Long
     external fun nativeLastError(): String?
+    external fun nativeSetInputOptions(handle: Long, values: IntArray): Boolean
     external fun nativeSnapshot(handle: Long): String?
     external fun nativeCandidates(handle: Long, offset: Int, limit: Int): String?
     external fun nativeProcessKey(handle: Long, eventJson: String): String?
@@ -154,7 +155,56 @@ class GannyuInputMethodService : InputMethodService() {
         fun nativeCreateStatic(context: Context, region: String?): Long {
             val resourceRoot = RimeResourceStore.prepare(context).absolutePath
             val userDataDir = RimeResourceStore.userDataDirectory(context).absolutePath
-            return nativeBridge.nativeCreate(resourceRoot, region, userDataDir)
+            val handle = nativeBridge.nativeCreate(resourceRoot, region, userDataDir)
+            if (handle != 0L && !nativeBridge.nativeSetInputOptions(handle, inputOptions(context))) {
+                nativeBridge.nativeDestroy(handle)
+                return 0
+            }
+            return handle
+        }
+
+        fun inputOptions(context: Context): IntArray {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return IntArray(6) { index -> if (index == 5) prefs.getInt("input_option_5", 0).coerceIn(0, 2) else if (prefs.getBoolean("input_option_$index", true)) 1 else 0 }
+        }
+
+        fun populateInputOptions(context: Context, container: LinearLayout) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val values = inputOptions(context)
+            val switches = listOf("副标题", "赣普词语连带", "模糊匹配", "普拼兼容", "其他模糊规则").mapIndexed { index, label ->
+                android.widget.Switch(context).apply {
+                    text = label
+                    isChecked = values[index] != 0
+                    val indent = if (index == 1 || index == 3 || index == 4) 36 else 12
+                    setPadding((indent * resources.displayMetrics.density).toInt(), 8, 12, 8)
+                    container.addView(this)
+                }
+            }
+            fun updateEnabled() {
+                switches[1].isEnabled = switches[0].isChecked
+                switches[3].isEnabled = switches[2].isChecked
+                switches[4].isEnabled = switches[2].isChecked
+            }
+            switches.forEachIndexed { index, control -> control.setOnCheckedChangeListener { _, checked ->
+                prefs.edit().putBoolean("input_option_$index", checked).apply()
+                updateEnabled()
+            } }
+            updateEnabled()
+            container.addView(TextView(context).apply { text = "读音模式"; setPadding(12, 12, 12, 0) })
+            val modes = android.widget.RadioGroup(context)
+            listOf("新老兼有", "新派", "老派").forEachIndexed { index, label ->
+                modes.addView(android.widget.RadioButton(context).apply {
+                    id = View.generateViewId()
+                    text = label
+                    isChecked = index == values[5]
+                    tag = index
+                })
+            }
+            modes.setOnCheckedChangeListener { group, id ->
+                val selected = group.findViewById<View>(id)?.tag as? Int ?: return@setOnCheckedChangeListener
+                prefs.edit().putInt("input_option_5", selected).apply()
+            }
+            container.addView(modes)
         }
 
         @JvmStatic
@@ -342,8 +392,20 @@ class GannyuInputMethodService : InputMethodService() {
         init { System.loadLibrary("gannyu_input_jni") }
     }
 
+    private val inputOptionsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key?.startsWith("input_option_") == true) {
+            candidateLoadGeneration += 1
+            candidateExpanded = false
+            enqueueNativeOperation { handle ->
+                check(nativeBridge.nativeSetInputOptions(handle, inputOptions(this)))
+                nativeBridge.nativeSnapshot(handle)
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(inputOptionsListener)
         loadSelectedPipelineAsync()
     }
 
@@ -354,6 +416,7 @@ class GannyuInputMethodService : InputMethodService() {
         get() = getColor(R.color.keyboard_secondary_text)
 
     override fun onDestroy() {
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(inputOptionsListener)
         stopBackspaceRepeat()
         pipelineLoadGeneration += 1
         engineGeneration += 1
@@ -434,6 +497,10 @@ class GannyuInputMethodService : InputMethodService() {
         super.onStartInputView(info, restarting)
         if (selectedRegionId(this) != currentStaticRegionId()) {
             loadSelectedPipelineAsync()
+        }
+        enqueueNativeOperation { handle ->
+            check(nativeBridge.nativeSetInputOptions(handle, inputOptions(this)))
+            nativeBridge.nativeSnapshot(handle)
         }
         renderKeyboard()
         renderState()

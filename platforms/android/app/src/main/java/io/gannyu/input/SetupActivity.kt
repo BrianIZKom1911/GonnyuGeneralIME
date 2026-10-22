@@ -38,6 +38,10 @@ class SetupActivity : Activity() {
         regionSpinner = findViewById(R.id.regionSpinner)
         manageUserDataButton = findViewById(R.id.manageUserData)
         openImePickerButton = findViewById(R.id.openImePicker)
+        val inputOptions = android.widget.LinearLayout(this).apply { orientation = android.widget.LinearLayout.VERTICAL }
+        findViewById<android.widget.LinearLayout>(R.id.settingsSections).addView(inputOptions, 2)
+        inputOptions.addView(TextView(this).apply { text = "输入设置"; textSize = 18f })
+        GannyuInputMethodService.populateInputOptions(this, inputOptions)
         setupRegionPicker(statusView)
         manageUserDataButton.setOnClickListener { showClearChoices() }
 
