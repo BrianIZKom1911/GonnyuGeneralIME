@@ -16,6 +16,7 @@ pub enum ReadingMode {
 pub struct InputOptions {
     pub annotations: bool,
     pub relations: bool,
+    pub synonyms: bool,
     pub fuzzy: bool,
     pub mandarin: bool,
     pub fuzzy_rules: bool,
@@ -27,6 +28,7 @@ impl Default for InputOptions {
         Self {
             annotations: true,
             relations: true,
+            synonyms: true,
             fuzzy: true,
             mandarin: true,
             fuzzy_rules: true,
@@ -42,6 +44,10 @@ impl InputOptions {
 
     pub fn mandarin_enabled(self) -> bool {
         self.fuzzy && self.mandarin
+    }
+
+    pub fn synonyms_enabled(self) -> bool {
+        self.annotations && self.synonyms
     }
 
     pub fn fuzzy_rules_enabled(self) -> bool {
@@ -62,6 +68,7 @@ impl InputOptions {
             .collect();
         let entries = source.entries().iter().filter_map(|entry| {
             if !self.relations_enabled()
+                && entry.headword.chars().count() > 1
                 && (entry.is_mandarin_only() || mandarin_words.contains(entry.headword.as_ref()))
             {
                 return None;
@@ -114,6 +121,12 @@ impl InputOptions {
             if !self.relations_enabled() {
                 entry.mandarin_word = "".into();
                 entry.mandarin_word_pinyin = "".into();
+                if entry.is_mandarin_only() {
+                    entry.category = "赣".into();
+                }
+            }
+            if !self.synonyms_enabled() {
+                entry.synonyms = "".into();
             }
             Some(entry)
         });

@@ -1384,6 +1384,7 @@ pub unsafe extern "C" fn gannyu_engine_set_input_options(
     let options = gannyu_input_core::InputOptions {
         annotations: annotations != 0,
         relations: relations != 0,
+        synonyms: (&*handle).pipeline.lock().input_options().synonyms,
         fuzzy: fuzzy != 0,
         mandarin: mandarin != 0,
         fuzzy_rules: fuzzy_rules != 0,
@@ -1395,6 +1396,31 @@ pub unsafe extern "C" fn gannyu_engine_set_input_options(
         if pipeline.input_options() == options {
             return STATUS_OK;
         }
+        pipeline.set_input_options(options);
+    }
+    let mut session = handle.session.lock();
+    session.page_number = 0;
+    clear_accumulated_selection(&mut session);
+    STATUS_OK
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_set_synonyms_enabled(
+    handle: *mut GannyuPipelineHandle,
+    enabled: c_int,
+) -> c_int {
+    clear_last_error();
+    if handle.is_null() {
+        return invalid_argument("engine handle is null");
+    }
+    let handle = &*handle;
+    {
+        let mut pipeline = handle.pipeline.lock();
+        let mut options = pipeline.input_options();
+        if options.synonyms == (enabled != 0) {
+            return STATUS_OK;
+        }
+        options.synonyms = enabled != 0;
         pipeline.set_input_options(options);
     }
     let mut session = handle.session.lock();

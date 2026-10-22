@@ -536,10 +536,12 @@ impl InputPipeline {
         }
         let dictionary_changed = self.input_options.relations_enabled()
             != options.relations_enabled()
+            || self.input_options.synonyms_enabled() != options.synonyms_enabled()
             || self.input_options.mandarin_enabled() != options.mandarin_enabled()
             || self.input_options.reading_mode != options.reading_mode;
         if dictionary_changed {
             let original = options.relations_enabled()
+                && options.synonyms_enabled()
                 && options.mandarin_enabled()
                 && options.reading_mode == crate::ReadingMode::Both;
             if original {
@@ -573,11 +575,11 @@ impl InputPipeline {
         if !options.relations_enabled() {
             let source = self.source_dictionary.as_ref().unwrap_or(&self.dictionary);
             for entry in source.entries() {
-                if entry.is_mandarin_only() {
+                if entry.is_mandarin_only() && entry.headword.chars().count() > 1 {
                     self.excluded_words.insert(entry.headword.clone());
                 }
                 for word in entry.mandarin_word.split(['/', ';']).map(str::trim) {
-                    if !word.is_empty() && word != entry.headword.as_ref() {
+                    if word.chars().count() > 1 && word != entry.headword.as_ref() {
                         self.excluded_words.insert(word.into());
                     }
                 }

@@ -13,6 +13,69 @@ fn hot_options_filter_before_lookup_and_restore_original_candidates() {
         .retrieve("che1ma3")
         .iter()
         .any(|candidate| candidate.text == "车马"));
+    for relations in [true, false] {
+        for synonyms in [true, false] {
+            pipeline.set_input_options(InputOptions {
+                relations,
+                synonyms,
+                ..InputOptions::default()
+            });
+            let candidates = pipeline.retrieve("ji3do1");
+            assert!(candidates.iter().any(|candidate| candidate.text == "几多"));
+            assert_eq!(
+                candidates.iter().any(|candidate| candidate.text == "多少"),
+                synonyms
+            );
+            let source = candidates
+                .iter()
+                .find(|candidate| candidate.text == "几多")
+                .unwrap();
+            assert_eq!(
+                source
+                    .annotation
+                    .as_deref()
+                    .unwrap_or("")
+                    .contains("[联]多少"),
+                synonyms
+            );
+            assert_eq!(
+                pipeline
+                    .retrieve("yang4niu4")
+                    .iter()
+                    .any(|candidate| candidate.text == "放牛"),
+                relations
+            );
+            assert!(pipeline
+                .retrieve("do1sêu3")
+                .iter()
+                .any(|candidate| candidate.text == "多少"));
+            let chars = pipeline.retrieve("za3");
+            let character = chars
+                .iter()
+                .find(|candidate| candidate.text == "这")
+                .unwrap();
+            assert_eq!(character.mandarin_only, relations);
+            assert_eq!(
+                character
+                    .annotation
+                    .as_deref()
+                    .unwrap_or("")
+                    .contains("[不习用]"),
+                relations
+            );
+        }
+    }
+    pipeline.set_input_options(InputOptions {
+        annotations: false,
+        ..InputOptions::default()
+    });
+    let candidates = pipeline.retrieve("ji3do1");
+    assert!(candidates.iter().any(|candidate| candidate.text == "几多"));
+    assert!(!candidates.iter().any(|candidate| candidate.text == "多少"));
+    assert!(candidates
+        .iter()
+        .all(|candidate| candidate.annotation.is_none()));
+    pipeline.set_input_options(InputOptions::default());
     let mut options = InputOptions {
         fuzzy: false,
         relations: false,
