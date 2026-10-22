@@ -136,6 +136,22 @@ impl From<std::io::Error> for SyllableError {
 }
 
 impl FuzzyMap {
+    pub fn with_optional_rules(&self, enabled: bool) -> FuzzyMap {
+        Self::from_entries(
+            self.entries
+                .iter()
+                .filter(|entry| {
+                    enabled
+                        || matches!(
+                            (entry.gon_fuzzy.as_str(), entry.gon_pin.as_str()),
+                            ("i", "ï") | ("e", "ê") | ("ee", "ê") | ("ir", "e")
+                        )
+                })
+                .cloned()
+                .collect(),
+        )
+    }
+
     fn from_entries(entries: Vec<FuzzyEntry>) -> FuzzyMap {
         let mut gon_fuzzy_index: HashMap<char, Vec<usize>> = HashMap::new();
         let mut gon_pin_index: HashMap<char, Vec<usize>> = HashMap::new();

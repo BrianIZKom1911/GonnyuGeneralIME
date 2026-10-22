@@ -1046,7 +1046,7 @@ impl Dictionary {
         })
     }
 
-    fn rebuild_mandarin_word_text_index(&mut self) {
+    pub(crate) fn rebuild_mandarin_word_text_index(&mut self) {
         self.mandarin_word_text_index.clear();
         for (entry_index, entry) in self.entries.iter().enumerate() {
             add_text_index_entries(

@@ -423,7 +423,10 @@ unsafe fn swap_handle_from_recreated(
         };
     }
     let replacement = *Box::from_raw(replacement);
-    *current.pipeline.lock() = replacement.pipeline.into_inner();
+    let options = current.pipeline.lock().input_options();
+    let mut pipeline = replacement.pipeline.into_inner();
+    pipeline.set_input_options(options);
+    *current.pipeline.lock() = pipeline;
     *current.session.lock() = replacement.session.into_inner();
     current._temp_dir = replacement._temp_dir;
     current._resource_fds = replacement._resource_fds;
@@ -1356,6 +1359,48 @@ pub unsafe extern "C" fn gannyu_engine_switch_region(
     }
     let snapshot = build_snapshot(current, true, None);
     serialize_snapshot(&snapshot, out_json)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_set_input_options(
+    handle: *mut GannyuPipelineHandle,
+    annotations: c_int,
+    relations: c_int,
+    fuzzy: c_int,
+    mandarin: c_int,
+    fuzzy_rules: c_int,
+    reading_mode: c_int,
+) -> c_int {
+    clear_last_error();
+    if handle.is_null() {
+        return invalid_argument("engine handle is null");
+    }
+    let reading_mode = match reading_mode {
+        0 => gannyu_input_core::ReadingMode::Both,
+        1 => gannyu_input_core::ReadingMode::New,
+        2 => gannyu_input_core::ReadingMode::Old,
+        _ => return invalid_argument("reading mode must be 0, 1 or 2"),
+    };
+    let options = gannyu_input_core::InputOptions {
+        annotations: annotations != 0,
+        relations: relations != 0,
+        fuzzy: fuzzy != 0,
+        mandarin: mandarin != 0,
+        fuzzy_rules: fuzzy_rules != 0,
+        reading_mode,
+    };
+    let handle = &*handle;
+    {
+        let mut pipeline = handle.pipeline.lock();
+        if pipeline.input_options() == options {
+            return STATUS_OK;
+        }
+        pipeline.set_input_options(options);
+    }
+    let mut session = handle.session.lock();
+    session.page_number = 0;
+    clear_accumulated_selection(&mut session);
+    STATUS_OK
 }
 
 #[no_mangle]

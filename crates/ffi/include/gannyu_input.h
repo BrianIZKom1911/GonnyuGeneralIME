@@ -100,6 +100,9 @@ int gannyu_engine_snapshot(GannyuPipelineHandle *handle, char **out_json);
 int gannyu_engine_candidates(GannyuPipelineHandle *handle, size_t offset,
                             size_t limit, char **out_json);
 int gannyu_engine_set_candidate_limit(GannyuPipelineHandle *handle, size_t limit);
+int gannyu_engine_set_input_options(GannyuPipelineHandle *handle,
+                                   int annotations, int relations, int fuzzy,
+                                   int mandarin, int fuzzy_rules, int reading_mode);
 
 int gannyu_engine_process_key(GannyuPipelineHandle *handle,
                             const char *event_json,
