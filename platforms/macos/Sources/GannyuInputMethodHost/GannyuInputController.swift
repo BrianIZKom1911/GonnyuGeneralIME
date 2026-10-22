@@ -219,20 +219,21 @@ final class GannyuInputController: IMKInputController {
         let settings = NSMenu(title: "输入设置")
         settings.autoenablesItems = false
         let values = GannyuRegionStore.shared.inputOptions
-        for (index, title) in GannyuRegionStore.optionTitles.enumerated() {
+        for index in [0, 1, 6, 2, 3, 4] {
+            let title = GannyuRegionStore.optionTitles[index]
             let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
             item.target = self
             item.tag = index
-            item.indentationLevel = [1, 3, 4].contains(index) ? 1 : 0
+            item.indentationLevel = [1, 6, 3, 4].contains(index) ? 1 : 0
             item.state = values[index] != 0 ? .on : .off
-            item.isEnabled = index == 1 ? values[0] != 0 : (index == 3 || index == 4 ? values[2] != 0 : true)
+            item.isEnabled = (index == 1 || index == 6) ? values[0] != 0 : (index == 3 || index == 4 ? values[2] != 0 : true)
             settings.addItem(item)
         }
         settings.addItem(.separator())
         for (index, title) in ["新老兼有", "新派", "老派"].enumerated() {
             let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
             item.target = self
-            item.tag = 5 + index
+            item.tag = 10 + index
             item.state = values[5] == Int32(index) ? .on : .off
             settings.addItem(item)
         }
@@ -244,7 +245,7 @@ final class GannyuInputController: IMKInputController {
 
     @objc private func selectInputOption(_ item: NSMenuItem) {
         let values = GannyuRegionStore.shared.inputOptions
-        GannyuRegionStore.shared.setInputOption(item.tag < 5 ? item.tag : 5, value: item.tag < 5 ? (values[item.tag] == 0 ? 1 : 0) : Int32(item.tag - 5))
+        GannyuRegionStore.shared.setInputOption(item.tag < 10 ? item.tag : 5, value: item.tag < 10 ? (values[item.tag] == 0 ? 1 : 0) : Int32(item.tag - 10))
     }
 
     @objc private func inputOptionsDidChange() {
