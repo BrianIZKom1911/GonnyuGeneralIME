@@ -3,11 +3,13 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/../.." && pwd)"
-source_root="${GANNYU_MACOS_RIME_RESOURCE_SOURCE:-$repo_root/build/rime-mobile/mobile-resources}"
+source_root="${GANNYU_MACOS_RIME_RESOURCE_SOURCE:-$repo_root/build/rime-macos-mobile/mobile-resources}"
 output_root="${GANNYU_MACOS_RIME_RESOURCE_OUTPUT:-$repo_root/build/rime-macos/resources}"
 
 if [[ "${GANNYU_MACOS_SKIP_RESOURCE_REBUILD:-0}" != "1" ]]; then
-  bash "$repo_root/platforms/rime/mobile/prepare_resources.sh"
+  GANNYU_MOBILE_RESOURCE_ROOT="$source_root" \
+  GANNYU_RIME_MOBILE_BUILD_ROOT="$repo_root/build/rime-macos-mobile/host" \
+    bash "$repo_root/platforms/rime/mobile/prepare_resources.sh"
 fi
 
 [[ -f "$source_root/resource-manifest.json" ]] || { echo "missing Rime resource manifest: $source_root" >&2; exit 2; }

@@ -7,7 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_macos_resource_staging_uses_canonical_mobile_resources() -> None:
     script = (ROOT / "platforms/macos/prepare_rime_resources.sh").read_text(encoding="utf-8")
 
-    assert 'build/rime-mobile/mobile-resources' in script
+    assert 'build/rime-macos-mobile/mobile-resources' in script
+    assert 'GANNYU_MOBILE_RESOURCE_ROOT="$source_root"' in script
+    assert 'GANNYU_RIME_MOBILE_BUILD_ROOT="$repo_root/build/rime-macos-mobile/host"' in script
     assert 'platforms/rime/mobile/prepare_resources.sh' in script
     assert 'resource-manifest.json' in script
     assert '"$source_root/shared"' in script
