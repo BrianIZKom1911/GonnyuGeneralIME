@@ -47,6 +47,7 @@ Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fu
     - [Windows](#windows)
     - [Linux Fcitx5](#linux-fcitx5)
     - [Rime](#rime)
+    - [Input settings](#input-settings)
   - [The General Gon-pin Romanisation](#the-general-gon-pin-romanisation)
     - [Initials](#initials)
     - [Finals](#finals)
@@ -184,6 +185,28 @@ Restart Fcitx5 with `fcitx5 -r`, or sign out and back in. Then add **Gannyu Gan 
 Download `GonnyuGeneralIME-version-rime-region.zip` for the required locality. The archive works with Rime front ends on every platform.
 
 For Windows Weasel, copy the archive contents into `%APPDATA%\Rime` and redeploy from the input-method menu. For Linux Fcitx5 Rime, copy the contents into `~/.local/share/fcitx5/rime/`, redeploy, then select the locality from the schema menu. For iOS and Android, import or deploy the ZIP in the installed Rime front end.
+
+### Input settings
+
+All switches are enabled by default, with both newer and older readings selected. Changes take effect without reinstalling or redeploying.
+
+| Setting | Effect |
+| --- | --- |
+| Annotations | Show or hide candidate readings and annotations. |
+| Gan–Mandarin associations | Control associated Gan and Mandarin candidates and their annotations. Disabling this filters Mandarin words while retaining single-character candidates. |
+| Synonym associations | Control associated synonym candidates and their annotations, independently of Gan–Mandarin associations and annotations. |
+| Fuzzy matching | Master switch for Mandarin Pinyin compatibility, literary–colloquial matching, and other fuzzy rules. Mandarin Pinyin compatibility allows words to be found using Mandarin Pinyin. Literary–colloquial matching links literary and colloquial readings; disabling it preserves their labels. Other fuzzy rules control matching beyond compatibility for the special i and e phonemes. |
+| Reading mode | Select both newer and older readings, newer readings, or older readings. This affects matching and the readings shown in annotations. |
+
+Disabling fuzzy matching suspends its three child options while preserving their selections; these options appear greyed out on mobile.
+
+| Platform | Access |
+| --- | --- |
+| macOS | Click **赣·locality** in the menu bar and open **输入设置**. |
+| Windows | With the Gan input method active, open **输入设置** in the language bar. |
+| iOS, Android | Open the Gan input method app and adjust **输入设置**. |
+| Rime | Open the front end’s schema menu and select a switch or reading mode. |
+| Native Linux Fcitx5 | These settings have no interface yet. Fcitx5 Rime uses the Rime schema menu. |
 
 ## The General Gon-pin Romanisation
 
