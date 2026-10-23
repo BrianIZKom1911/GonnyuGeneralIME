@@ -36,6 +36,7 @@ permissions:
 
 jobs:
   build:
+    if: github.event_name != 'push' || github.ref_type != 'branch' || !startsWith(github.event.head_commit.message, 'chore(release):')
     runs-on: macos-15-intel
     timeout-minutes: 90
     outputs:
@@ -44,6 +45,7 @@ jobs:
       CMAKE_BUILD_PARALLEL_LEVEL: "2"
       GANNYU_MACOS_RIME_RESOURCE_OUTPUT: ${{ github.workspace }}/build/rime-macos-resources
       GANNYU_MACOS_REUSE_PINNED_ENGINE: "1"
+      GANNYU_MACOS_RIME_BUILD_ROOT: ${{ github.workspace }}/build/rime-macos
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,7 +66,7 @@ jobs:
       - name: Restore pinned native libraries
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/../dependencies/cache/macos/rime-engine/prefix
+          path: build/rime-macos/prefix
           key: macos-native-${{ runner.arch }}-${{ steps.engine_cache.outputs.key }}
       - name: Restore locked native sources
         uses: actions/cache@v4

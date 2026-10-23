@@ -67,15 +67,21 @@ jobs:
           for suffix in android.apk fcitx5.tar.gz windows-installer.exe macos.pkg; do
             test -f "release-assets/GonnyuGeneralIME-${PRODUCT_VERSION}-${suffix}"
           done
-          awk -v heading="## 正式版本 ${PRODUCT_VERSION}" "\$0 == heading { found = 1; next }
-            found && /^## / { exit }
-            found { print }
-            END { if (!found) exit 1 }
-          " README.md > release-notes.md
-          test -s release-notes.md
+          release_flags=()
+          if [[ "$PRODUCT_VERSION" == *-* ]]; then
+            release_flags=(--prerelease --latest=false)
+            printf 'GonnyuGeneralIME %s\n' "$PRODUCT_VERSION" > release-notes.md
+          else
+            awk -v heading="## 正式版本 ${PRODUCT_VERSION}" "\$0 == heading { found = 1; next }
+              found && /^## / { exit }
+              found { print }
+              END { if (!found) exit 1 }
+            " README.md > release-notes.md
+            test -s release-notes.md
+          fi
           if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber
-            gh release edit "$GITHUB_REF_NAME" --title "GonnyuGeneralIME ${PRODUCT_VERSION}" --notes-file release-notes.md
+            gh release edit "$GITHUB_REF_NAME" --title "GonnyuGeneralIME ${PRODUCT_VERSION}" --notes-file release-notes.md "${release_flags[@]}"
           else
-            gh release create "$GITHUB_REF_NAME" release-assets/* --title "GonnyuGeneralIME ${PRODUCT_VERSION}" --notes-file release-notes.md
+            gh release create "$GITHUB_REF_NAME" release-assets/* --verify-tag --title "GonnyuGeneralIME ${PRODUCT_VERSION}" --notes-file release-notes.md "${release_flags[@]}"
           fi

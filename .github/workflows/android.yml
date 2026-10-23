@@ -24,6 +24,7 @@ permissions:
 
 jobs:
   build:
+    if: github.event_name != 'push' || github.ref_type != 'branch' || !startsWith(github.event.head_commit.message, 'chore(release):')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +46,25 @@ jobs:
         with:
           packages: platform-tools
       - run: sdkmanager "ndk;26.3.11579264"
+      - name: Restore locked native sources
+        uses: actions/cache@v4
+        with:
+          path: build/rime-mobile/sources
+          key: rime-sources-${{ runner.os }}-${{ hashFiles('platforms/rime/mobile/engine-lock.json', 'platforms/rime/mobile/fetch_sources.py') }}
+      - name: Restore native compilation outputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/rime-mobile/host
+            build/rime-mobile/android
+          key: android-native-${{ runner.os }}-${{ runner.arch }}-ndk26.3.11579264-${{ hashFiles('platforms/rime/mobile/engine-lock.json', 'platforms/rime/mobile/build_host.sh', 'platforms/rime/mobile/build_android_engine.sh', 'platforms/rime/mobile/boost_regex/CMakeLists.txt', 'engines/rime/**', 'crates/ffi/include/**') }}
+      - name: Restore Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('platforms/android/**/*.gradle', 'platforms/android/**/*.gradle.kts', 'platforms/android/gradle/wrapper/gradle-wrapper.properties') }}
       - env:
           GANNYU_RESOURCE_KEY: ${{ secrets.GANNYU_RESOURCE_KEY }}
           GANNYU_ANDROID_BUILD_VARIANT: release

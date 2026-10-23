@@ -41,7 +41,9 @@ def test_release_workflow_uses_tagged_workspace_version() -> None:
     assert 'gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber' in content
     assert 'gh release edit "$GITHUB_REF_NAME"' in content
     assert 'gh release create "$GITHUB_REF_NAME" release-assets/*' in content
-    assert "--prerelease" not in content
+    assert 'release_flags=(--prerelease --latest=false)' in content
+    assert '--verify-tag' in content
+    assert 'if [[ "$PRODUCT_VERSION" == *-* ]]; then' in content
 
 def test_fcitx5_workflow_runs_an_isolated_installer_smoke_test() -> None:
     content = (ROOT / ".github/workflows/fcitx5.yml").read_text(encoding="utf-8")
@@ -156,3 +158,10 @@ def test_local_android_sdk_file_stays_ignored_and_ci_safe() -> None:
     assert "platforms/android/local.properties" in root_ignore
     assert "platforms/android/local.properties" in share_ignore
     assert 'write_local_properties "$SDK_ROOT"' in build_script
+
+
+def test_macos_native_cache_uses_the_actual_build_prefix() -> None:
+    content = (ROOT / ".github/workflows/macos.yml").read_text(encoding="utf-8")
+    assert 'GANNYU_MACOS_RIME_BUILD_ROOT: ${{ github.workspace }}/build/rime-macos' in content
+    assert 'path: build/rime-macos/prefix' in content
+    assert '/../dependencies/' not in content
