@@ -48,6 +48,7 @@ HEADERS = (
     "新旧标记",
 )
 MAX_FORMS = 64
+VERSION_LINE = re.compile(r'(?m)^version: "[^"]+"$')
 
 def active_regions() -> tuple[str, ...]:
     """Return active regions with the manifest default first.
@@ -740,10 +741,23 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
                  for name in ("chars", "words", "gan_chars", "gan_words")
                  if config["language"].get(name))
     paths.append((region_dir / config["phonology"]["fuzzy_map"]).resolve())
-    key = build_cache.fingerprint(ROOT, paths, f"{VERSION}:{display_name}")
+    key = build_cache.fingerprint(ROOT, paths, display_name)
     stamp = output / f".gannyu-cache-{region}.json"
     cached = build_cache.load(stamp, output, key)
     if cached is not None:
+        cached_files = [output / name for name in cached["files"]]
+        metadata_changed = False
+        for path in cached_files:
+            if path.name.endswith((".schema.yaml", ".dict.yaml")):
+                content = path.read_text(encoding="utf-8")
+                updated, replacements = VERSION_LINE.subn(f'version: "{VERSION}"', content, count=1)
+                if replacements != 1:
+                    raise RuntimeError(f"cannot refresh cached Rime version in {path}")
+                if updated != content:
+                    path.write_text(updated, encoding="utf-8")
+                    metadata_changed = True
+        if metadata_changed:
+            build_cache.save(stamp, output, key, cached_files, cached["counts"])
         print(f"resource-cache [{region}] hit", flush=True)
         return cached["counts"]
     print(f"resource-cache [{region}] rebuild", flush=True)
@@ -761,7 +775,7 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
              and (path.name.startswith(f"gannyu_{region}.")
                   or path.name.startswith(f"gannyu_{region}_")
                   or path.name in LUA_NAMES or path.name == "LICENSE")]
-    if build_cache.fingerprint(ROOT, paths, f"{VERSION}:{display_name}") != key:
+    if build_cache.fingerprint(ROOT, paths, display_name) != key:
         raise RuntimeError(f"[{region}] source changed during generation")
     build_cache.save(stamp, output, key, files, counts)
     return counts
