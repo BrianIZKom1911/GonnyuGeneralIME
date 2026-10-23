@@ -37,8 +37,6 @@ librime_root="$source_root/librime"
 boost_include="${GANNYU_RIME_BOOST_INCLUDE:-$source_root/boost}"
 [[ -f "$boost_include/boost/version.hpp" ]] || { echo "missing pinned Boost headers: $boost_include" >&2; exit 1; }
 
-# Recreate host tools from the pinned source revision.
-rm -rf "$build_root"
 mkdir -p "$build_root"
 
 build_dependency() {
@@ -84,7 +82,9 @@ cmake --build "$build_root/build"
 cmake --install "$build_root/build"
 
 resources_dir="$build_root/gannyu-data"
-"$python_bin" "$repo_root/platforms/rime/build.py" --region all --display-name apple --output "$resources_dir"
+if [[ "${GANNYU_RIME_HOST_GENERATE_RESOURCES:-1}" == "1" ]]; then
+  "$python_bin" "$repo_root/platforms/rime/build.py" --region all --display-name apple --output "$resources_dir"
+fi
 
 "$python_bin" - "$script_dir/engine-lock.json" "$build_root/build-summary.json" "$prefix" "$resources_dir" <<'PYTHON'
 import json
@@ -100,7 +100,7 @@ summary = {
     "librime": lock["librime"],
     "librime_lua": lock["librime_lua"],
     "install_prefix": str(prefix),
-    "resource_manifest": str(resources / "resource-manifest.json"),
+    "resource_manifest": str(resources / "resource-manifest.json") if (resources / "resource-manifest.json").is_file() else None,
 }
 summary_path.write_text(
     json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",

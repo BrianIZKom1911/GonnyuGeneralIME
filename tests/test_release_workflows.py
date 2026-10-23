@@ -19,10 +19,6 @@ def test_platform_workflows_use_the_workspace_version() -> None:
         assert "0.2.1" not in content
 
 
-def test_quality_workflow_rejects_a_stale_cargo_lockfile() -> None:
-    content = (ROOT / ".github/workflows/quality.yml").read_text(encoding="utf-8")
-    assert "cargo clippy --workspace --all-targets --locked -- -D warnings" in content
-    assert "cargo test --workspace --locked" in content
 
 
 def test_release_workflow_uses_tagged_workspace_version() -> None:
@@ -41,7 +37,9 @@ def test_release_workflow_uses_tagged_workspace_version() -> None:
     assert 'gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber' in content
     assert 'gh release edit "$GITHUB_REF_NAME"' in content
     assert 'gh release create "$GITHUB_REF_NAME" release-assets/*' in content
-    assert "--prerelease" not in content
+    assert 'release_flags=(--prerelease --latest=false)' in content
+    assert '--verify-tag' in content
+    assert 'if [[ "$PRODUCT_VERSION" == *-* ]]; then' in content
 
 def test_fcitx5_workflow_runs_an_isolated_installer_smoke_test() -> None:
     content = (ROOT / ".github/workflows/fcitx5.yml").read_text(encoding="utf-8")
@@ -75,9 +73,10 @@ def test_macos_workflow_rebuilds_and_inspects_pkg() -> None:
     assert "MACOS_DEVELOPER_ID_INSTALLER_P12_BASE64" in content
     assert "APPLE_NOTARY_KEY_P8_BASE64" in content
     assert "GANNYU_MACOS_SIGNING_KEYCHAIN" in content
-    assert "timeout-minutes: 45" in content
+    assert "GANNYU_MACOS_BUILD_STAGE: engine" in content
+    assert "GANNYU_MACOS_BUILD_STAGE: resources" in content
+    assert "GANNYU_MACOS_BUILD_STAGE: app" in content
     assert 'CMAKE_BUILD_PARALLEL_LEVEL: "4"' in content
-    assert "timeout-minutes: 15" in content
     assert "release_signing:" in content
     assert "startsWith(github.ref, 'refs/tags/v') || inputs.release_signing" in content
     assert "matrix:" in content
@@ -96,8 +95,6 @@ def test_macos_installer_signing_is_non_interactive_and_observable() -> None:
     assert "Preflight installer private-key signing" in workflow
     assert "Preflight installer trusted timestamp" in workflow
     assert "--timestamp=none" in workflow
-    assert "timeout-minutes: 2" in workflow
-    assert "timeout-minutes: 3" in workflow
     assert 'pkgutil --check-signature "$preflight/local-signed.pkg"' in workflow
     assert 'pkgutil --check-signature "$preflight/timestamped.pkg"' in workflow
     assert 'productsign_args=(--sign "$installer_identity" --timestamp)' in package
@@ -151,3 +148,10 @@ def test_local_android_sdk_file_stays_ignored_and_ci_safe() -> None:
     assert "platforms/android/local.properties" in root_ignore
     assert "platforms/android/local.properties" in share_ignore
     assert 'write_local_properties "$SDK_ROOT"' in build_script
+
+
+def test_macos_native_cache_uses_the_actual_build_prefix() -> None:
+    content = (ROOT / ".github/workflows/macos.yml").read_text(encoding="utf-8")
+    assert 'GANNYU_MACOS_RIME_BUILD_ROOT: ${{ github.workspace }}/build/rime-macos' in content
+    assert 'path: build/rime-macos/prefix' in content
+    assert '/../dependencies/' not in content

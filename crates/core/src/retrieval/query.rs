@@ -1106,6 +1106,22 @@ pub(crate) fn retrieve_sentence_input_cached(
         }
     }
 
+    let mut exact_mandarin = dictionary.by_mandarin_pinyin_normalized(&normalized);
+    exact_mandarin.extend(dictionary.by_mandarin_word_pinyin_normalized(&normalized));
+    exact_mandarin.sort_by_key(|entry| std::cmp::Reverse(entry.frequency.unwrap_or(0)));
+    let mut insert_at = candidates
+        .iter()
+        .position(|candidate| candidate.consumed_bytes < normalized.len())
+        .unwrap_or(candidates.len());
+    for entry in exact_mandarin {
+        if seen.insert(entry.headword.to_string()) {
+            let mut candidate = gan_candidate(dictionary, entry, RetrievalLayer::MandarinExact, tone_values);
+            candidate.consumed_bytes = normalized.len();
+            candidates.insert(insert_at, candidate);
+            insert_at += 1;
+        }
+    }
+
     if candidates.len() < 8 {
         for doubled in &coda_doubled_variants(&normalized) {
             let Some((_path, boundaries)) = cached_sentence_chunk_path(

@@ -10,6 +10,14 @@
         android:padding="20dp">
 
         <TextView
+            android:id="@+id/setupLanguageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/setup_language_title"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/setupTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -19,6 +19,7 @@ on:
     branches: [main]
     paths:
       - Cargo.toml
+      - crates/ffi/include/**
       - platforms/macos/**
       - platforms/rime/**
       - engines/rime/**
@@ -26,18 +27,29 @@ on:
       - tests/test_macos_platform.py
       - .github/workflows/macos.yml
 
+concurrency:
+  group: macos-${{ github.event_name == 'push' && github.ref_type == 'branch' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref_type == 'branch' && !inputs.release_signing }}
+
 permissions:
   contents: read
 
 jobs:
   build:
+    if: github.event_name != 'push' || github.ref_type != 'branch' || !startsWith(github.event.head_commit.message, 'chore(release):')
     runs-on: macos-15-intel
-    timeout-minutes: 60
+    timeout-minutes: 90
+    outputs:
+      compatibility_artifact: ${{ steps.compatibility_artifact.outputs.name }}
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: "2"
       GANNYU_MACOS_RIME_RESOURCE_OUTPUT: ${{ github.workspace }}/build/rime-macos-resources
+      GANNYU_MACOS_REUSE_PINNED_ENGINE: "1"
+      GANNYU_MACOS_RIME_BUILD_ROOT: ${{ github.workspace }}/build/rime-macos
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -48,6 +60,26 @@ jobs:
           test -n "$version"
           printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
       - run: brew install cmake ninja
+      - name: Restore regional resource outputs
+        uses: actions/cache@v4
+        with:
+          path: build/rime-macos-resources
+          key: regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-${{ hashFiles('platforms/rime/**', 'resources/manifest.toml', 'resources/regions/**', 'engines/rime/**', 'LICENSE') }}
+          restore-keys: |
+            regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-
+      - name: Identify pinned native toolchain
+        id: engine_cache
+        run: echo "key=$(python3 platforms/macos/native_cache.py key)" >> "$GITHUB_OUTPUT"
+      - name: Restore pinned native libraries
+        uses: actions/cache@v4
+        with:
+          path: build/rime-macos/prefix
+          key: macos-native-${{ runner.arch }}-${{ steps.engine_cache.outputs.key }}
+      - name: Restore locked native sources
+        uses: actions/cache@v4
+        with:
+          path: build/rime-mobile/sources
+          key: rime-sources-${{ runner.os }}-${{ hashFiles('platforms/rime/mobile/engine-lock.json', 'platforms/rime/mobile/fetch_sources.py') }}
       - name: Import release signing identities and notary credentials
         if: startsWith(github.ref, 'refs/tags/v') || inputs.release_signing
         shell: bash
@@ -125,13 +157,22 @@ jobs:
             "$preflight/unsigned.pkg" "$preflight/timestamped.pkg"
           pkgutil --check-signature "$preflight/timestamped.pkg"
           rm -rf "$preflight"
-      - name: Rebuild universal librime app from locked source
-        timeout-minutes: 45
-        shell: bash
+      - name: Build verified universal native engine
+        timeout-minutes: 35
         env:
+          GANNYU_MACOS_BUILD_STAGE: engine
+          CMAKE_BUILD_PARALLEL_LEVEL: "4"
+        run: bash platforms/macos/build.sh
+      - name: Generate current-source Rime resources
+        env:
+          GANNYU_MACOS_BUILD_STAGE: resources
+        run: bash platforms/macos/build.sh
+      - name: Build and sign universal input-method app
+        timeout-minutes: 10
+        env:
+          GANNYU_MACOS_BUILD_STAGE: app
           GANNYU_MACOS_SIGN_IDENTITY: ${{ env.GANNYU_MACOS_APP_SIGN_IDENTITY }}
           GANNYU_MACOS_CI_ADHOC: ${{ !(startsWith(github.ref, 'refs/tags/v') || inputs.release_signing) && '1' || '0' }}
-          CMAKE_BUILD_PARALLEL_LEVEL: "4"
         run: bash platforms/macos/build.sh
       - name: Validate bundled engine and input-method host
         shell: bash
@@ -146,6 +187,25 @@ jobs:
           GANNYU_RIME_USER_DATA_DIR=build/rime-macos/ci-user \
             platforms/macos/.build/apple/Products/Release/GannyuMacOSSmoke --region lancong --input gau
           GANNYU_IMK_SELFTEST=1 "$bundle/Contents/MacOS/GannyuInputMethodHost"
+      - name: Prepare current-commit compatibility artifact
+        if: ${{ !(startsWith(github.ref, 'refs/tags/v') || inputs.release_signing) }}
+        id: compatibility_artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          bin_dir="$(swift build --package-path platforms/macos -c release --arch arm64 --arch x86_64 --show-bin-path)"
+          cp "$bin_dir/GannyuMacOSSmoke" build/macos/GannyuMacOSSmoke
+          lipo build/macos/GannyuMacOSSmoke -verify_arch arm64 x86_64
+          python3 platforms/macos/ci_artifact.py write
+          tar -czf build/macos-compatibility.tar.gz -C build/macos \
+            GonnyuInputMethod.app GannyuMacOSSmoke ci-provenance.json
+          echo "name=macos-compatibility-${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !(startsWith(github.ref, 'refs/tags/v') || inputs.release_signing) }}
+        with:
+          name: ${{ steps.compatibility_artifact.outputs.name }}
+          path: build/macos-compatibility.tar.gz
+          if-no-files-found: error
       - name: Build and inspect PKG
         timeout-minutes: 15
         shell: bash
@@ -226,6 +286,7 @@ jobs:
             rm -rf "$RUNNER_TEMP/gonnyu-signing"
           fi
   compatibility:
+    needs: build
     if: ${{ !(startsWith(github.ref, 'refs/tags/v') || inputs.release_signing) }}
     strategy:
       fail-fast: false
@@ -234,18 +295,28 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: brew install cmake ninja
-      - name: Build and smoke-test the universal host
-        env:
-          GANNYU_MACOS_CI_ADHOC: "1"
-          GANNYU_MACOS_RIME_RESOURCE_OUTPUT: ${{ github.workspace }}/build/rime-macos-resources
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.compatibility_artifact }}
+          path: build/compatibility-download
+      - name: Verify and smoke-test the current-commit universal host
+        shell: bash
         run: |
           set -euo pipefail
-          bash platforms/macos/build.sh
-          GANNYU_RIME_RESOURCE_ROOT=build/rime-macos-resources \
+          mkdir -p build/macos
+          tar -xzf build/compatibility-download/macos-compatibility.tar.gz -C build/macos
+          python3 platforms/macos/ci_artifact.py verify
+          bundle=build/macos/GonnyuInputMethod.app
+          plutil -lint "$bundle/Contents/Info.plist"
+          codesign --verify --deep --strict "$bundle"
+          lipo "$bundle/Contents/MacOS/GannyuInputMethodHost" -verify_arch arm64 x86_64
+          lipo build/macos/GannyuMacOSSmoke -verify_arch arm64 x86_64
+          GANNYU_RIME_RESOURCE_ROOT="$bundle/Contents/Resources/rime" \
           GANNYU_RIME_USER_DATA_DIR=build/rime-macos/matrix-user \
-            platforms/macos/.build/apple/Products/Release/GannyuMacOSSmoke --region lancong --input gau
-          lipo build/macos/GonnyuInputMethod.app/Contents/MacOS/GannyuInputMethodHost -verify_arch arm64 x86_64
+            build/macos/GannyuMacOSSmoke --region lancong --input gau
+          GANNYU_IMK_SELFTEST=1 "$bundle/Contents/MacOS/GannyuInputMethodHost"

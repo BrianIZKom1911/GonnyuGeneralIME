@@ -59,15 +59,16 @@ def test_android_and_windows_package_the_same_tutorial_resource() -> None:
     assert "OpenTutorial();" in windows
 
 
-def test_android_candidate_bar_keeps_cache_out_of_the_editor() -> None:
+def test_android_backspace_uses_grapheme_safe_deletion() -> None:
     source = (ROOT / "platforms/android/app/src/main/java/io/gannyu/input/GannyuInputMethodService.kt").read_text(encoding="utf-8")
     layout = (ROOT / "platforms/android/app/src/main/res/layout/input_view.xml").read_text(encoding="utf-8")
 
     assert 'key.label == "分词"                            -> appendInput(\'\\\'\')' in source
-    assert "deleteSurroundingTextInCodePoints(1, 0)" in source
     assert "onUpdateSelection(" in source
     assert "setComposingText" not in source
     assert 'android:id="@+id/cacheTag"' in layout
     assert 'android:id="@+id/preeditView"' not in layout
     assert 'android:translationY="-12dp"' not in layout
-    assert "getTextBeforeCursor" not in source
+    assert "getTextBeforeCursor(32, 0)" in source
+    assert "BreakIterator.getCharacterInstance(Locale.ROOT)" in source
+    assert "deleteSurroundingTextInCodePoints(codePointCount, 0)" in source

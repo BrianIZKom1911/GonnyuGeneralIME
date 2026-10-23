@@ -541,17 +541,25 @@ mod tests {
 
     #[test]
     fn load_dictionary_expands_multi_mandarin_words() {
-        let body = "本词\t国际音标\t方言拼音\t汉语拼音\t词汇属性\t对应官话词\t官话拼音\t词频\t同义词\t新旧标记\n\
-青菜\t\tqiang cai\tqing1 cai4\t赣\t蔬菜/菜\tshu1 cai4/cai4\t100\t\t\n";
-        let path = write_fixture("multi-mandarin.tsv", body);
+        // Source: resources/regions/lancong/dictionaries/gan_chars.tsv, 脱.
+        let source = include_str!("../../../resources/regions/lancong/dictionaries/gan_chars.tsv");
+        let row = source
+            .lines()
+            .find(|line| line.starts_with("脱\t"))
+            .expect("Lancong source row for 脱");
+        let body = format!("{}\n{}\n", source.lines().next().unwrap(), row);
+        let path = write_fixture("multi-mandarin.tsv", &body);
         let dictionary = Dictionary::load_tsv(&path).expect("load dictionary");
         let mut book = SlangBook::empty();
         book.load_dictionary(&dictionary);
 
-        let shucai_hits = book.slang_by_trigger("蔬菜");
-        assert!(shucai_hits.iter().any(|hit| hit.entry.slang == "青菜"));
-        let cai_hits = book.slang_by_trigger("菜");
-        assert!(cai_hits.iter().any(|hit| hit.entry.slang == "青菜"));
-        assert_eq!(book.slang_entries()[0].mandarin_glosses, vec!["蔬菜", "菜"]);
+        for gloss in ["很", "非常", "极其"] {
+            let hits = book.slang_by_trigger(gloss);
+            assert!(hits.iter().any(|hit| hit.entry.slang == "脱"));
+        }
+        assert_eq!(
+            book.slang_entries()[0].mandarin_glosses,
+            vec!["很", "非常", "极其"]
+        );
     }
 }

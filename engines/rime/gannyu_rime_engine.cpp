@@ -3,12 +3,14 @@
 #include <rime_api.h>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <filesystem>
 #include <memory>
+#include <limits>
 #include <mutex>
 #include <optional>
 #include <sstream>
@@ -19,6 +21,9 @@ struct GannyuPipelineHandle {
   RimeSessionId session = 0;
   std::string schema_id;
   size_t candidate_limit = 0;
+  std::array<int, 6> input_options{{1, 1, 1, 1, 1, 0}};
+  bool synonyms_enabled = true;
+  bool wenbai_enabled = true;
 };
 
 namespace {
@@ -158,6 +163,14 @@ Runtime& GlobalRuntime() {
   return runtime;
 }
 
+bool HasRegisteredHandleLocked(Runtime& runtime, GannyuPipelineHandle* handle) {
+  if (std::find(runtime.handles.begin(), runtime.handles.end(), handle) != runtime.handles.end()) {
+    return true;
+  }
+  SetError("engine handle is unavailable");
+  return false;
+}
+
 void FinalizeUnusedRuntimeLocked(Runtime& runtime) {
   if (runtime.handles.empty() && runtime.initialized && runtime.api != nullptr) {
     runtime.api->finalize();
@@ -210,6 +223,21 @@ bool EnsureRuntimeLocked(const char* shared_data_dir, const char* prebuilt_data_
 
 RimeApi* Api() { return GlobalRuntime().api; }
 
+void ApplyInputOptions(GannyuPipelineHandle* handle) {
+  Api()->set_option(handle->session, "gannyu_batch", True);
+  const char* names[] = {"gannyu_no_annotations", "gannyu_no_relations", "gannyu_no_fuzzy",
+                         "gannyu_no_mandarin", "gannyu_no_fuzzy_rules"};
+  for (size_t index = 0; index < 5; ++index) {
+    Api()->set_option(handle->session, names[index], handle->input_options[index] ? False : True);
+  }
+  Api()->set_option(handle->session, "gannyu_both", handle->input_options[5] == 0 ? True : False);
+  Api()->set_option(handle->session, "gannyu_new", handle->input_options[5] == 1 ? True : False);
+  Api()->set_option(handle->session, "gannyu_old", handle->input_options[5] == 2 ? True : False);
+  Api()->set_option(handle->session, "gannyu_no_synonyms", handle->synonyms_enabled ? False : True);
+  Api()->set_option(handle->session, "gannyu_no_wenbai", handle->wenbai_enabled ? False : True);
+  Api()->set_option(handle->session, "gannyu_batch", False);
+}
+
 bool StartSessionLocked(GannyuPipelineHandle* handle) {
   handle->session = Api()->create_session();
   if (handle->session == 0) {
@@ -222,6 +250,7 @@ bool StartSessionLocked(GannyuPipelineHandle* handle) {
     SetError("failed to select Rime schema: " + handle->schema_id);
     return false;
   }
+  ApplyInputOptions(handle);
   return true;
 }
 
@@ -451,7 +480,9 @@ int gannyu_runtime_finalize(void) {
 int gannyu_engine_snapshot(GannyuPipelineHandle* handle, char** out_json) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     return WriteSnapshot(handle, false, std::nullopt, out_json);
   });
 }
@@ -459,9 +490,54 @@ int gannyu_engine_snapshot(GannyuPipelineHandle* handle, char** out_json) {
 int gannyu_engine_set_candidate_limit(GannyuPipelineHandle* handle, size_t limit) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     handle->candidate_limit = limit;
     return kOk;
+  });
+}
+
+int gannyu_engine_candidates(GannyuPipelineHandle* handle, size_t offset, size_t limit, char** out_json) {
+  return AbiStatus([&] {
+    g_last_error.clear();
+    if (out_json == nullptr) return kInvalidArgument;
+    *out_json = nullptr;
+    if (handle == nullptr || limit == 0 || limit > 100 ||
+        offset > static_cast<size_t>(std::numeric_limits<int>::max()) - limit) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
+    if (!RIME_PROVIDED(Api(), candidate_list_from_index) ||
+        !RIME_PROVIDED(Api(), candidate_list_next) || !RIME_PROVIDED(Api(), candidate_list_end)) {
+      SetError("candidate range iteration is unavailable");
+      return kLoadFailure;
+    }
+    std::ostringstream output;
+    output << "{\"rawInput\":\"" << JsonEscape(Api()->get_input(handle->session))
+           << "\",\"schemaId\":\"" << JsonEscape(handle->schema_id)
+           << "\",\"offset\":" << offset << ",\"candidates\":[";
+    bool has_more = false;
+    RimeCandidateListIterator iterator{};
+    if (Api()->candidate_list_from_index(handle->session, &iterator, static_cast<int>(offset))) {
+      auto end = [](RimeCandidateListIterator* value) { Api()->candidate_list_end(value); };
+      std::unique_ptr<RimeCandidateListIterator, decltype(end)> guard(&iterator, end);
+      size_t count = 0;
+      while (count < limit && Api()->candidate_list_next(&iterator)) {
+        if (count++ > 0) output << ',';
+        const auto& candidate = iterator.candidate;
+        output << "{\"text\":\"" << JsonEscape(candidate.text) << "\"";
+        if (candidate.comment != nullptr && candidate.comment[0] != '\0') {
+          output << ",\"annotation\":\"" << JsonEscape(candidate.comment) << "\"";
+        }
+        output << ",\"globalIndex\":" << iterator.index
+               << ",\"pageIndex\":" << iterator.index << ",\"deletable\":false}";
+      }
+      has_more = count == limit && Api()->candidate_list_next(&iterator);
+    }
+    output << "],\"hasMore\":" << (has_more ? "true" : "false") << '}';
+    *out_json = CopyOut(output.str());
+    return *out_json == nullptr ? kSerializeFailure : kOk;
   });
 }
 
@@ -469,7 +545,9 @@ int gannyu_engine_process_key(GannyuPipelineHandle* handle, const char* event_js
   return AbiStatus([&] {
     g_last_error.clear();
     if (handle == nullptr || event_json == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     const auto type = JsonStringField(event_json, "type");
     if (!type.has_value()) {
       SetError("invalid engine key event");
@@ -515,7 +593,9 @@ int gannyu_engine_process_key(GannyuPipelineHandle* handle, const char* event_js
 int gannyu_engine_select_candidate(GannyuPipelineHandle* handle, size_t global_index, char** out_json) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     const bool handled = Api()->select_candidate(handle->session, global_index);
     return WriteSnapshot(handle, handled, TakeCommit(handle->session), out_json);
   });
@@ -524,7 +604,9 @@ int gannyu_engine_select_candidate(GannyuPipelineHandle* handle, size_t global_i
 int gannyu_engine_change_page(GannyuPipelineHandle* handle, int direction, char** out_json) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     const bool handled = direction < 0 ? Api()->process_key(handle->session, kPageUp, 0)
                                        : direction > 0 && Api()->process_key(handle->session, kPageDown, 0);
     return WriteSnapshot(handle, handled, TakeCommit(handle->session), out_json);
@@ -534,7 +616,9 @@ int gannyu_engine_change_page(GannyuPipelineHandle* handle, int direction, char*
 int gannyu_engine_clear_composition(GannyuPipelineHandle* handle, char** out_json) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     Api()->clear_composition(handle->session);
     return WriteSnapshot(handle, true, std::nullopt, out_json);
   });
@@ -543,10 +627,15 @@ int gannyu_engine_clear_composition(GannyuPipelineHandle* handle, char** out_jso
 int gannyu_engine_switch_region(GannyuPipelineHandle* handle, const char* region_id, char** out_json) {
   return AbiStatus([&] {
     if (handle == nullptr || region_id == nullptr || *region_id == '\0') return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     const std::string schema = "gannyu_" + std::string(region_id);
     const bool handled = Api()->select_schema(handle->session, schema.c_str());
-    if (handled) handle->schema_id = schema;
+    if (handled) {
+      handle->schema_id = schema;
+      ApplyInputOptions(handle);
+    }
     return WriteSnapshot(handle, handled, std::nullopt, out_json);
   });
 }
@@ -554,9 +643,53 @@ int gannyu_engine_switch_region(GannyuPipelineHandle* handle, const char* region
 int gannyu_engine_set_ascii_mode(GannyuPipelineHandle* handle, int enabled, char** out_json) {
   return AbiStatus([&] {
     if (handle == nullptr) return kInvalidArgument;
-    std::lock_guard<std::mutex> lock(GlobalRuntime().mutex);
+    Runtime& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
     Api()->set_option(handle->session, "ascii_mode", enabled ? True : False);
     return WriteSnapshot(handle, true, std::nullopt, out_json);
+  });
+}
+
+int gannyu_engine_set_input_options(GannyuPipelineHandle* handle, int annotations,
+                                   int relations, int fuzzy, int mandarin,
+                                   int fuzzy_rules, int reading_mode) {
+  return AbiStatus([&] {
+    if (handle == nullptr || reading_mode < 0 || reading_mode > 2) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
+    const std::array<int, 6> values{{annotations, relations, fuzzy, mandarin, fuzzy_rules, reading_mode}};
+    if (handle->input_options == values) return kOk;
+    handle->input_options = values;
+    ApplyInputOptions(handle);
+    return kOk;
+  });
+}
+
+int gannyu_engine_set_synonyms_enabled(GannyuPipelineHandle* handle, int enabled) {
+  return AbiStatus([&] {
+    if (handle == nullptr) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
+    if (handle->synonyms_enabled == (enabled != 0)) return kOk;
+    handle->synonyms_enabled = enabled != 0;
+    ApplyInputOptions(handle);
+    return kOk;
+  });
+}
+
+int gannyu_engine_set_wenbai_enabled(GannyuPipelineHandle* handle, int enabled) {
+  return AbiStatus([&] {
+    if (handle == nullptr) return kInvalidArgument;
+    auto& runtime = GlobalRuntime();
+    std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
+    if (handle->wenbai_enabled == (enabled != 0)) return kOk;
+    handle->wenbai_enabled = enabled != 0;
+    ApplyInputOptions(handle);
+    return kOk;
   });
 }
 
@@ -572,11 +705,7 @@ int gannyu_engine_reset_user_data(GannyuPipelineHandle* handle, int scope, char*
 
     Runtime& runtime = GlobalRuntime();
     std::lock_guard<std::mutex> lock(runtime.mutex);
-    const auto registered = std::find(runtime.handles.begin(), runtime.handles.end(), handle);
-    if (registered == runtime.handles.end()) {
-      SetError("engine handle is not registered with the Rime runtime");
-      return kInvalidArgument;
-    }
+    if (!HasRegisteredHandleLocked(runtime, handle)) return kInvalidArgument;
 
     std::vector<GannyuPipelineHandle*> affected;
     for (GannyuPipelineHandle* candidate : runtime.handles) {
@@ -601,9 +730,16 @@ int gannyu_engine_reset_user_data(GannyuPipelineHandle* handle, int scope, char*
     }
 
     std::error_code remove_error;
-    const std::filesystem::path userdb =
-        std::filesystem::path(runtime.user_data_dir) / (handle->schema_id + ".userdb");
-    std::filesystem::remove_all(userdb, remove_error);
+    std::filesystem::path userdb;
+    for (const char* suffix : {"", "_both_norel", "_new_rel", "_new_norel", "_old_rel", "_old_norel"}) {
+      const auto path = std::filesystem::path(runtime.user_data_dir) / (handle->schema_id + suffix + ".userdb");
+      std::error_code error;
+      std::filesystem::remove_all(path, error);
+      if (error && !remove_error) {
+        remove_error = error;
+        userdb = path;
+      }
+    }
 
     bool sessions_restored = true;
     for (GannyuPipelineHandle* candidate : affected) {
@@ -626,6 +762,7 @@ void gannyu_pipeline_destroy(GannyuPipelineHandle* handle) {
   try {
     Runtime& runtime = GlobalRuntime();
     std::lock_guard<std::mutex> lock(runtime.mutex);
+    if (!HasRegisteredHandleLocked(runtime, handle)) return;
     if (Api() != nullptr) (void)StopSessionLocked(handle);
     runtime.handles.erase(std::remove(runtime.handles.begin(), runtime.handles.end(), handle),
                           runtime.handles.end());

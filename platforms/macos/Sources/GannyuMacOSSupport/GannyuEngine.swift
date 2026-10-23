@@ -108,6 +108,24 @@ public final class GannyuRegionStore {
     public static let shared = GannyuRegionStore()
     public static let didChange = Notification.Name("org.doohaey.gonnyu.regionDidChange")
     private let key = "org.doohaey.gonnyu.region"
+    public static let optionsDidChange = Notification.Name("org.doohaey.gonnyu.optionsDidChange")
+    public static let optionTitles = ["副标题", "赣普词语连带", "模糊匹配", "普拼兼容", "其他模糊规则", "读音模式", "同义词连带", "文白匹配"]
+
+    public var inputOptions: [Int32] {
+        let stored = UserDefaults.standard.array(forKey: "GannyuInputOptions") as? [Int]
+        guard var stored, (6...8).contains(stored.count) else { return [1, 1, 1, 1, 1, 0, 1, 1] }
+        while stored.count < 8 { stored.append(1) }
+        return stored.enumerated().map { index, value in Int32(index == 5 ? min(2, max(0, value)) : (value == 0 ? 0 : 1)) }
+    }
+
+    public func setInputOption(_ index: Int, value: Int32) {
+        guard (0..<8).contains(index) else { return }
+        var options = inputOptions
+        options[index] = value
+        UserDefaults.standard.set(options.map(Int.init), forKey: "GannyuInputOptions")
+        NotificationCenter.default.post(name: Self.optionsDidChange, object: nil)
+    }
+
 
     public func currentID() -> String? {
         guard let regions = try? GannyuEngine.availableRegions(),
@@ -159,12 +177,23 @@ public final class GannyuEngine {
             throw GannyuEngineError.status(status, Self.lastError())
         }
         handle = created
+        try setInputOptions(GannyuRegionStore.shared.inputOptions)
     }
 
     deinit { if let handle { gannyu_pipeline_destroy(handle) } }
 
     public static func availableRegions() throws -> [GannyuRegion] {
         try validatedManifest().regions
+    }
+
+    public func setInputOptions(_ values: [Int32]) throws {
+        guard values.count == 8 else { throw GannyuEngineError.resources("invalid input options") }
+        let status = gannyu_engine_set_input_options(handle, values[0], values[1], values[2], values[3], values[4], values[5])
+        guard status == gannyu_ffi_status_ok() else { throw GannyuEngineError.status(status, Self.lastError()) }
+        let synonymStatus = gannyu_engine_set_synonyms_enabled(handle, values[6])
+        guard synonymStatus == gannyu_ffi_status_ok() else { throw GannyuEngineError.status(synonymStatus, Self.lastError()) }
+        let wenbaiStatus = gannyu_engine_set_wenbai_enabled(handle, values[7])
+        guard wenbaiStatus == gannyu_ffi_status_ok() else { throw GannyuEngineError.status(wenbaiStatus, Self.lastError()) }
     }
 
     public func snapshot() throws -> GannyuSnapshot {

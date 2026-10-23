@@ -34,6 +34,7 @@ final class GannyuInputController: IMKInputController {
             guard let self else { return }
             _ = self.page(direction, client: self.client())
         }
+        NotificationCenter.default.addObserver(self, selector: #selector(inputOptionsDidChange), name: GannyuRegionStore.optionsDidChange, object: nil)
         if diagnosticsEnabled { log.notice("IMK input controller created") }
         NotificationCenter.default.addObserver(
             self,
@@ -205,16 +206,18 @@ final class GannyuInputController: IMKInputController {
 
     @objc(menu)
     override func menu() -> NSMenu! {
-        let menu = NSMenu(title: "Gonnyu")
-        let current = GannyuRegionStore.shared.currentID()
-        for region in (try? GannyuEngine.availableRegions()) ?? [] {
-            let item = NSMenuItem(title: region.nameZh, action: #selector(selectRegion(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = region.id
-            item.state = region.id == current ? .on : .off
-            menu.addItem(item)
+        nil
+    }
+
+    @objc private func inputOptionsDidChange() {
+        guard let engine else { return }
+        do {
+            try engine.setInputOptions(GannyuRegionStore.shared.inputOptions)
+            selectedLine = 0
+            render(try engine.snapshot(), client: client())
+        } catch {
+            log.error("input options failed: \(String(describing: error), privacy: .public)")
         }
-        return menu
     }
 
     @objc(commitComposition:)
@@ -670,11 +673,6 @@ final class GannyuInputController: IMKInputController {
         if let engine, let result = try? engine.switchRegion(region) {
             render(result, client: client())
         }
-    }
-
-    @objc private func selectRegion(_ sender: NSMenuItem) {
-        guard let region = sender.representedObject as? String else { return }
-        _ = GannyuRegionStore.shared.select(region)
     }
 }
 

@@ -6,11 +6,16 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.graphics.Typeface
+import android.icu.text.BreakIterator
+import android.text.InputType
 import android.util.Log
+import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.FrameLayout
@@ -19,13 +24,18 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.ArrayDeque
+import java.util.concurrent.Executors
+import java.util.Locale
 
 private class NativePipelineBridge {
     init { System.loadLibrary("gannyu_input_jni") }
 
     external fun nativeCreate(manifestPath: String?, regionId: String?, dataDir: String): Long
     external fun nativeLastError(): String?
+    external fun nativeSetInputOptions(handle: Long, values: IntArray): Boolean
     external fun nativeSnapshot(handle: Long): String?
+    external fun nativeCandidates(handle: Long, offset: Int, limit: Int): String?
     external fun nativeProcessKey(handle: Long, eventJson: String): String?
     external fun nativeSelectCandidate(handle: Long, globalIndex: Int): String?
     external fun nativeChangeCandidatePage(handle: Long, direction: Int): String?
@@ -35,7 +45,7 @@ private class NativePipelineBridge {
 }
 
 class GannyuInputMethodService : InputMethodService() {
-    private enum class KeyboardPage { LETTERS, NUMBERS, SYMBOLS, SYMBOLS_MORE }
+    private enum class KeyboardPage { LETTERS, NUMBERS, SYMBOLS, SYMBOLS_MORE, EMOJI }
 
     private data class RankedCandidate(
         val text: String,
@@ -67,8 +77,15 @@ class GannyuInputMethodService : InputMethodService() {
             get() = "$nameZh（$id）"
     }
 
-    private var pipelineHandle: Long = 0
-    private var pipelineReady: Boolean = false
+    @Volatile private var pipelineHandle: Long = 0
+    @Volatile private var pipelineReady: Boolean = false
+    @Volatile private var pipelineLoadGeneration = 0L
+    @Volatile private var engineGeneration = 0L
+    private var hasPendingComposition = false
+    private var pendingEngineOperationCount = 0
+    private var needsEngineClear = true
+    private val pendingEngineEvents = ArrayDeque<String>()
+    private val engineExecutor = Executors.newSingleThreadExecutor()
     private lateinit var cacheTag: TextView
     private lateinit var candidateScroll: HorizontalScrollView
     private lateinit var candidateBar: LinearLayout
@@ -81,11 +98,26 @@ class GannyuInputMethodService : InputMethodService() {
     private var lastSnapshot = EngineSnapshot()
     private var candidateExpanded = false
     private val expandedCandidates = mutableListOf<RankedCandidate>()
+    private var candidateLoadGeneration = 0
+    private var candidateNextOffset = 0
+    private var candidateHasMore = false
+    private var candidateLoading = false
+    private var candidateLoadFailed = false
+    private val candidateLoadHandler = Handler(Looper.getMainLooper())
     private var keyboardPage = KeyboardPage.LETTERS
+    private var editorKeyboardOverride = false
+    private var savedKeyboardPage = KeyboardPage.LETTERS
+    private var savedEnglishMode = false
+    private var emojiPageIndex = 0
     private var englishMode = false
     private var lastRenderedKeyboardWidth = 0
     // One-shot state only: it is never persisted and resets after one letter.
     private var englishShift = false
+    private var editorSelectionCollapsed: Boolean? = null
+    private var editorSelectionStart: Int? = null
+    private var editorSelectionEnd: Int? = null
+    private var expectedSelectionStart: Int? = null
+    private var expectedSelectionEnd: Int? = null
     private val backspaceRepeatHandler = Handler(Looper.getMainLooper())
     private val backspaceRepeat = object : Runnable {
         override fun run() {
@@ -116,13 +148,66 @@ class GannyuInputMethodService : InputMethodService() {
         @Volatile private var staticHandle: Long = 0
         @Volatile private var staticRegionId: String? = null
         @Volatile private var preloadedRegionId: String? = null
+        private var preloadGeneration = 0L
         private val nativeBridge = NativePipelineBridge()
 
         @JvmStatic
         fun nativeCreateStatic(context: Context, region: String?): Long {
             val resourceRoot = RimeResourceStore.prepare(context).absolutePath
             val userDataDir = RimeResourceStore.userDataDirectory(context).absolutePath
-            return nativeBridge.nativeCreate(resourceRoot, region, userDataDir)
+            val handle = nativeBridge.nativeCreate(resourceRoot, region, userDataDir)
+            if (handle != 0L && !nativeBridge.nativeSetInputOptions(handle, inputOptions(context))) {
+                nativeBridge.nativeDestroy(handle)
+                return 0
+            }
+            return handle
+        }
+
+        fun inputOptions(context: Context): IntArray {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return IntArray(8) { index -> if (index == 5) prefs.getInt("input_option_5", 0).coerceIn(0, 2) else if (prefs.getBoolean("input_option_$index", true)) 1 else 0 }
+        }
+
+        fun populateInputOptions(context: Context, container: LinearLayout) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val values = inputOptions(context)
+            val labels = listOf("副标题", "赣普词语连带", "模糊匹配", "普拼兼容", "其他模糊规则", "读音模式", "同义词连带", "文白匹配")
+            val indices = listOf(0, 1, 6, 2, 3, 7, 4)
+            val switches = indices.map { index ->
+                val label = labels[index]
+                android.widget.Switch(context).apply {
+                    text = label
+                    isChecked = values[index] != 0
+                    val indent = if (index == 3 || index == 7 || index == 4) 36 else 12
+                    setPadding((indent * resources.displayMetrics.density).toInt(), 8, 12, 8)
+                    container.addView(this)
+                }
+            }
+            fun updateEnabled() {
+                switches[4].isEnabled = switches[3].isChecked
+                switches[5].isEnabled = switches[3].isChecked
+                switches[6].isEnabled = switches[3].isChecked
+            }
+            switches.forEachIndexed { index, control -> control.setOnCheckedChangeListener { _, checked ->
+                prefs.edit().putBoolean("input_option_${indices[index]}", checked).apply()
+                updateEnabled()
+            } }
+            updateEnabled()
+            container.addView(TextView(context).apply { text = "读音模式"; setPadding(12, 12, 12, 0) })
+            val modes = android.widget.RadioGroup(context)
+            listOf("新老兼有", "新派", "老派").forEachIndexed { index, label ->
+                modes.addView(android.widget.RadioButton(context).apply {
+                    id = View.generateViewId()
+                    text = label
+                    isChecked = index == values[5]
+                    tag = index
+                })
+            }
+            modes.setOnCheckedChangeListener { group, id ->
+                val selected = group.findViewById<View>(id)?.tag as? Int ?: return@setOnCheckedChangeListener
+                prefs.edit().putInt("input_option_5", selected).apply()
+            }
+            container.addView(modes)
         }
 
         @JvmStatic
@@ -196,39 +281,51 @@ class GannyuInputMethodService : InputMethodService() {
             onComplete: ((Boolean, String?) -> Unit)? = null,
         ) {
             val desiredRegion = normalizeRegionId(regionId)
+            val generation = synchronized(preloadLock) { ++preloadGeneration }
             Thread {
                 try {
                     val handle = nativeCreateStatic(context, desiredRegion)
                     val errorDetail = if (handle == 0L) nativeLastErrorStatic() else null
                     Log.i(TAG, "preload handle=" + handle)
                     if (handle != 0L) {
-                        synchronized(preloadLock) {
-                            if (preloadedHandle != 0L) {
-                                destroyHandle(preloadedHandle)
+                        val accepted = synchronized(preloadLock) {
+                            if (generation != preloadGeneration) {
+                                preloadLock.notifyAll()
+                                false
+                            } else {
+                                val previous = preloadedHandle
+                                preloadedHandle = handle
+                                preloadedRegionId = desiredRegion
+                                if (previous != 0L) destroyHandle(previous)
+                                preloadLock.notifyAll()
+                                true
                             }
-                            preloadedHandle = handle
-                            preloadedRegionId = desiredRegion
-                            preloadLock.notifyAll()
+                        }
+                        if (!accepted) {
+                            destroyHandle(handle)
+                            return@Thread
                         }
                         onComplete?.invoke(true, null)
                         return@Thread
                     }
+                    synchronized(preloadLock) { preloadLock.notifyAll() }
                     onComplete?.invoke(false, errorDetail.orEmpty().ifBlank { "native pipeline creation returned no detail" })
                 } catch (e: Exception) {
                     Log.e(TAG, "preload failed", e)
+                    synchronized(preloadLock) { preloadLock.notifyAll() }
                     onComplete?.invoke(false, e.stackTraceToString())
                 }
             }.start()
         }
 
         @JvmStatic
-        fun currentStaticRegionId(): String? = staticRegionId
+        fun currentStaticRegionId(): String? = staticRegionId.takeIf { staticHandle != 0L }
 
         @JvmStatic
         fun isRegionPrepared(regionId: String?): Boolean {
             val desired = normalizeRegionId(regionId)
-            return desired == normalizeRegionId(staticRegionId) ||
-                desired == normalizeRegionId(preloadedRegionId)
+            return (staticHandle != 0L && desired == normalizeRegionId(staticRegionId)) ||
+                (preloadedHandle != 0L && desired == normalizeRegionId(preloadedRegionId))
         }
 
         private fun normalizeRegionId(regionId: String?): String? =
@@ -270,17 +367,27 @@ class GannyuInputMethodService : InputMethodService() {
             KeySpec("m", isLetter=true))
 
         private val NUM_ROW_1 = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
-        private val NUM_ROW_2 = listOf("－", "／", "：", "；", "（", "）", "￥", "＆", "＠", "＂")
+        private val NUM_ROW_2 = listOf("－", "／", "：", "；", "（", "）", "￥", "＆", "@", "＂")
         private val NUM_ROW_3 = listOf(".", ",", "？", "！", "＇", "％", "＋", "⌫")
         private val SYM_ROW_1 = listOf("【", "】", "“", "”", "〈", "〉", "《", "》", "：", "；")
         private val SYM_ROW_2 = listOf("，", "、", "。", "？", "！", "…", "—", "～", "·", "／")
         private val SYM_ROW_3 = listOf("更多", "（", "）", "[", "]", "{", "}", "#", "⌫")
         private val MORE_ROW_1 = listOf("+", "−", "=", "×", "÷", "<", ">", "^", "~", "_")
-        private val MORE_ROW_2 = listOf("@", "#", "$", "¥", "€", "£", "&", "*", "\\", "|")
+        private val MORE_ROW_2 = listOf("＠", "#", "$", "¥", "€", "£", "&", "*", "\\", "|")
         private val MORE_ROW_3 = listOf("常用", "!", "?", "'", "\"", ":", ";", "／", "⌫")
 
         private const val FUNCTION_KEY_WIDTH_MULTIPLIER = 1.12f
         private const val SEGMENT_KEY_WIDTH_MULTIPLIER = 1.5f
+        private val EMOJI_PAGES = listOf(
+            "😀 😃 😄 😁 😆 😅 😂 😊 😇 🙂 🙃 😉 😌 😍 😘 😗 😙 😚 😋 😛 😝 😜 🤗 🤔 😎 😏 😒 🙄 😬 😴".split(" "),
+            "😔 😞 😟 😕 🙁 😣 😖 😫 😩 😢 😭 😤 😠 😡 😳 😱 😨 😰 😥 😓 😶 😐 😑 😯 😦 😧 😮 😲 😵 😷".split(" "),
+            "👍 👎 👏 🙌 👐 🙏 👋 👌 👊 ✊ 💪 👈 👉 👆 👇 👀 👂 👃 👄 👶 👧 👦 👩 👨 👵 👴 👮 👷 👸 👼".split(" "),
+            "🐶 🐱 🐭 🐹 🐰 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🐤 🐺 🐗 🐴 🦄 🐝 🐛 🐌 🐞 🐜 🐢 🐍 🐙".split(" "),
+            "🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🍒 🍑 🍍 🥝 🍅 🍆 🌽 🍠 🍞 🧀 🍖 🍗 🍔 🍟 🍕 🍳 🍜 🍚 🍣 🍦 🍰 🍺".split(" "),
+            "🚗 🚕 🚌 🚎 🚓 🚑 🚒 🚚 🚲 🚂 🚆 🚇 🚊 🚉 🚀 🚁 🚢 🏠 🏡 🏢 🏥 🏫 🏪 🏨 🏭 🏰 🗼 🗽 🌋 🗻".split(" "),
+            "🎉 🎊 🎁 🎈 🎂 🎄 🎃 🎆 🎇 💐 🌸 🌹 🌻 🌷 🌱 🌲 🌳 🌴 🌵 🍀 🍁 🍂 🍃 🌈 🌙 🌞 🌍 🌎 🌏 🔥".split(" "),
+            "💖 💕 💞 💓 💗 💘 💝 💔 💜 💛 💚 💙 💯 💢 💥 💫 💦 💤 💬 💭 🔔 🎵 🎶 🎤 🎧 📷 📱 💻 🔑 💡".split(" "),
+        )
         private const val IME_SWITCH_KEY = "🌐"
         private const val BACKSPACE_INITIAL_DELAY_MS = 380L
         private const val BACKSPACE_REPEAT_INTERVAL_MS = 55L
@@ -288,8 +395,20 @@ class GannyuInputMethodService : InputMethodService() {
         init { System.loadLibrary("gannyu_input_jni") }
     }
 
+    private val inputOptionsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key?.startsWith("input_option_") == true) {
+            candidateLoadGeneration += 1
+            candidateExpanded = false
+            enqueueNativeOperation { handle ->
+                check(nativeBridge.nativeSetInputOptions(handle, inputOptions(this)))
+                nativeBridge.nativeSnapshot(handle)
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(inputOptionsListener)
         loadSelectedPipelineAsync()
     }
 
@@ -300,7 +419,13 @@ class GannyuInputMethodService : InputMethodService() {
         get() = getColor(R.color.keyboard_secondary_text)
 
     override fun onDestroy() {
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(inputOptionsListener)
         stopBackspaceRepeat()
+        pipelineLoadGeneration += 1
+        engineGeneration += 1
+        synchronized(preloadLock) { preloadLock.notifyAll() }
+        candidateLoadGeneration += 1
+        engineExecutor.shutdownNow()
         pipelineHandle = 0
         pipelineReady = false
         super.onDestroy()
@@ -325,7 +450,7 @@ class GannyuInputMethodService : InputMethodService() {
         })
         val collapseButton = Button(this).apply {
             text = "⌃"
-            textSize = 17f
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17f)
             setTextColor(keyTextColor)
             background = getDrawable(R.drawable.key_action)
             elevation = dp(4).toFloat()
@@ -358,7 +483,16 @@ class GannyuInputMethodService : InputMethodService() {
 
     override fun onStartInput(attribute: android.view.inputmethod.EditorInfo?, restarting: Boolean) {
         super.onStartInput(attribute, restarting)
+        restoreEditorKeyboardState()
+        applyEditorKeyboardState(attribute)
         englishShift = false
+        editorSelectionCollapsed = attribute?.let {
+            if (it.initialSelStart >= 0 && it.initialSelEnd >= 0) it.initialSelStart == it.initialSelEnd else null
+        }
+        editorSelectionStart = attribute?.initialSelStart?.takeIf { it >= 0 }
+        editorSelectionEnd = attribute?.initialSelEnd?.takeIf { it >= 0 }
+        expectedSelectionStart = null
+        expectedSelectionEnd = null
         resetState(clearAccumulated = true)
     }
 
@@ -366,6 +500,10 @@ class GannyuInputMethodService : InputMethodService() {
         super.onStartInputView(info, restarting)
         if (selectedRegionId(this) != currentStaticRegionId()) {
             loadSelectedPipelineAsync()
+        }
+        enqueueNativeOperation { handle ->
+            check(nativeBridge.nativeSetInputOptions(handle, inputOptions(this)))
+            nativeBridge.nativeSnapshot(handle)
         }
         renderKeyboard()
         renderState()
@@ -375,6 +513,12 @@ class GannyuInputMethodService : InputMethodService() {
         stopBackspaceRepeat()
         hideKeyPreview()
         englishShift = false
+        editorSelectionCollapsed = null
+        editorSelectionStart = null
+        editorSelectionEnd = null
+        expectedSelectionStart = null
+        expectedSelectionEnd = null
+        restoreEditorKeyboardState()
         resetState(clearAccumulated = true)
         super.onFinishInput()
     }
@@ -383,6 +527,7 @@ class GannyuInputMethodService : InputMethodService() {
         stopBackspaceRepeat()
         englishShift = false
         hideKeyPreview()
+        restoreEditorKeyboardState()
         resetState(clearAccumulated = true)
         super.onFinishInputView(finishingInput)
     }
@@ -396,6 +541,24 @@ class GannyuInputMethodService : InputMethodService() {
         candidatesEnd: Int,
     ) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        editorSelectionCollapsed = if (newSelStart >= 0 && newSelEnd >= 0) newSelStart == newSelEnd else null
+        val expected = newSelStart >= 0 && newSelEnd >= 0 &&
+            newSelStart == expectedSelectionStart && newSelEnd == expectedSelectionEnd
+        editorSelectionStart = newSelStart.takeIf { it >= 0 }
+        editorSelectionEnd = newSelEnd.takeIf { it >= 0 }
+        if (expected) {
+            expectedSelectionStart = null
+            expectedSelectionEnd = null
+            return
+        }
+        expectedSelectionStart = null
+        expectedSelectionEnd = null
+        if (hasPendingComposition &&
+            (oldSelStart != newSelStart || oldSelEnd != newSelEnd) &&
+            newSelStart >= 0 && newSelEnd >= 0
+        ) {
+            resetState(clearAccumulated = true)
+        }
     }
 
     override fun onWindowHidden() {
@@ -410,11 +573,51 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun desiredRegionId(): String? = selectedRegionId(this)
 
+    private fun restoreEditorKeyboardState() {
+        if (!editorKeyboardOverride) return
+        keyboardPage = savedKeyboardPage
+        englishMode = savedEnglishMode
+        editorKeyboardOverride = false
+    }
+
+    private fun applyEditorKeyboardState(info: EditorInfo?) {
+        val inputType = info?.inputType ?: return
+        val inputClass = inputType and InputType.TYPE_MASK_CLASS
+        val variation = inputType and InputType.TYPE_MASK_VARIATION
+        val numeric = inputClass == InputType.TYPE_CLASS_NUMBER || inputClass == InputType.TYPE_CLASS_PHONE
+        val asciiText = inputClass == InputType.TYPE_CLASS_TEXT && variation in setOf(
+            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_URI,
+            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+        )
+        if (!numeric && !asciiText) return
+        savedKeyboardPage = keyboardPage
+        savedEnglishMode = englishMode
+        editorKeyboardOverride = true
+        keyboardPage = if (numeric) KeyboardPage.NUMBERS else KeyboardPage.LETTERS
+        if (asciiText) englishMode = true
+    }
+
     private fun loadSelectedPipelineAsync() {
+        val generation = ++pipelineLoadGeneration
+        engineGeneration += 1
+        needsEngineClear = true
+        if (pipelineReady && pipelineHandle != 0L) {
+            pendingEngineEvents.clear()
+            hasPendingComposition = false
+            pendingEngineOperationCount = 0
+            lastSnapshot = EngineSnapshot()
+        }
+        pipelineHandle = 0
+        pipelineReady = false
+        synchronized(preloadLock) { preloadLock.notifyAll() }
         Thread {
             try {
                 val desired = desiredRegionId()
                 synchronized(preloadLock) {
+                    if (generation != pipelineLoadGeneration || desired != desiredRegionId()) return@Thread
                     if (staticHandle != 0L && staticRegionId == desired) {
                         pipelineHandle = staticHandle
                         pipelineReady = true
@@ -423,9 +626,10 @@ class GannyuInputMethodService : InputMethodService() {
                         return@Thread
                     }
                     if (staticHandle != 0L && staticRegionId != desired) {
-                        destroyHandle(staticHandle)
+                        val previous = staticHandle
                         staticHandle = 0L
                         staticRegionId = null
+                        destroyHandle(previous)
                     }
                     if (preloadedHandle != 0L && preloadedRegionId == desired) {
                         pipelineHandle = preloadedHandle
@@ -439,21 +643,30 @@ class GannyuInputMethodService : InputMethodService() {
                         return@Thread
                     }
                     if (preloadedHandle != 0L && preloadedRegionId != desired) {
-                        destroyHandle(preloadedHandle)
+                        val previous = preloadedHandle
                         preloadedHandle = 0L
                         preloadedRegionId = null
+                        destroyHandle(previous)
                     }
                 }
                 Log.i(TAG, "Delegating to preload for region=${desired ?: "(default)"}")
                 preloadSelectedRegionAsync(this, desired)
                 synchronized(preloadLock) {
-                    (preloadLock as Object).wait(20_000)
-                    if (preloadedHandle != 0L) {
+                    val deadline = android.os.SystemClock.uptimeMillis() + 20_000
+                    while (generation == pipelineLoadGeneration && desired == desiredRegionId() &&
+                        (preloadedHandle == 0L || preloadedRegionId != desired)
+                    ) {
+                        val remaining = deadline - android.os.SystemClock.uptimeMillis()
+                        if (remaining <= 0) break
+                        (preloadLock as Object).wait(remaining)
+                    }
+                    if (generation != pipelineLoadGeneration || desired != desiredRegionId()) return@Thread
+                    if (preloadedHandle != 0L && preloadedRegionId == desired) {
                         pipelineHandle = preloadedHandle
                         preloadedHandle = 0L
+                        preloadedRegionId = null
                         staticHandle = pipelineHandle
                         staticRegionId = desired
-                        preloadedRegionId = null
                         pipelineReady = true
                         Log.i(TAG, "Pipeline loaded via preload for region=${desired ?: "(default)"}")
                         postUpdateCandidates()
@@ -464,6 +677,10 @@ class GannyuInputMethodService : InputMethodService() {
                 return@Thread
             } catch (e: Exception) {
                 Log.e(TAG, "Pipeline init failed", e)
+                if (generation == pipelineLoadGeneration) {
+                    pipelineHandle = 0
+                    pipelineReady = false
+                }
             }
         }.start()
     }
@@ -483,6 +700,9 @@ class GannyuInputMethodService : InputMethodService() {
             KeyboardPage.NUMBERS -> renderAuxiliaryPage(NUM_ROW_1, NUM_ROW_2, NUM_ROW_3, keyWidth, gap)
             KeyboardPage.SYMBOLS -> renderAuxiliaryPage(SYM_ROW_1, SYM_ROW_2, SYM_ROW_3, keyWidth, gap)
             KeyboardPage.SYMBOLS_MORE -> renderAuxiliaryPage(MORE_ROW_1, MORE_ROW_2, MORE_ROW_3, keyWidth, gap)
+            KeyboardPage.EMOJI -> EMOJI_PAGES[emojiPageIndex].chunked(10).forEach { row ->
+                keyboardRows.addView(keyRow(row.map(::KeySpec), keyWidth, gap, bottomGap = gap))
+            }
         }
         renderBottomRow(keyWidth, gap)
     }
@@ -515,22 +735,30 @@ class GannyuInputMethodService : InputMethodService() {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46))
         }
-        val showImeSwitcher = shouldShowImeSwitchKey()
-        val mode = if (keyboardPage == KeyboardPage.LETTERS) if (englishMode) "中" else "英"
-            else if (keyboardPage == KeyboardPage.NUMBERS) "符号" else "123"
-        val nav = if (keyboardPage == KeyboardPage.LETTERS) "123" else "ABC"
-        val keys = (if (showImeSwitcher) listOf(IME_SWITCH_KEY) else emptyList()) +
-            listOf(mode, nav, "空格", if (englishMode) "," else "，", if (englishMode) "." else "。", "↵")
+        val keys = bottomRowLabels(shouldShowImeSwitchKey())
         keys.forEachIndexed { index, label ->
             val width = when (label) {
                 "空格" -> 0
                 "中", "英", "123", "ABC", "符号", IME_SWITCH_KEY -> functionKeyWidth(label, keyWidth)
                 "↵" -> (keyWidth * 1.6f).toInt()
+                "赣拼" -> (keyWidth * 1.5f).toInt()
                 else -> keyWidth
             }
             r4.addView(keyBtn(KeySpec(label), width, if (index == keys.lastIndex) 0 else gap))
         }
         keyboardRows.addView(r4)
+    }
+
+    private fun bottomRowLabels(showImeSwitcher: Boolean): List<String> {
+        val mode = if (keyboardPage == KeyboardPage.LETTERS) if (englishMode) "中" else "英"
+            else if (keyboardPage == KeyboardPage.NUMBERS) "符号" else "123"
+        val nav = if (keyboardPage == KeyboardPage.LETTERS) "123" else "ABC"
+        val pageKeys = if (keyboardPage == KeyboardPage.EMOJI) {
+            listOf("赣拼", "上一页", "下一页", "空格", "⌫", "↵")
+        } else {
+            listOf(mode, nav, "表情", "空格", if (englishMode) "," else "，", if (englishMode) "." else "。", "↵")
+        }
+        return (if (showImeSwitcher) listOf(IME_SWITCH_KEY) else emptyList()) + pageKeys
     }
 
     private fun spacer(width: Int): View = View(this).apply {
@@ -575,13 +803,23 @@ class GannyuInputMethodService : InputMethodService() {
         text = when {
             key.label == IME_SWITCH_KEY -> ""
             key.label == "空格" -> ""
-            key.label == "↵" -> if (englishMode) "return" else "换行"
+            key.label == "↵" -> if (englishMode) "return" else "回车"
+            key.label == "表情" -> "☺"
+            key.label == "上一页" -> "◀"
+            key.label == "下一页" -> "▶"
             key.isLetter && englishMode && englishShift -> key.label.uppercase()
             else -> key.label
         }
-        isAllCaps = false; textSize = if (key.isLetter) 23f else if (key.label.length > 2) 12f else 15f
+        isAllCaps = false
+        setTextSize(TypedValue.COMPLEX_UNIT_DIP, if (key.isLetter) 23f else if (key.label == "表情") 18f else if (key.label.length > 2) 12f else 15f)
         if (key.isLetter) setTypeface(Typeface.DEFAULT_BOLD)
         if (key.label == "空格") contentDescription = "空格"
+        if (key.label == "↵") contentDescription = text
+        if (key.label == "表情") contentDescription = "表情"
+        if (key.label in setOf("上一页", "下一页")) contentDescription = "${key.label}，第${emojiPageIndex + 1}页，共${EMOJI_PAGES.size}页"
+        if (keyboardPage == KeyboardPage.EMOJI && key.label !in ACTION_KEYS && key.label != "空格") {
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 23f)
+        }
         layoutParams = LinearLayout.LayoutParams(width, dp(46), if (width == 0) 1f else 0f).apply {
             marginEnd = gap
         }
@@ -680,12 +918,29 @@ class GannyuInputMethodService : InputMethodService() {
             key.label == "更多"                            -> { keyboardPage = KeyboardPage.SYMBOLS_MORE; renderKeyboard() }
             key.label == "常用"                            -> { keyboardPage = KeyboardPage.SYMBOLS; renderKeyboard() }
             key.label == "ABC"                           -> { keyboardPage = KeyboardPage.LETTERS; renderKeyboard() }
+            key.label == "表情" -> {
+                resetState(clearAccumulated = true)
+                emojiPageIndex = 0
+                keyboardPage = KeyboardPage.EMOJI
+                renderKeyboard()
+            }
+            key.label == "赣拼" -> {
+                englishMode = false
+                englishShift = false
+                keyboardPage = KeyboardPage.LETTERS
+                renderKeyboard()
+            }
+            key.label == "上一页" || key.label == "下一页" -> {
+                val direction = if (key.label == "上一页") -1 else 1
+                emojiPageIndex = (emojiPageIndex + direction + EMOJI_PAGES.size) % EMOJI_PAGES.size
+                renderKeyboard()
+            }
             key.isLetter                                 -> if (englishMode) {
                 currentInputConnection?.commitText(if (englishShift) key.label.uppercase() else key.label, 1)
                 if (englishShift) { englishShift = false; renderKeyboard() }
             } else appendInput(key.label.single())
             keyboardPage != KeyboardPage.LETTERS || key.label in PUNCT_AFTER_COMPOSE -> {
-                if (lastSnapshot.rawInput.isNotEmpty()) applyEngineSnapshot(processEngineText(key.label))
+                if (hasPendingComposition) applyEngineSnapshot(processEngineText(key.label))
                 else currentInputConnection?.commitText(key.label, 1)
             }
             else                                         -> currentInputConnection?.commitText(key.label, 1)
@@ -693,7 +948,7 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private val PUNCT_AFTER_COMPOSE = setOf("，", "。", "？", "！", "：", "；", "、", ",", ".")
-    private val ACTION_KEYS = setOf("分词", "⇧", "⌫", "中", "英", "123", "ABC", "符号", "更多", "常用", "↵", IME_SWITCH_KEY)
+    private val ACTION_KEYS = setOf("分词", "⇧", "⌫", "中", "英", "123", "ABC", "符号", "更多", "常用", "↵", "表情", "赣拼", "上一页", "下一页", IME_SWITCH_KEY)
     private val FUNCTION_WIDTH_KEYS = setOf("分词", "⇧", "中", "英", "123", "ABC", "符号", "更多", "常用", IME_SWITCH_KEY)
 
     private fun shouldShowImeSwitchKey(): Boolean {
@@ -722,11 +977,32 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun handleBackspace() {
-        if (lastSnapshot.rawInput.isNotEmpty()) {
+        if (hasPendingComposition) {
             applyEngineSnapshot(processEngineEvent("""{"type":"backspace"}"""))
             return
         }
-        currentInputConnection?.deleteSurroundingTextInCodePoints(1, 0)
+        val connection = currentInputConnection ?: return
+        val selectedText = connection.getSelectedText(0)
+        if (!selectedText.isNullOrEmpty()) {
+            if (connection.commitText("", 1)) editorSelectionCollapsed = true
+            return
+        }
+        if (selectedText == null && editorSelectionCollapsed != true) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            return
+        }
+        val beforeCursor = connection.getTextBeforeCursor(32, 0)?.toString()
+        if (beforeCursor.isNullOrEmpty()) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            return
+        }
+        val iterator = BreakIterator.getCharacterInstance(Locale.ROOT)
+        iterator.setText(beforeCursor)
+        val clusterStart = iterator.preceding(beforeCursor.length).takeIf { it != BreakIterator.DONE } ?: 0
+        val codePointCount = beforeCursor.codePointCount(clusterStart, beforeCursor.length).coerceAtLeast(1)
+        if (!connection.deleteSurroundingTextInCodePoints(codePointCount, 0)) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+        }
     }
 
     private fun stopBackspaceRepeat() {
@@ -734,7 +1010,7 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun handleSpace() {
-        if (lastSnapshot.rawInput.isEmpty()) {
+        if (!hasPendingComposition) {
             currentInputConnection?.commitText(" ", 1)
             return
         }
@@ -742,28 +1018,63 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun handleEnter() {
-        if (lastSnapshot.rawInput.isNotEmpty()) {
+        if (hasPendingComposition) {
             applyEngineSnapshot(processEngineEnter())
-        } else {
-            currentInputConnection?.commitText("\n", 1)
+            return
+        }
+        val connection = currentInputConnection ?: return
+        val info = currentInputEditorInfo
+        if (info == null ||
+            info.inputType and InputType.TYPE_MASK_CLASS == InputType.TYPE_NULL ||
+            info.imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION != 0
+        ) {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+            return
+        }
+        if (!info.actionLabel.isNullOrEmpty() && info.actionId != EditorInfo.IME_ACTION_UNSPECIFIED) {
+            connection.performEditorAction(info.actionId)
+            return
+        }
+        when (val action = info.imeOptions and EditorInfo.IME_MASK_ACTION) {
+            EditorInfo.IME_ACTION_UNSPECIFIED,
+            EditorInfo.IME_ACTION_NONE -> sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+            else -> connection.performEditorAction(action)
         }
     }
 
     private fun processEngineEnter(): EngineSnapshot? = processEngineEvent("""{"type":"enter"}""")
 
     private fun commitCandidate(candidate: RankedCandidate) {
-        if (pipelineHandle == 0L) return
+        if (!pipelineReady || pipelineHandle == 0L) return
         // The expanded panel represents one candidate snapshot.  Selecting an
         // item invalidates it, so hide it before requesting the next snapshot.
         if (candidateExpanded) collapseCandidateExpansion()
-        applyEngineSnapshot(nativeSelectCandidate(pipelineHandle, candidate.globalIndex)?.let(::parseSnapshot))
+        invalidateCandidateSnapshot()
+        enqueueNativeOperation { handle -> nativeBridge.nativeSelectCandidate(handle, candidate.globalIndex) }
     }
 
     private fun resetState(clearAccumulated: Boolean) {
-        if (pipelineHandle != 0L && clearAccumulated) {
-            applyEngineSnapshot(nativeClearComposition(pipelineHandle)?.let(::parseSnapshot), render = false)
+        if (clearAccumulated) {
+            engineGeneration += 1
+            pendingEngineEvents.clear()
+            hasPendingComposition = false
+            pendingEngineOperationCount = 0
+            if (pipelineReady && pipelineHandle != 0L) {
+                needsEngineClear = false
+                val handle = pipelineHandle
+                val generation = engineGeneration
+                engineExecutor.execute {
+                    if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                        runCatching { nativeBridge.nativeClearComposition(handle) }
+                    }
+                }
+            } else {
+                needsEngineClear = true
+            }
         }
         lastSnapshot = EngineSnapshot()
+        candidateLoadGeneration += 1
+        candidateLoading = false
         candidateExpanded = false
         expandedCandidates.clear()
         if (::candidateBar.isInitialized) renderState()
@@ -773,7 +1084,7 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun renderState() {
         if (!::candidateBar.isInitialized) return
-        if (::candidateBar.isInitialized) refreshCandidates()
+        initializeEngine()
         renderCacheTag()
         if (::candidateBar.isInitialized) renderCandidateBar()
         if (::candidateExpandedRows.isInitialized) renderExpandedCandidates()
@@ -786,20 +1097,70 @@ class GannyuInputMethodService : InputMethodService() {
         cacheTag.text = display
     }
 
-    private fun refreshCandidates() {
-        if (!::candidateBar.isInitialized) return
-        candidateBar.removeAllViews()
-        if (!pipelineReady || pipelineHandle == 0L) {
-            Log.w(TAG, "refreshCandidates SKIP ready=$pipelineReady handle=$pipelineHandle")
-            lastSnapshot = EngineSnapshot()
-            return
-        }
-        lastSnapshot = nativeSnapshot(pipelineHandle)?.let(::parseSnapshot) ?: EngineSnapshot()
-    }
-
     private fun postUpdateCandidates() {
         if (::candidateBar.isInitialized) candidateBar.post {
-            if (candidateBar.isAttachedToWindow) renderState()
+            if (candidateBar.isAttachedToWindow) {
+                initializeEngine()
+                renderState()
+            }
+        }
+    }
+
+    private fun initializeEngine() {
+        if (!pipelineReady || pipelineHandle == 0L || (!needsEngineClear && pendingEngineEvents.isEmpty())) return
+        val handle = pipelineHandle
+        val generation = engineGeneration
+        if (needsEngineClear) {
+            needsEngineClear = false
+            engineExecutor.execute {
+                if (generation != engineGeneration || pipelineHandle != handle || !pipelineReady) return@execute
+                runCatching { nativeBridge.nativeClearComposition(handle) }
+                val snapshot = runCatching { nativeBridge.nativeSnapshot(handle)?.let(::parseSnapshot) }.getOrNull()
+                candidateLoadHandler.post {
+                    if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                        applyEngineSnapshot(snapshot)
+                    }
+                }
+            }
+        }
+        while (pendingEngineEvents.isNotEmpty()) {
+            enqueueEngineEvent(handle, generation, pendingEngineEvents.removeFirst())
+        }
+    }
+
+    private fun enqueueEngineEvent(handle: Long, generation: Long, eventJson: String) {
+        pendingEngineOperationCount += 1
+        hasPendingComposition = true
+        engineExecutor.execute {
+            if (generation != engineGeneration || pipelineHandle != handle || !pipelineReady) return@execute
+            val snapshot = runCatching {
+                nativeBridge.nativeProcessKey(handle, eventJson)?.let(::parseSnapshot)
+            }.getOrNull()
+            candidateLoadHandler.post {
+                if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                    pendingEngineOperationCount = (pendingEngineOperationCount - 1).coerceAtLeast(0)
+                    applyEngineSnapshot(snapshot)
+                }
+            }
+        }
+    }
+
+    private fun enqueueNativeOperation(operation: (Long) -> String?) {
+        if (!pipelineReady || pipelineHandle == 0L) return
+        initializeEngine()
+        val handle = pipelineHandle
+        val generation = engineGeneration
+        pendingEngineOperationCount += 1
+        hasPendingComposition = true
+        engineExecutor.execute {
+            if (generation != engineGeneration || pipelineHandle != handle || !pipelineReady) return@execute
+            val snapshot = runCatching { operation(handle)?.let(::parseSnapshot) }.getOrNull()
+            candidateLoadHandler.post {
+                if (generation == engineGeneration && pipelineHandle == handle && pipelineReady) {
+                    pendingEngineOperationCount = (pendingEngineOperationCount - 1).coerceAtLeast(0)
+                    applyEngineSnapshot(snapshot)
+                }
+            }
         }
     }
 
@@ -826,6 +1187,7 @@ class GannyuInputMethodService : InputMethodService() {
         expanded: Boolean,
     ) : LinearLayout(context) {
         private var downX = 0f
+        private var downY = 0f
         private var moved = false
 
         init {
@@ -842,7 +1204,7 @@ class GannyuInputMethodService : InputMethodService() {
 
             addView(TextView(context).apply {
                 text = candidate.text
-                textSize = 18f; setTextColor(keyTextColor)
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16f); setTextColor(keyTextColor)
                 setTypeface(null, Typeface.NORMAL)
                 gravity = android.view.Gravity.START
                 maxLines = 1
@@ -855,7 +1217,7 @@ class GannyuInputMethodService : InputMethodService() {
                 if (expanded) minimumHeight = dp(37)
                 addView(TextView(context).apply {
                     text = displayMeta
-                    textSize = 10f; setTextColor(keySecondaryTextColor)
+                    setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10f); setTextColor(keySecondaryTextColor)
                     gravity = android.view.Gravity.START
                     if (expanded) {
                         maxLines = Int.MAX_VALUE
@@ -871,12 +1233,25 @@ class GannyuInputMethodService : InputMethodService() {
 
         override fun onTouchEvent(event: MotionEvent): Boolean {
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> { downX = event.x; moved = false; parent.requestDisallowInterceptTouchEvent(true); return true }
-                MotionEvent.ACTION_MOVE -> {
-                    if (kotlin.math.abs(event.x - downX) > dp(8)) { moved = true; parent.requestDisallowInterceptTouchEvent(false) }
+                MotionEvent.ACTION_DOWN -> {
+                    downX = event.x
+                    downY = event.y
+                    moved = false
+                    parent.requestDisallowInterceptTouchEvent(true)
                     return true
                 }
-                MotionEvent.ACTION_UP -> { parent.requestDisallowInterceptTouchEvent(false); if (!moved) commitCandidate(candidate); return true }
+                MotionEvent.ACTION_MOVE -> {
+                    if (kotlin.math.hypot(event.x - downX, event.y - downY) >= dp(8)) {
+                        moved = true
+                        parent.requestDisallowInterceptTouchEvent(false)
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_UP -> {
+                    parent.requestDisallowInterceptTouchEvent(false)
+                    if (!moved && kotlin.math.hypot(event.x - downX, event.y - downY) < dp(8)) commitCandidate(candidate)
+                    return true
+                }
                 MotionEvent.ACTION_CANCEL -> { parent.requestDisallowInterceptTouchEvent(false); return true }
             }
             return super.onTouchEvent(event)
@@ -892,6 +1267,8 @@ class GannyuInputMethodService : InputMethodService() {
 
     private fun renderExpandedCandidates() {
         if (!::candidateExpandedRows.isInitialized) return
+        val scrollY = candidateExpandedScroll.scrollY
+        val generation = candidateLoadGeneration
         candidateExpandedRows.removeAllViews()
         if (!candidateExpanded) {
             candidateExpansionContainer.visibility = View.GONE
@@ -923,6 +1300,23 @@ class GannyuInputMethodService : InputMethodService() {
             usedWidth += (if (usedWidth == 0) 0 else dp(3)) + width
         }
         if (row.childCount > 0) candidateExpandedRows.addView(row)
+        if (candidateHasMore) {
+            candidateExpandedRows.addView(Button(this).apply {
+                text = when {
+                    candidateLoading -> "正在加载候选…"
+                    candidateLoadFailed -> "重试加载候选"
+                    else -> "加载更多候选"
+                }
+                isAllCaps = false
+                isEnabled = !candidateLoading
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12f)
+                setTextColor(keySecondaryTextColor)
+                setOnClickListener { loadMoreCandidates() }
+            }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(44)))
+        }
+        candidateExpandedScroll.post {
+            if (candidateExpanded && candidateLoadGeneration == generation) candidateExpandedScroll.scrollTo(0, scrollY)
+        }
     }
 
     private fun expandedCandidateRow(): LinearLayout = LinearLayout(this).apply {
@@ -931,8 +1325,8 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun candidateWidth(candidate: RankedCandidate): Int {
-        val scale = resources.displayMetrics.scaledDensity
-        val wordWidth = android.graphics.Paint().apply { textSize = 18f * scale }.measureText(candidate.text)
+        val density = resources.displayMetrics.density
+        val wordWidth = android.graphics.Paint().apply { textSize = 16f * density }.measureText(candidate.text)
         return maxOf(dp(44), kotlin.math.ceil(wordWidth.toDouble()).toInt() + dp(10))
     }
 
@@ -943,15 +1337,57 @@ class GannyuInputMethodService : InputMethodService() {
         }
         if (lastSnapshot.candidates.isEmpty()) return
         candidateExpanded = true
+        candidateLoadGeneration += 1
+        candidateNextOffset = 0
+        candidateHasMore = true
+        candidateLoading = false
+        candidateLoadFailed = false
         expandedCandidates.clear()
         expandedCandidates += lastSnapshot.candidates
         renderState()
+        loadMoreCandidates()
     }
 
     private fun collapseCandidateExpansion() {
+        candidateLoadGeneration += 1
+        candidateLoading = false
         candidateExpanded = false
         expandedCandidates.clear()
         renderState()
+    }
+
+    private fun loadMoreCandidates() {
+        if (!candidateExpanded || candidateLoading || !candidateHasMore || !pipelineReady || pipelineHandle == 0L) return
+        candidateLoading = true
+        candidateLoadFailed = false
+        val generation = ++candidateLoadGeneration
+        val handle = pipelineHandle
+        val rawInput = lastSnapshot.rawInput
+        val schemaId = lastSnapshot.schemaId
+        val offset = candidateNextOffset
+        renderExpandedCandidates()
+        engineExecutor.execute {
+            val result = runCatching {
+                if (pipelineReady && pipelineHandle == handle) nativeBridge.nativeCandidates(handle, offset, 100)?.let(::JSONObject) else null
+            }.getOrNull()
+            candidateLoadHandler.post {
+                if (!candidateExpanded || candidateLoadGeneration != generation || pipelineHandle != handle ||
+                    lastSnapshot.rawInput != rawInput || lastSnapshot.schemaId != schemaId) return@post
+                candidateLoading = false
+                val candidates = runCatching { result?.let { parseSnapshot(it.toString()).candidates } }.getOrNull()
+                if (result == null || candidates == null || result.optInt("offset", -1) != offset ||
+                    result.optString("rawInput") != rawInput || result.optString("schemaId") != schemaId ||
+                    candidates.size > 100 || candidates.withIndex().any { it.value.globalIndex != offset + it.index }) {
+                    candidateLoadFailed = true
+                } else {
+                    if (offset == 0) expandedCandidates.clear()
+                    expandedCandidates += candidates
+                    candidateNextOffset = offset + candidates.size
+                    candidateHasMore = result.optBoolean("hasMore") && candidates.isNotEmpty()
+                }
+                renderExpandedCandidates()
+            }
+        }
     }
 
     private fun processEngineText(text: String): EngineSnapshot? {
@@ -960,24 +1396,54 @@ class GannyuInputMethodService : InputMethodService() {
     }
 
     private fun processEngineEvent(eventJson: String): EngineSnapshot? {
-        if (pipelineHandle == 0L || !pipelineReady) return null
-        return nativeProcessKey(pipelineHandle, eventJson)?.let(::parseSnapshot)
+        invalidateCandidateSnapshot()
+        if (!pipelineReady || pipelineHandle == 0L) {
+            pendingEngineEvents.addLast(eventJson)
+            if (runCatching { JSONObject(eventJson).optString("type") == "text" }.getOrDefault(false)) {
+                hasPendingComposition = true
+            }
+            return null
+        }
+        initializeEngine()
+        if (runCatching { JSONObject(eventJson).optString("type") == "text" }.getOrDefault(false)) {
+            hasPendingComposition = true
+        }
+        enqueueEngineEvent(pipelineHandle, engineGeneration, eventJson)
+        return null
     }
 
     private fun applyEngineSnapshot(snapshot: EngineSnapshot?, render: Boolean = true) {
         if (snapshot == null) return
-        val compositionChanged = lastSnapshot.rawInput != snapshot.rawInput || !snapshot.commitText.isNullOrEmpty()
+        val compositionChanged = lastSnapshot.rawInput != snapshot.rawInput ||
+            lastSnapshot.schemaId != snapshot.schemaId || !snapshot.commitText.isNullOrEmpty()
         if (!snapshot.commitText.isNullOrEmpty()) {
-            currentInputConnection?.commitText(snapshot.commitText, 1)
+            val selectionStart = editorSelectionStart
+            if (currentInputConnection?.commitText(snapshot.commitText, 1) == true && selectionStart != null) {
+                val cursor = selectionStart + snapshot.commitText.length
+                expectedSelectionStart = cursor
+                expectedSelectionEnd = cursor
+            }
         }
         lastSnapshot = snapshot
+        hasPendingComposition = snapshot.rawInput.isNotEmpty() || pendingEngineOperationCount > 0
         if (compositionChanged) {
+            candidateLoadGeneration += 1
+            candidateLoading = false
             candidateExpanded = false
             expandedCandidates.clear()
         }
         if (render && ::candidateBar.isInitialized) {
             renderState()
         }
+    }
+
+    private fun invalidateCandidateSnapshot() {
+        candidateLoadGeneration += 1
+        candidateLoading = false
+        candidateExpanded = false
+        expandedCandidates.clear()
+        lastSnapshot = lastSnapshot.copy(preedit = "", candidates = emptyList(), hasNextPage = false)
+        if (::candidateBar.isInitialized) renderState()
     }
 
     private fun parseSnapshot(json: String): EngineSnapshot {

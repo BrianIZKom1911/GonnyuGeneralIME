@@ -55,7 +55,6 @@ Java_io_gannyu_input_GannyuInputMethodService_nativeCreate(
     if (resource_root_c != NULL) (*env)->ReleaseStringUTFChars(env, resource_root, resource_root_c);
     if (region_c != NULL) (*env)->ReleaseStringUTFChars(env, region, region_c);
     if (user_data_dir_c != NULL) (*env)->ReleaseStringUTFChars(env, user_data_dir, user_data_dir_c);
-    if (status == 0) status = gannyu_engine_set_candidate_limit(handle, 60);
     return status == 0 ? (jlong)(intptr_t)handle : 0;
 }
 
@@ -139,6 +138,16 @@ Java_io_gannyu_input_NativePipelineBridge_nativeCreate(JNIEnv* env, jobject thiz
 }
 
 JNIEXPORT jstring JNICALL
+Java_io_gannyu_input_NativePipelineBridge_nativeCandidates(
+    JNIEnv* env, jobject thiz, jlong handle, jint offset, jint limit) {
+    (void)thiz;
+    if (offset < 0 || limit <= 0) return NULL;
+    char* out = NULL;
+    return gannyu_engine_candidates((GannyuPipelineHandle*)(intptr_t)handle,
+                                    (size_t)offset, (size_t)limit, &out) == 0 ? copy_out_string(env, out) : NULL;
+}
+
+JNIEXPORT jstring JNICALL
 Java_io_gannyu_input_NativePipelineBridge_nativeLastError(JNIEnv* env, jobject thiz) {
     return Java_io_gannyu_input_GannyuInputMethodService_nativeLastError(env, thiz);
 }
@@ -176,4 +185,17 @@ Java_io_gannyu_input_NativePipelineBridge_nativeResetCurrentUserData(JNIEnv* env
 JNIEXPORT void JNICALL
 Java_io_gannyu_input_NativePipelineBridge_nativeDestroy(JNIEnv* env, jobject thiz, jlong handle) {
     Java_io_gannyu_input_GannyuInputMethodService_nativeDestroy(env, thiz, handle);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_io_gannyu_input_NativePipelineBridge_nativeSetInputOptions(JNIEnv* env, jobject thiz, jlong handle, jintArray values) {
+    (void)thiz;
+    if (values == NULL || (*env)->GetArrayLength(env, values) != 8) return JNI_FALSE;
+    jint options[8];
+    (*env)->GetIntArrayRegion(env, values, 0, 8, options);
+    if ((*env)->ExceptionCheck(env)) return JNI_FALSE;
+    return gannyu_engine_set_input_options((GannyuPipelineHandle*)(intptr_t)handle,
+        options[0], options[1], options[2], options[3], options[4], options[5]) == 0 &&
+        gannyu_engine_set_synonyms_enabled((GannyuPipelineHandle*)(intptr_t)handle, options[6]) == 0 &&
+        gannyu_engine_set_wenbai_enabled((GannyuPipelineHandle*)(intptr_t)handle, options[7]) == 0 ? JNI_TRUE : JNI_FALSE;
 }

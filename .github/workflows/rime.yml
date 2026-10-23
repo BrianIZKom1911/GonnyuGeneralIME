@@ -11,11 +11,16 @@ on:
       - resources/**
       - .github/workflows/rime.yml
 
+concurrency:
+  group: rime-${{ github.event_name == 'push' && github.ref_type == 'branch' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref_type == 'branch' }}
+
 permissions:
   contents: read
 
 jobs:
   build:
+    if: github.event_name != 'push' || github.ref_type != 'branch' || !startsWith(github.event.head_commit.message, 'chore(release):')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +32,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Restore regional resource outputs
+        uses: actions/cache@v4
+        with:
+          path: build/rime
+          key: regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-${{ hashFiles('platforms/rime/build.py', 'platforms/rime/fuzzy.py', 'platforms/rime/build_cache.py', 'platforms/rime/gannyu.schema.yaml', 'platforms/rime/*.lua', 'resources/manifest.toml', 'resources/regions/**', 'LICENSE') }}
+          restore-keys: |
+            regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-
       - run: bash platforms/rime/package.sh
       - uses: actions/upload-artifact@v4
         with:

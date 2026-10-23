@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::fs;
@@ -58,6 +58,12 @@ pub enum PriorityTier {
     Fallback,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum FuzzyConversionCondition {
+    NotDerivedFromIr,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct FuzzyEntry {
     #[serde(default = "default_fuzzy_region")]
@@ -75,6 +81,8 @@ pub struct FuzzyEntry {
     pub priority_tier: PriorityTier,
     #[serde(default)]
     pub starts_with: Vec<String>,
+    #[serde(default)]
+    pub conversion_condition: Option<FuzzyConversionCondition>,
     #[serde(default)]
     pub example: Option<String>,
     #[serde(default)]
@@ -96,6 +104,10 @@ fn fuzzy_region_applies(entry_region: &str, region_id: Option<&str>) -> bool {
 #[derive(Debug, Clone)]
 pub struct FuzzyMap {
     pub entries: Vec<FuzzyEntry>,
+    gon_fuzzy_index: HashMap<char, Vec<usize>>,
+    gon_pin_index: HashMap<char, Vec<usize>>,
+    gon_fuzzy_empty_source: Vec<usize>,
+    gon_pin_empty_source: Vec<usize>,
 }
 
 #[derive(Debug)]
@@ -124,6 +136,54 @@ impl From<std::io::Error> for SyllableError {
 }
 
 impl FuzzyMap {
+    pub fn with_optional_rules(&self, enabled: bool) -> FuzzyMap {
+        Self::from_entries(
+            self.entries
+                .iter()
+                .filter(|entry| {
+                    enabled
+                        || matches!(
+                            (entry.gon_fuzzy.as_str(), entry.gon_pin.as_str()),
+                            ("i", "ï") | ("e", "ê") | ("ee", "ê") | ("ir", "e")
+                        )
+                })
+                .cloned()
+                .collect(),
+        )
+    }
+
+    fn from_entries(entries: Vec<FuzzyEntry>) -> FuzzyMap {
+        let mut gon_fuzzy_index: HashMap<char, Vec<usize>> = HashMap::new();
+        let mut gon_pin_index: HashMap<char, Vec<usize>> = HashMap::new();
+        let mut gon_fuzzy_empty_source = Vec::new();
+        let mut gon_pin_empty_source = Vec::new();
+        for (index, entry) in entries.iter().enumerate() {
+            if let Some(first) = entry.gon_fuzzy.chars().next() {
+                gon_fuzzy_index.entry(first).or_default().push(index);
+            } else {
+                gon_fuzzy_empty_source.push(index);
+            }
+            if entry.bidirectional {
+                if let Some(first) = entry.gon_pin.chars().next() {
+                    gon_pin_index.entry(first).or_default().push(index);
+                } else {
+                    gon_pin_empty_source.push(index);
+                }
+            }
+        }
+        FuzzyMap {
+            entries,
+            gon_fuzzy_index,
+            gon_pin_index,
+            gon_fuzzy_empty_source,
+            gon_pin_empty_source,
+        }
+    }
+
+    pub fn empty() -> FuzzyMap {
+        Self::from_entries(Vec::new())
+    }
+
     pub fn load(path: impl AsRef<Path>) -> Result<FuzzyMap, SyllableError> {
         Self::load_scoped(path, None)
     }
@@ -158,7 +218,7 @@ impl FuzzyMap {
                 entries.push(entry);
             }
         }
-        Ok(FuzzyMap { entries })
+        Ok(FuzzyMap::from_entries(entries))
     }
 
     pub fn load_tsv(path: impl AsRef<Path>) -> Result<FuzzyMap, SyllableError> {
@@ -236,6 +296,31 @@ impl FuzzyMap {
                 "false" => false,
                 other => return Err(parse_error(format!("invalid chainable: {other}"))),
             };
+            let conversion_condition = match value_for("conversion_condition")
+                .unwrap_or_default()
+                .as_str()
+            {
+                "" | "none" => None,
+                "not-derived-from-ir" => Some(FuzzyConversionCondition::NotDerivedFromIr),
+                other => {
+                    return Err(parse_error(format!(
+                        "invalid conversion_condition: {other}"
+                    )))
+                }
+            };
+            if conversion_condition.is_some()
+                && !matches!(
+                    (
+                        value_for("gon_fuzzy").as_deref(),
+                        value_for("gon_pin").as_deref()
+                    ),
+                    (Some("e"), Some("ê")) | (Some("ee"), Some("ê"))
+                )
+            {
+                return Err(parse_error(
+                    "not-derived-from-ir only applies to e/ee→ê".to_string(),
+                ));
+            }
             let optional = |value: Option<String>| value.filter(|text| !text.is_empty());
             let region = value_for("region")
                 .filter(|value| !value.is_empty())
@@ -250,6 +335,7 @@ impl FuzzyMap {
                 chainable,
                 priority_tier,
                 starts_with: parse_csv_list(value_for("starts_with")),
+                conversion_condition,
                 example: optional(value_for("example")),
                 note: optional(value_for("note")),
             };
@@ -257,7 +343,7 @@ impl FuzzyMap {
                 entries.push(entry);
             }
         }
-        Ok(FuzzyMap { entries })
+        Ok(FuzzyMap::from_entries(entries))
     }
 
     pub fn normalize(&self, input: &str, target: SyllableScheme) -> Vec<NormalizedSyllable> {
@@ -271,17 +357,34 @@ impl FuzzyMap {
                 applied: Vec::new(),
             },
             true,
+            Vec::<usize>::new(),
         )];
-        let mut produced: HashSet<String> = std::iter::once(outputs[0].0.text.clone()).collect();
+        let mut produced: HashSet<(String, Vec<usize>)> =
+            std::iter::once((outputs[0].0.text.clone(), Vec::new())).collect();
+        let mut produced_texts: HashSet<String> =
+            std::iter::once(outputs[0].0.text.clone()).collect();
         let mut cursor = 0;
         const MAX_OUTPUTS: usize = 64;
-        while cursor < outputs.len() && outputs.len() < MAX_OUTPUTS {
-            let (base, expandable) = outputs[cursor].clone();
-            if !expandable || base.text.contains("yuo") {
+        while cursor < outputs.len() && produced_texts.len() < MAX_OUTPUTS {
+            let (base, expandable, origins) = outputs[cursor].clone();
+            if !expandable {
                 cursor += 1;
                 continue;
             }
-            for entry in &self.entries {
+            let (index, empty_source) = match target {
+                SyllableScheme::GonPin => (&self.gon_fuzzy_index, &self.gon_fuzzy_empty_source),
+                SyllableScheme::GonFuzzy => (&self.gon_pin_index, &self.gon_pin_empty_source),
+            };
+            let mut candidate_indices = empty_source.clone();
+            for character in base.text.chars() {
+                if let Some(indices) = index.get(&character) {
+                    candidate_indices.extend(indices);
+                }
+            }
+            candidate_indices.sort_unstable();
+            candidate_indices.dedup();
+            for index in candidate_indices {
+                let entry = &self.entries[index];
                 if !entry.starts_with.is_empty()
                     && !entry
                         .starts_with
@@ -300,20 +403,37 @@ impl FuzzyMap {
                     }
                 };
                 let substituted = match entry.applies {
-                    FuzzyApplies::SyllableInitial => substitute_initial(&base.text, from, to),
-                    FuzzyApplies::SyllableFinal => substitute_final(&base.text, from, to),
+                    FuzzyApplies::SyllableInitial => {
+                        substitute_initial_matches(&base.text, from, to)
+                    }
+                    FuzzyApplies::SyllableFinal => substitute_final_matches(&base.text, from, to),
                     FuzzyApplies::Anywhere => {
-                        substitute_any(&base.text, from, to, &entry.starts_with)
+                        substitute_any_matches(&base.text, from, to, &entry.starts_with)
                     }
                 };
-                for candidate in substituted {
-                    if produced.contains(&candidate) || outputs.len() >= MAX_OUTPUTS {
+                for (candidate, start, source_length) in substituted {
+                    if entry.conversion_condition
+                        == Some(FuzzyConversionCondition::NotDerivedFromIr)
+                        && origins
+                            .iter()
+                            .any(|position| start <= *position && *position < start + source_length)
+                    {
+                        continue;
+                    }
+                    let candidate_origins =
+                        carry_ir_e_origins(&origins, start, source_length, to.len(), from, to);
+                    let state = (candidate.clone(), candidate_origins.clone());
+                    if produced.contains(&state)
+                        || (!produced_texts.contains(&candidate)
+                            && produced_texts.len() >= MAX_OUTPUTS)
+                    {
                         continue;
                     }
                     let tier = lowest_tier(base.tier, entry.priority_tier);
                     let mut applied = base.applied.clone();
                     applied.push(format!("{}→{}", from, to));
-                    produced.insert(candidate.clone());
+                    produced.insert(state);
+                    produced_texts.insert(candidate.clone());
                     outputs.push((
                         NormalizedSyllable {
                             text: candidate,
@@ -323,13 +443,18 @@ impl FuzzyMap {
                             applied,
                         },
                         entry.chainable,
+                        candidate_origins,
                     ));
                 }
             }
             cursor += 1;
         }
-        outputs.sort_by_key(|(item, _)| tier_rank(item.tier));
-        outputs.into_iter().map(|(item, _)| item).collect()
+        outputs.sort_by_key(|(item, _, _)| tier_rank(item.tier));
+        let mut output_texts = HashSet::new();
+        outputs
+            .into_iter()
+            .filter_map(|(item, _, _)| output_texts.insert(item.text.clone()).then_some(item))
+            .collect()
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &FuzzyEntry> {
@@ -387,7 +512,12 @@ fn strip_tone(input: &str) -> StrippedSyllable {
     }
 }
 
-fn substitute_any(text: &str, from: &str, to: &str, initials: &[String]) -> Vec<String> {
+fn substitute_any_matches(
+    text: &str,
+    from: &str,
+    to: &str,
+    initials: &[String],
+) -> Vec<(String, usize, usize)> {
     if from.is_empty() || !text.contains(from) {
         return Vec::new();
     }
@@ -404,23 +534,23 @@ fn substitute_any(text: &str, from: &str, to: &str, initials: &[String]) -> Vec<
         next.push_str(&text[..absolute]);
         next.push_str(to);
         next.push_str(&text[absolute + from.len()..]);
-        results.push(next);
+        results.push((next, absolute, from.len()));
         start = absolute + from.len();
     }
     results
 }
 
-fn substitute_initial(text: &str, from: &str, to: &str) -> Vec<String> {
+fn substitute_initial_matches(text: &str, from: &str, to: &str) -> Vec<(String, usize, usize)> {
     if !text.starts_with(from) || (to.len() > from.len() && text.starts_with(to)) {
         return Vec::new();
     }
     let mut next = String::with_capacity(text.len() + to.len());
     next.push_str(to);
     next.push_str(&text[from.len()..]);
-    vec![next]
+    vec![(next, 0, from.len())]
 }
 
-fn substitute_final(text: &str, from: &str, to: &str) -> Vec<String> {
+fn substitute_final_matches(text: &str, from: &str, to: &str) -> Vec<(String, usize, usize)> {
     if from == "o" && to == "eo" && text != from {
         return Vec::new();
     }
@@ -432,7 +562,7 @@ fn substitute_final(text: &str, from: &str, to: &str) -> Vec<String> {
         if to.is_empty() || text.ends_with(['p', 't', 'k']) {
             return Vec::new();
         }
-        return vec![format!("{}{}", text, to)];
+        return vec![(format!("{}{}", text, to), text.len(), 0)];
     }
     if !text.ends_with(from) {
         return Vec::new();
@@ -446,7 +576,35 @@ fn substitute_final(text: &str, from: &str, to: &str) -> Vec<String> {
     let mut next = String::with_capacity(text.len() + to.len());
     next.push_str(&text[..text.len() - from.len()]);
     next.push_str(to);
-    vec![next]
+    vec![(next, text.len() - from.len(), from.len())]
+}
+
+fn carry_ir_e_origins(
+    origins: &[usize],
+    start: usize,
+    source_length: usize,
+    target_length: usize,
+    from: &str,
+    to: &str,
+) -> Vec<usize> {
+    let end = start + source_length;
+    let shift = target_length as isize - source_length as isize;
+    let mut carried = Vec::new();
+    for position in origins {
+        if *position < start {
+            carried.push(*position);
+        } else if *position >= end {
+            carried.push((*position as isize + shift) as usize);
+        } else {
+            carried.extend(to.char_indices().map(|(offset, _)| start + offset));
+        }
+    }
+    if from == "ir" && to == "e" {
+        carried.push(start);
+    }
+    carried.sort_unstable();
+    carried.dedup();
+    carried
 }
 
 fn parse_category(value: &str) -> Option<FuzzyCategory> {

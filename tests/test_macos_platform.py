@@ -15,7 +15,7 @@ def test_macos_platform_exposes_build_and_smoke_entrypoints() -> None:
     assert 'build_rime_engine.sh' in build_script
     assert 'prepare_rime_resources.sh' in build_script
     assert 'Contents/Resources/rime' in build_script
-    assert 'swift build --package-path "$script_dir" -c release' in build_script
+    assert 'swift build --package-path "$script_dir" --scratch-path "$swift_build_root" -c release' in build_script
     assert '--arch arm64 --arch x86_64' in build_script
     assert 'lipo "$bundle_root/Contents/MacOS/GannyuInputMethodHost" -verify_arch arm64 x86_64' in build_script
     assert "Info.plist.template" in build_script
@@ -201,15 +201,6 @@ def test_macos_keeps_the_transparent_imk_candidate_window_with_the_server() -> N
     assert "IMKCandidatesSendServerKeyEventFirst" in host
 
 
-def test_macos_build_reuses_complete_rime_caches_until_their_inputs_change() -> None:
-    build_script = (ROOT / "platforms/macos/build.sh").read_text(encoding="utf-8")
-
-    assert "GANNYU_MACOS_FORCE_RIME_REBUILD" in build_script
-    assert "reusing cached macOS librime engine" in build_script
-    assert "reusing cached macOS Rime resources" in build_script
-    assert '"$repo_root/engines/rime/gannyu_rime_engine.cpp"' in build_script
-    assert "dependencies/cache/macos/rime-engine" in build_script
-    assert "build/rime-macos-resources" in build_script
 
 def test_macos_region_selection_is_validated_against_embedded_catalog() -> None:
     engine = (

@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 
 namespace {
 
@@ -22,8 +23,8 @@ bool Footprint(uint64_t* bytes) {
 }
 
 int main(int argc, char** argv) {
-  if (argc != 5) {
-    std::fprintf(stderr, "usage: %s SHARED_DATA_DIR PREBUILT_DATA_DIR USER_DATA_DIR REGION\n", argv[0]);
+  if (argc != 5 && argc != 6) {
+    std::fprintf(stderr, "usage: %s SHARED_DATA_DIR PREBUILT_DATA_DIR USER_DATA_DIR REGION [--input-options]\n", argv[0]);
     return 2;
   }
   RimeApi* api = rime_get_api();
@@ -33,6 +34,8 @@ int main(int argc, char** argv) {
   }
   uint64_t baseline = 0;
   uint64_t latest = 0;
+  uint64_t peak = 0;
+  const bool input_options = argc == 6 && std::strcmp(argv[5], "--input-options") == 0;
   for (int round = 1; round <= 25; ++round) {
     GannyuEngineConfig config = GANNYU_ENGINE_CONFIG_INIT;
     config.shared_data_dir = argv[1];
@@ -49,12 +52,34 @@ int main(int argc, char** argv) {
       return 3;
     }
     char* snapshot = nullptr;
-    const bool snapshot_ok = gannyu_engine_snapshot(handle, &snapshot) == 0 && snapshot != nullptr;
+    bool snapshot_ok = gannyu_engine_snapshot(handle, &snapshot) == 0 && snapshot != nullptr;
     gannyu_string_destroy(snapshot);
+    if (input_options) {
+      snapshot = nullptr;
+      snapshot_ok = snapshot_ok && gannyu_engine_set_candidate_limit(handle, 9) == 0;
+      snapshot_ok = snapshot_ok && gannyu_engine_process_key(handle, "{\"type\":\"text\",\"text\":\"cama\"}", &snapshot) == 0;
+      gannyu_string_destroy(snapshot);
+      for (int mode = 0; mode < 3; ++mode) {
+        for (int relations = 0; relations < 2; ++relations) {
+          for (int rules = 0; rules < 2; ++rules) {
+            for (int mandarin = 0; mandarin < 2; ++mandarin) {
+              snapshot_ok = snapshot_ok && gannyu_engine_set_input_options(handle, 1, relations, 1, mandarin, rules, mode) == 0;
+              for (int synonyms = 0; synonyms < 2; ++synonyms) {
+                snapshot = nullptr;
+                snapshot_ok = snapshot_ok && gannyu_engine_set_synonyms_enabled(handle, synonyms) == 0;
+                snapshot_ok = snapshot_ok && gannyu_engine_snapshot(handle, &snapshot) == 0 && snapshot != nullptr;
+                gannyu_string_destroy(snapshot);
+                if (Footprint(&latest) && latest > peak) peak = latest;
+              }
+            }
+          }
+        }
+      }
+    }
     gannyu_pipeline_destroy(handle);
     if (!snapshot_ok || !Footprint(&latest)) return 4;
     if (round == 5) baseline = latest;
-    std::printf("round=%d closedFootprintMiB=%.3f\n", round, latest / 1048576.0);
+    std::printf("round=%d closedFootprintMiB=%.3f peakFootprintMiB=%.3f\n", round, latest / 1048576.0, peak / 1048576.0);
     std::fflush(stdout);
     if (round > 5 && latest > baseline + 8 * 1024 * 1024) {
       std::fprintf(stderr, "closed-engine footprint grew by more than 8 MiB after warmup\n");

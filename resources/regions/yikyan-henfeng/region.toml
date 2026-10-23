@@ -5,10 +5,10 @@ status = "active"
 
 [tone_classes]
 1 = { name = "阴平", value = "44" }
-2 = { name = "阳平", value = "22" }
-3 = { name = "上声", value = "412" }
-4 = { name = "阴去", value = "45" }
-5 = { name = "阳去", value = "212" }
+2 = { name = "阳平", value = "24" }
+3 = { name = "上声", value = "42" }
+4 = { name = "阴去", value = "35" }
+5 = { name = "阳去", value = "21" }
 6 = { name = "阴入", value = "5" }
 7 = { name = "阳入", value = "4" }
 
@@ -37,14 +37,11 @@ status = "active"
 "tsʰ" = "c"
 "tɕ" = "j"
 "tɕʰ" = "q"
-"tʃ" = "j"
-"tʃʰ" = "q"
 "tʰ" = "t"
 "x" = "h"
 "ŋ" = "ng"
 "ȵ" = "n"
 "ɕ" = "x"
-"ʃ" = "x"
 
 [ipa_final_map]
 "ɯ" = "e"
@@ -61,6 +58,7 @@ status = "active"
 "iau" = "iau"
 "iaʔ" = "iak"
 "ien" = "iên"
+"io" = "io"
 "iəu" = "ieu"
 "iɛ" = "iê"
 "iɛn" = "iên"
@@ -85,8 +83,10 @@ status = "active"
 "uɛʔ" = "uêk"
 "uɪʔ" = "uek"
 "y" = "yu"
+"ya" = "yua"
 "yaʔ" = "yuak"
 "yn" = "yun"
+"yoi" = "yuoi"
 "yɔŋ" = "yuong"
 "yɔʔ" = "yuok"
 "yəʔ" = "yuek"
@@ -96,6 +96,7 @@ status = "active"
 "yɪʔ" = "yuek"
 "ŋ̍" = "ng"
 "ɔŋ" = "ong"
+"ɔu" = "ou"
 "ɔʔ" = "ok"
 "ə" = "e"
 "əu" = "eu"

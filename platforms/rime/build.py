@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import csv
 import hashlib
 import itertools
@@ -14,17 +15,27 @@ import struct
 import tomllib
 import zlib
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 try:
-    from .fuzzy import compile_algebra, load_rules
+    from . import build_cache
+    from .fuzzy import compile_algebra, essential_rules, load_rules
 except ImportError:
-    from fuzzy import compile_algebra, load_rules
+    import build_cache
+    from fuzzy import compile_algebra, essential_rules, load_rules
 
 
 ROOT = Path(__file__).resolve().parents[2]
 PLATFORM_DIR = Path(__file__).resolve().parent
+LUA_NAMES = (
+    "gannyu_input_options.lua", "gannyu_options_translator.lua",
+    "gannyu_annotation_store.lua", "gannyu_data_lifecycle.lua",
+    "gannyu_annotation_filter.lua", "gannyu_single_char_filter.lua",
+    "gannyu_relation_filter.lua",
+)
+LUA_SOURCES = {name: (PLATFORM_DIR / name).read_bytes() for name in LUA_NAMES}
+SCHEMA_TEMPLATE = (PLATFORM_DIR / "gannyu.schema.yaml").read_text(encoding="utf-8")
 HEADERS = (
     "本词",
     "国际音标",
@@ -38,6 +49,27 @@ HEADERS = (
     "新旧标记",
 )
 MAX_FORMS = 64
+VERSION_LINE = re.compile(r'(?m)^version: "([^"]+)"$')
+# These are the builder hashes used by the last successful macOS cache and by
+# the immediately preceding cache-fix build. They allow a one-time, verified
+# migration of their stamps without rebuilding unchanged regional resources.
+LEGACY_BUILD_HASHES = (
+    ("e7df51dc8ac45da642969c98bec9df8a44d9e378c73d402f06d60f009b76a055", True),
+    ("573c26d5ac3d1446e28a4a6481e40569be28b2e57285d55aa2ffb5191b3f4455", False),
+    ("07cf83af0d45625123dbf4ddffcfc48978f9328ff8f1e1d1dfa9cbe1bd59a560", False),
+)
+LEGACY_RESOURCE_LOGIC_HASH = "2ed1ac480a043ac10be214841d8009e9aab67d56ff23e2eb971304179a5689e9"
+RESOURCE_LOGIC_FUNCTIONS = frozenset((
+    "region_name", "split_values", "syllables", "strip_tone",
+    "lua_quote", "load_entries", "build_new_old", "build_paired_readings",
+    "format_pair_display", "display_pair_priority", "matching_pair",
+    "matching_pair_for_lookup", "annotated_reading", "strip_prefix_labels",
+    "trailing_tone", "suppress_neutral_displays", "build_metadata",
+    "build_preferred_readings", "build_synonym_relations", "entry_codes",
+    "write_dictionary", "build_single_character_frequencies", "write_annotation_store",
+    "write_lua_data", "selected_entries", "write_option_resources", "build_uncached",
+))
+RESOURCE_LOGIC_CONSTANTS = frozenset(("HEADERS", "MAX_FORMS", "LUA_NAMES"))
 
 def active_regions() -> tuple[str, ...]:
     """Return active regions with the manifest default first.
@@ -264,6 +296,7 @@ def annotated_reading(
     new_old: dict[str, tuple[str, str]],
     heteronyms: dict[str, tuple[str, str]],
     paired_readings: dict[str, list[tuple[str, str, str]]] | None = None,
+    reading_mode: str = "both",
 ) -> str:
     if not syllables(entry.gan):
         return ""
@@ -273,6 +306,8 @@ def annotated_reading(
             first, second, kind = match
             return format_pair_display(first, second, kind, False)
     prefix = {"文": "[文]", "白": "[白]"}.get(entry.category, "")
+    if reading_mode != "both" and len(entry.word) == 1 and entry.new_old[:1] in {"新", "老"}:
+        prefix = f"[{entry.new_old[0]}]"
     annotated = prefix + entry.gan
     if len(entry.word) <= 1:
         return annotated
@@ -322,14 +357,14 @@ def suppress_neutral_displays(displays: dict[str, int]) -> dict[str, int]:
     }
 
 
-def build_metadata(entries: list[Entry]) -> tuple[dict[str, str], dict[str, list[str]], dict[str, list[str]]]:
+def build_metadata(entries: list[Entry], reading_mode: str = "both", include_synonyms: bool = True) -> tuple[dict[str, str], dict[str, list[str]], dict[str, list[str]]]:
     by_word: dict[str, list[Entry]] = defaultdict(list)
     associates: dict[str, set[str]] = defaultdict(set)
     gan_to_mandarin: dict[str, list[str]] = defaultdict(list)
     mandarin_to_gan: dict[str, list[str]] = defaultdict(list)
     for entry in entries:
         by_word[entry.word].append(entry)
-        for synonym in split_values(entry.synonyms):
+        for synonym in split_values(entry.synonyms) if include_synonyms else ():
             if synonym != entry.word:
                 associates[entry.word].add(synonym)
                 associates[synonym].add(entry.word)
@@ -346,7 +381,7 @@ def build_metadata(entries: list[Entry]) -> tuple[dict[str, str], dict[str, list
         for entry in by_word.get(word, []):
             if entry.category == "官" and not include_mandarin:
                 continue
-            display = annotated_reading(entry, new_old, heteronyms, paired_readings)
+            display = annotated_reading(entry, new_old, heteronyms, paired_readings, reading_mode)
             if display:
                 displays[display] = max(displays.get(display, 0), entry.frequency)
         if len(word) == 1:
@@ -421,6 +456,18 @@ def build_preferred_readings(entries: list[Entry]) -> dict[str, str]:
     return {word: reading for word, (_, reading) in preferred.items()}
 
 
+def build_synonym_relations(entries: list[Entry], known_only: bool = False) -> dict[str, list[str]]:
+    relations: dict[str, set[str]] = defaultdict(set)
+    for entry in entries:
+        for synonym in split_values(entry.synonyms):
+            if synonym != entry.word:
+                relations[entry.word].add(synonym)
+                relations[synonym].add(entry.word)
+    known = {entry.word for entry in entries}
+    return {word: sorted(item for item in words if not known_only or item in known)
+            for word, words in relations.items()}
+
+
 def entry_codes(entry: Entry, paired_readings: dict[str, list[tuple[str, str, str]]]) -> set[str]:
     gan = [strip_tone(item) for item in syllables(entry.gan)]
     mandarin = [strip_tone(item) for item in syllables(entry.mandarin)]
@@ -445,14 +492,14 @@ def entry_codes(entry: Entry, paired_readings: dict[str, list[tuple[str, str, st
             stored = strip_tone(gan[index])
             match = matching_pair_for_lookup(char, stored, paired_readings)
             if match is None:
-                readings = [stored]
+                readings = [f"G{stored}"]
             else:
-                first, second, _kind = match
-                readings = [strip_tone(first)]
-                second = strip_tone(second)
-                if second not in readings:
-                    readings.append(second)
-            choices.append([f"G{reading}" for reading in readings])
+                first, second, kind = match
+                readings = list(dict.fromkeys(
+                    ("W" if kind == "wenbai" and strip_tone(reading) != stored else "G") + strip_tone(reading)
+                    for reading in (first, second)
+                ))
+            choices.append(readings)
         total = 1
         for options in choices:
             total *= len(options)
@@ -461,7 +508,8 @@ def entry_codes(entry: Entry, paired_readings: dict[str, list[tuple[str, str, st
     return {code for code in codes if code}
 
 
-def write_dictionary(path: Path, entries: list[Entry], region: str) -> int:
+def write_dictionary(path: Path, entries: list[Entry], region: str, name: str | None = None) -> int:
+    name = name or f"gannyu_{region}"
     paired_readings = build_paired_readings(entries)
     records: dict[tuple[str, str], int] = {}
     for entry in entries:
@@ -472,7 +520,7 @@ def write_dictionary(path: Path, entries: list[Entry], region: str) -> int:
     with path.open("w", encoding="utf-8", newline="\n") as handle:
         handle.write("# Rime dictionary\n# encoding: utf-8\n\n---\n")
         handle.write(
-            f'name: gannyu_{region}\nversion: "{VERSION}"\nsort: by_weight\n'
+            f'name: {name}\nversion: "{VERSION}"\nsort: by_weight\n'
             "use_preset_vocabulary: false\n...\n\n"
         )
         for (word, code), frequency in sorted(records.items()):
@@ -510,6 +558,9 @@ def write_lua_data(
     before: dict[str, list[str]],
     after: dict[str, list[str]],
     single_character_frequencies: dict[str, int],
+    forbidden_words: list[str] | None = None,
+    synonyms: dict[str, list[str]] | None = None,
+    synonym_candidates: dict[str, list[str]] | None = None,
 ) -> None:
     name = path.stem.removesuffix("_data")
     write_annotation_store(path.with_name(f"{name}_annotations.bin"), name, annotations)
@@ -526,9 +577,17 @@ def write_lua_data(
     def number_map(values: dict[str, int]) -> str:
         return "\n".join(f"  [{lua_quote(key)}] = {value}," for key, value in sorted(values.items()))
 
+    forbidden = ""
+    if forbidden_words:
+        forbidden = " forbidden_words = {\n" + "\n".join(f"  [{lua_quote(word)}] = true," for word in sorted(forbidden_words)) + "\n },\n"
+    synonym_table = "" if synonyms is None else f" synonyms = {{\n{list_map(synonyms)}\n }},\n"
+    if synonym_candidates is not None:
+        synonym_table += f" synonym_candidates = {{\n{list_map(synonym_candidates)}\n }},\n"
     path.write_text(
         "return {\n"
-        f" annotations = require(\"gannyu_annotation_store\").open({lua_quote(name)}),\n"
+        + forbidden
+        + synonym_table
+        + f" annotations = require(\"gannyu_annotation_store\").open({lua_quote(name)}),\n"
         f" readings = {{\n{table_map(readings)}\n }},\n"
         f" before = {{\n{list_map(before)}\n }},\n"
         f" after = {{\n{list_map(after)}\n }},\n"
@@ -538,8 +597,82 @@ def write_lua_data(
     )
 
 
+OPTION_NAMES = (
+    "gannyu_no_annotations", "gannyu_no_relations", "gannyu_no_synonyms", "gannyu_no_fuzzy",
+    "gannyu_no_mandarin", "gannyu_no_wenbai", "gannyu_no_fuzzy_rules", "gannyu_both", "gannyu_new", "gannyu_old",
+)
+
+
+def selected_entries(entries: list[Entry], mode: str, relations: bool) -> list[Entry]:
+    pairs = build_paired_readings(entries)
+    mandarin_words = {word for entry in entries for word in split_values(entry.mandarin_word) if word != entry.word}
+    selected = []
+    for entry in entries:
+        if not relations and len(entry.word) > 1 and (entry.category == "官" or entry.word in mandarin_words):
+            continue
+        if (mode == "new" and entry.new_old.startswith("老")) or (mode == "old" and entry.new_old.startswith("新")):
+            continue
+        parts = syllables(entry.gan)
+        if mode != "both" and len(entry.word) > 1 and len(parts) == len(entry.word):
+            for index, char in enumerate(entry.word):
+                pair = next((pair for pair in pairs.get(char, []) if pair[2] == "newold"
+                             and strip_tone(parts[index]) in {strip_tone(pair[0]), strip_tone(pair[1])}), None)
+                if pair:
+                    reading = pair[0 if mode == "new" else 1]
+                    parts[index] = strip_tone(reading) + "0" if trailing_tone(parts[index]) == "0" else reading
+            entry = replace(entry, gan=" ".join(parts))
+        if not relations:
+            entry = replace(entry, mandarin_word="", category="赣" if entry.category == "官" else entry.category)
+        selected.append(entry)
+    return selected
+
+
+def write_option_resources(region: str, entries: list[Entry], output: Path,
+                           full_algebra: list[str], special_algebra: list[str]) -> list[str]:
+    dependencies = []
+    root = f"gannyu_{region}"
+    forbidden_words = sorted({entry.word for entry in entries if entry.category == "官" and len(entry.word) > 1}
+                             | {word for entry in entries for word in split_values(entry.mandarin_word) if word != entry.word and len(word) > 1})
+    for mode, relations in itertools.product(("both", "new", "old"), (True, False)):
+        suffix = "" if mode == "both" and relations else f"_{mode}_" + ("rel" if relations else "norel")
+        name = root + suffix
+        selected = entries if not suffix else selected_entries(entries, mode, relations)
+        if suffix:
+            write_dictionary(output / f"{name}.dict.yaml", selected, region, name)
+            annotations, before, after = build_metadata(selected, mode, include_synonyms=False)
+            write_lua_data(output / "lua" / f"{name}_data.lua", annotations,
+                           build_preferred_readings(selected), before, after,
+                           build_single_character_frequencies(selected), None if relations else forbidden_words,
+                           synonyms=build_synonym_relations(selected),
+                           synonym_candidates=build_synonym_relations(selected, known_only=True))
+        for full, mandarin, wenbai in itertools.product((True, False), repeat=3):
+            prism_suffix = "" if full and mandarin else ("_full" if full else "_special") + ("_mix" if mandarin else "_gan")
+            if not wenbai:
+                prism_suffix += "_nowenbai"
+            schema_id = name + prism_suffix
+            if schema_id == root:
+                continue
+            algebra = list(full_algebra if full else special_algebra)
+            algebra.insert(0, "    - xform/^W/G/" if wenbai else "    - erase/^W.*$/")
+            if not mandarin:
+                algebra.insert(-3, "    - erase/^[^GF].*$/")
+            body = (
+                f"schema:\n  schema_id: {schema_id}\n  name: {region}\n  version: \"{VERSION}\"\n"
+                f"translator:\n  dictionary: {name}\n  prism: {schema_id}\n"
+                f"  user_dict: {name}\n  enable_user_dict: true\n  enable_sentence: true\n"
+                "  enable_completion: true\n  spelling_hints: 8\n"
+                "speller:\n  alphabet: zyxwvutsrqponmlkjihgfedcba\n  delimiter: \" '\"\n  algebra:\n"
+                + "\n".join(algebra) + "\n"
+            )
+            (output / f"{schema_id}.schema.yaml").write_text(body, encoding="utf-8")
+            dependencies.append(schema_id)
+    return dependencies
+
+
 def write_default_custom(output: Path, regions: tuple[str, ...]) -> None:
-    lines = ["patch:", "  schema_list/+:" ]
+    lines = ["patch:", "  switcher/save_options/+:" ]
+    lines.extend(f"    - {option}" for option in OPTION_NAMES)
+    lines.append("  schema_list/+:")
     lines.extend(f"    - schema: gannyu_{region}" for region in regions)
     (output / "default.custom.yaml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -580,13 +713,16 @@ def write_mobile_default(output: Path, regions: tuple[str, ...]) -> None:
     )
 
 
-def write_resource_manifest(output: Path, regions: tuple[str, ...]) -> None:
+def write_resource_manifest(output: Path, regions: tuple[str, ...], package_files: tuple[str, ...] | None = None) -> None:
     files = []
-    for path in sorted(output.rglob("*")):
-        if not path.is_file():
-            continue
+    paths = (output / name for name in package_files) if package_files is not None else output.rglob("*")
+    for path in sorted(paths):
         relative = path.relative_to(output).as_posix()
-        if relative == "resource-manifest.json":
+        if relative == "resource-manifest.json" or path.name.startswith(".gannyu-cache-"):
+            continue
+        if not path.is_file():
+            if package_files is not None:
+                raise FileNotFoundError(path)
             continue
         files.append(
             {
@@ -613,7 +749,109 @@ def write_resource_manifest(output: Path, regions: tuple[str, ...]) -> None:
         encoding="utf-8",
     )
 
+
+def legacy_fingerprint(paths: list[Path], options: str, old_builder_hash: str) -> str:
+    records = [
+        (
+            path.relative_to(ROOT).as_posix(),
+            old_builder_hash if path == PLATFORM_DIR / "build.py" else build_cache.digest(path),
+        )
+        for path in sorted(set(paths))
+    ]
+    return hashlib.sha256(json.dumps([options, records], sort_keys=True).encode()).hexdigest()
+
+
+def resource_logic_fingerprint() -> str:
+    def dump(node: ast.AST) -> str:
+        try:
+            return ast.dump(node, include_attributes=False, show_empty=True)
+        except TypeError:
+            return ast.dump(node, include_attributes=False)
+
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    selected = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in RESOURCE_LOGIC_FUNCTIONS:
+            selected.append(dump(node))
+        elif isinstance(node, ast.ClassDef) and node.name == "Entry":
+            selected.append(dump(node))
+        elif isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id in RESOURCE_LOGIC_CONSTANTS
+            for target in node.targets
+        ):
+            selected.append(dump(node))
+    return hashlib.sha256("\n".join(selected).encode()).hexdigest()
+
+
 def build(region: str, output: Path, display_name: str = "short") -> dict[str, int]:
+    region_dir = ROOT / "resources" / "regions" / region
+    config_path = region_dir / "region.toml"
+    with config_path.open("rb") as handle:
+        config = tomllib.load(handle)
+    paths = [config_path, ROOT / "LICENSE", PLATFORM_DIR / "build.py",
+             PLATFORM_DIR / "fuzzy.py", PLATFORM_DIR / "build_cache.py",
+             PLATFORM_DIR / "gannyu.schema.yaml",
+             *(PLATFORM_DIR / name for name in LUA_NAMES)]
+    paths.extend(region_dir / config["language"][name]
+                 for name in ("chars", "words", "gan_chars", "gan_words")
+                 if config["language"].get(name))
+    paths.append((region_dir / config["phonology"]["fuzzy_map"]).resolve())
+    key = build_cache.fingerprint(ROOT, paths, display_name)
+    stamp = output / f".gannyu-cache-{region}.json"
+    cached = build_cache.load(stamp, output, key)
+    if (
+        cached is None
+        and stamp.is_file()
+        and resource_logic_fingerprint() == LEGACY_RESOURCE_LOGIC_HASH
+    ):
+        try:
+            stamp_data = json.loads(stamp.read_text(encoding="utf-8"))
+            cached_files = stamp_data.get("files", {})
+            cached_version = next(
+                match.group(1)
+                for name in cached_files
+                if name.endswith((".schema.yaml", ".dict.yaml"))
+                and (match := VERSION_LINE.search((output / name).read_text(encoding="utf-8")))
+            )
+        except (OSError, ValueError, KeyError, TypeError, StopIteration):
+            cached_version = ""
+        for legacy_build_hash, versioned_options in LEGACY_BUILD_HASHES:
+            if not cached_version:
+                break
+            legacy_options = f"{cached_version}:{display_name}" if versioned_options else display_name
+            legacy_key = legacy_fingerprint(paths, legacy_options, legacy_build_hash)
+            cached = build_cache.load(stamp, output, legacy_key)
+            if cached is not None:
+                print(f"resource-cache [{region}] legacy hit", flush=True)
+                break
+    if cached is not None:
+        cached_files = [output / name for name in cached["files"]]
+        if cached["key"] != key:
+            build_cache.save(stamp, output, key, cached_files, cached["counts"])
+        print(f"resource-cache [{region}] hit", flush=True)
+        return cached["counts"]
+    print(f"resource-cache [{region}] rebuild", flush=True)
+    for path in output.glob(f"gannyu_{region}.*"):
+        if path.is_file():
+            path.unlink()
+    for path in output.glob(f"gannyu_{region}_*"):
+        if path.is_file():
+            path.unlink()
+    for path in (output / "lua").glob(f"gannyu_{region}*"):
+        if path.is_file():
+            path.unlink()
+    counts = build_uncached(region, output, display_name)
+    files = [path for path in output.rglob("*") if path.is_file()
+             and (path.name.startswith(f"gannyu_{region}.")
+                  or path.name.startswith(f"gannyu_{region}_")
+                  or path.name in LUA_NAMES or path.name == "LICENSE")]
+    if build_cache.fingerprint(ROOT, paths, display_name) != key:
+        raise RuntimeError(f"[{region}] source changed during generation")
+    build_cache.save(stamp, output, key, files, counts)
+    return counts
+
+
+def build_uncached(region: str, output: Path, display_name: str = "short") -> dict[str, int]:
     region_name, entries = load_entries(region)
     region_dir = ROOT / "resources" / "regions" / region
     with (region_dir / "region.toml").open("rb") as handle:
@@ -630,8 +868,9 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
     algebra = compile_algebra(canonical, rules)
     output.mkdir(parents=True, exist_ok=True)
     (output / "lua").mkdir(exist_ok=True)
+    shutil.copy2(ROOT / "LICENSE", output / "LICENSE")
     dictionary_count = write_dictionary(output / f"gannyu_{region}.dict.yaml", entries, region)
-    annotations, before, after = build_metadata(entries)
+    annotations, before, after = build_metadata(entries, include_synonyms=False)
     readings = build_preferred_readings(entries)
     single_character_frequencies = build_single_character_frequencies(entries)
     schema_id = f"gannyu_{region}"
@@ -642,25 +881,24 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
         before,
         after,
         single_character_frequencies,
+        synonyms=build_synonym_relations(entries),
+        synonym_candidates=build_synonym_relations(entries, known_only=True),
     )
-    for name in (
-        "gannyu_annotation_store.lua",
-        "gannyu_data_lifecycle.lua",
-        "gannyu_annotation_filter.lua",
-        "gannyu_single_char_filter.lua",
-        "gannyu_relation_filter.lua",
-    ):
-        shutil.copy2(PLATFORM_DIR / name, output / "lua" / name)
-    schema = (PLATFORM_DIR / "gannyu.schema.yaml").read_text(encoding="utf-8")
+    for name, content in LUA_SOURCES.items():
+        (output / "lua" / name).write_bytes(content)
+    schema = SCHEMA_TEMPLATE
     label = f"赣语－{region_name}" if display_name == "apple" else region_name[:1]
     schema = (
         schema.replace("@REGION@", region)
         .replace("@REGION_NAME@", region_name)
         .replace("@REGION_LABEL@", label)
         .replace("@VERSION@", VERSION)
-        .replace("@FUZZY_ALGEBRA@", "\n".join(algebra))
+        .replace("@FUZZY_ALGEBRA@", "\n".join(["    - xform/^W/G/", *algebra]))
     )
     (output / f"{schema_id}.schema.yaml").write_text(schema, encoding="utf-8")
+    dependencies = write_option_resources(region, entries, output, algebra, compile_algebra(canonical, essential_rules(rules)))
+    schema_path = output / f"{schema_id}.schema.yaml"
+    schema_path.write_text(schema_path.read_text(encoding="utf-8").replace("@OPTIONS_DEPENDENCIES@", "  dependencies:\n" + "\n".join(f"    - {name}" for name in dependencies)), encoding="utf-8")
     write_default_custom(output, (region,))
     write_resource_manifest(output, (region,))
     return {

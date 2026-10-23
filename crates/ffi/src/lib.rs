@@ -380,7 +380,7 @@ fn build_snapshot(
     }
 }
 
-fn serialize_snapshot(snapshot: &EngineSnapshot, out_json: *mut *mut c_char) -> c_int {
+fn serialize_snapshot(snapshot: &impl Serialize, out_json: *mut *mut c_char) -> c_int {
     if out_json.is_null() {
         return invalid_argument("invalid output json pointer");
     }
@@ -423,7 +423,10 @@ unsafe fn swap_handle_from_recreated(
         };
     }
     let replacement = *Box::from_raw(replacement);
-    *current.pipeline.lock() = replacement.pipeline.into_inner();
+    let options = current.pipeline.lock().input_options();
+    let mut pipeline = replacement.pipeline.into_inner();
+    pipeline.set_input_options(options);
+    *current.pipeline.lock() = pipeline;
     *current.session.lock() = replacement.session.into_inner();
     current._temp_dir = replacement._temp_dir;
     current._resource_fds = replacement._resource_fds;
@@ -1061,6 +1064,53 @@ pub unsafe extern "C" fn gannyu_engine_snapshot(
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_candidates(
+    handle: *mut GannyuPipelineHandle,
+    offset: usize,
+    limit: usize,
+    out_json: *mut *mut c_char,
+) -> c_int {
+    clear_last_error();
+    if out_json.is_null() {
+        return invalid_argument("candidate output is null");
+    }
+    *out_json = ptr::null_mut();
+    if handle.is_null() || limit == 0 || limit > 100 || offset > i32::MAX as usize - limit {
+        return invalid_argument("invalid candidate range");
+    }
+    let handle = &*handle;
+    let pipeline = handle.pipeline.lock();
+    let session = handle.session.lock();
+    let all_candidates = pipeline.retrieve(&session.raw_input);
+    let candidates = all_candidates
+        .iter()
+        .enumerate()
+        .skip(offset)
+        .take(limit)
+        .map(|(index, candidate)| EngineCandidateSnapshot {
+            text: candidate.text.clone(),
+            annotation: candidate.annotation.clone(),
+            reading: candidate.reading.clone(),
+            mandarin_reading: candidate.mandarin_reading.clone(),
+            global_index: index,
+            page_index: index,
+            deletable: candidate
+                .annotation
+                .as_deref()
+                .is_some_and(|annotation| annotation.contains("[用户]")),
+        })
+        .collect::<Vec<_>>();
+    let batch = serde_json::json!({
+        "rawInput": session.raw_input,
+        "schemaId": handle.region_id,
+        "offset": offset,
+        "candidates": candidates,
+        "hasMore": all_candidates.len() > offset + limit,
+    });
+    serialize_snapshot(&batch, out_json)
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn gannyu_engine_set_candidate_limit(
     handle: *mut GannyuPipelineHandle,
     limit: usize,
@@ -1309,6 +1359,100 @@ pub unsafe extern "C" fn gannyu_engine_switch_region(
     }
     let snapshot = build_snapshot(current, true, None);
     serialize_snapshot(&snapshot, out_json)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_set_input_options(
+    handle: *mut GannyuPipelineHandle,
+    annotations: c_int,
+    relations: c_int,
+    fuzzy: c_int,
+    mandarin: c_int,
+    fuzzy_rules: c_int,
+    reading_mode: c_int,
+) -> c_int {
+    clear_last_error();
+    if handle.is_null() {
+        return invalid_argument("engine handle is null");
+    }
+    let reading_mode = match reading_mode {
+        0 => gannyu_input_core::ReadingMode::Both,
+        1 => gannyu_input_core::ReadingMode::New,
+        2 => gannyu_input_core::ReadingMode::Old,
+        _ => return invalid_argument("reading mode must be 0, 1 or 2"),
+    };
+    let handle = &*handle;
+    {
+        let mut pipeline = handle.pipeline.lock();
+        let options = gannyu_input_core::InputOptions {
+            annotations: annotations != 0,
+            relations: relations != 0,
+            synonyms: pipeline.input_options().synonyms,
+            wenbai: pipeline.input_options().wenbai,
+            fuzzy: fuzzy != 0,
+            mandarin: mandarin != 0,
+            fuzzy_rules: fuzzy_rules != 0,
+            reading_mode,
+        };
+        if pipeline.input_options() == options {
+            return STATUS_OK;
+        }
+        pipeline.set_input_options(options);
+    }
+    let mut session = handle.session.lock();
+    session.page_number = 0;
+    clear_accumulated_selection(&mut session);
+    STATUS_OK
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_set_synonyms_enabled(
+    handle: *mut GannyuPipelineHandle,
+    enabled: c_int,
+) -> c_int {
+    clear_last_error();
+    if handle.is_null() {
+        return invalid_argument("engine handle is null");
+    }
+    let handle = &*handle;
+    {
+        let mut pipeline = handle.pipeline.lock();
+        let mut options = pipeline.input_options();
+        if options.synonyms == (enabled != 0) {
+            return STATUS_OK;
+        }
+        options.synonyms = enabled != 0;
+        pipeline.set_input_options(options);
+    }
+    let mut session = handle.session.lock();
+    session.page_number = 0;
+    clear_accumulated_selection(&mut session);
+    STATUS_OK
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_set_wenbai_enabled(
+    handle: *mut GannyuPipelineHandle,
+    enabled: c_int,
+) -> c_int {
+    clear_last_error();
+    if handle.is_null() {
+        return invalid_argument("engine handle is null");
+    }
+    let handle = &*handle;
+    {
+        let mut pipeline = handle.pipeline.lock();
+        let mut options = pipeline.input_options();
+        if options.wenbai == (enabled != 0) {
+            return STATUS_OK;
+        }
+        options.wenbai = enabled != 0;
+        pipeline.set_input_options(options);
+    }
+    let mut session = handle.session.lock();
+    session.page_number = 0;
+    clear_accumulated_selection(&mut session);
+    STATUS_OK
 }
 
 #[no_mangle]

@@ -304,37 +304,37 @@ mod tests {
             entries: HashMap::new(),
             path: std::env::temp_dir().join(format!("user_dict_test_{}.tsv", std::process::id())),
         };
-        dict.add("测试词", "ce4 si4 ci2", "ce4 shi4 ci2");
+        dict.add("车马", "ca1 ma1", "che1 ma3");
         dict
     }
 
     #[test]
     fn boost_frequency_increments_by_step_and_caps() {
         let mut dict = temp_dict();
-        assert!(dict.boost_frequency("测试词"));
+        assert!(dict.boost_frequency("车马"));
         assert_eq!(
             dict.entries()
-                .find(|e| e.headword.as_ref() == "测试词")
+                .find(|e| e.headword.as_ref() == "车马")
                 .unwrap()
                 .frequency,
             Some(20001)
         );
         // 累加到封顶
         for _ in 0..20 {
-            dict.boost_frequency("测试词");
+            dict.boost_frequency("车马");
         }
         assert_eq!(
             dict.entries()
-                .find(|e| e.headword.as_ref() == "测试词")
+                .find(|e| e.headword.as_ref() == "车马")
                 .unwrap()
                 .frequency,
             Some(200000)
         );
         // 封顶后不再累加
-        dict.boost_frequency("测试词");
+        dict.boost_frequency("车马");
         assert_eq!(
             dict.entries()
-                .find(|e| e.headword.as_ref() == "测试词")
+                .find(|e| e.headword.as_ref() == "车马")
                 .unwrap()
                 .frequency,
             Some(200000)
@@ -344,47 +344,47 @@ mod tests {
     #[test]
     fn boost_frequency_missing_word_returns_false() {
         let mut dict = temp_dict();
-        assert!(!dict.boost_frequency("不存在的词"));
+        assert!(!dict.boost_frequency("火车"));
     }
 
     #[test]
     fn failed_add_does_not_mutate_memory() {
         let blocked = tempfile::tempdir().unwrap();
         let mut dict = UserDictionary::empty_at(blocked.path().to_path_buf());
-        assert!(!dict.add("失败词", "si1 bai4 ci2", ""));
-        assert!(!dict.contains("失败词"));
+        assert!(!dict.add("火车", "fo3 ca1", "huo3 che1"));
+        assert!(!dict.contains("火车"));
     }
 
     #[test]
     fn failed_boost_keeps_previous_frequency() {
         let mut dict = temp_dict();
-        let before = dict.frequency("测试词");
+        let before = dict.frequency("车马");
         let blocked = tempfile::tempdir().unwrap();
         dict.path = blocked.path().to_path_buf();
-        assert!(!dict.boost_frequency("测试词"));
-        assert_eq!(dict.frequency("测试词"), before);
+        assert!(!dict.boost_frequency("车马"));
+        assert_eq!(dict.frequency("车马"), before);
     }
 
     #[test]
     fn set_frequencies_batch_updates_and_caps() {
         let mut dict = temp_dict();
-        dict.add("第二个词", "di4 er4 ci2", "di4 er4 ci2");
+        dict.add("火车", "fo3 ca1", "huo3 che1");
         let updated = dict.set_frequencies(&[
-            ("测试词".to_string(), 500000),
-            ("第二个词".to_string(), 12000),
-            ("不存在的词".to_string(), 9999),
+            ("车马".to_string(), 500000),
+            ("火车".to_string(), 12000),
+            ("明白".to_string(), 9999),
         ]);
         assert_eq!(updated, 2);
         assert_eq!(
             dict.entries()
-                .find(|e| e.headword.as_ref() == "测试词")
+                .find(|e| e.headword.as_ref() == "车马")
                 .unwrap()
                 .frequency,
             Some(200000)
         );
         assert_eq!(
             dict.entries()
-                .find(|e| e.headword.as_ref() == "第二个词")
+                .find(|e| e.headword.as_ref() == "火车")
                 .unwrap()
                 .frequency,
             Some(12000)

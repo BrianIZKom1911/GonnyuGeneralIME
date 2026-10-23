@@ -1,10 +1,11 @@
 use fst::MapBuilder;
 use gannyu_input_core::{Dictionary, Manifest, RegionConfig};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashSet};
 use std::error::Error;
 use std::fs::File;
-use std::io::{BufWriter, Write};
+use std::io::{BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 
 type BuildResult<T> = Result<T, Box<dyn Error>>;
@@ -149,6 +150,67 @@ fn validate_default_words(
     Ok(())
 }
 
+#[derive(Serialize, Deserialize)]
+struct RegionCache {
+    key: String,
+    count: u32,
+    files: BTreeMap<String, String>,
+}
+
+fn file_digest(path: &Path) -> BuildResult<String> {
+    let mut digest = Sha256::new();
+    let mut file = File::open(path)?;
+    let mut buffer = [0u8; 65536];
+    loop {
+        let size = file.read(&mut buffer)?;
+        if size == 0 {
+            break;
+        }
+        digest.update(&buffer[..size]);
+    }
+    Ok(format!("{:x}", digest.finalize()))
+}
+
+fn region_key(paths: &[PathBuf], compiler: &str) -> BuildResult<String> {
+    let mut digest = Sha256::new();
+    digest.update(compiler.as_bytes());
+    for path in paths {
+        digest.update(file_digest(path)?.as_bytes());
+    }
+    Ok(format!("{:x}", digest.finalize()))
+}
+
+fn read_region_cache(directory: &Path, key: &str) -> Option<RegionCache> {
+    let data: RegionCache =
+        toml::from_str(&std::fs::read_to_string(directory.join("cache.toml")).ok()?).ok()?;
+    if data.key != key || data.count == 0 || data.files.len() != 4 {
+        return None;
+    }
+    for (name, expected) in &data.files {
+        if !Path::new(name)
+            .components()
+            .all(|part| matches!(part, std::path::Component::Normal(_)))
+            || file_digest(&directory.join(name)).ok().as_ref() != Some(expected)
+        {
+            return None;
+        }
+    }
+    Some(data)
+}
+
+fn copy_cached_files(
+    source: &Path,
+    output: &Path,
+    files: &BTreeMap<String, String>,
+) -> BuildResult<()> {
+    for name in files.keys() {
+        let destination = output.join(name);
+        std::fs::create_dir_all(destination.parent().ok_or("cache file has no parent")?)?;
+        std::fs::copy(source.join(name), destination)?;
+    }
+    Ok(())
+}
+
 pub fn build(resources: &Path, output: &Path) -> BuildResult<u32> {
     if output.exists() {
         return Err("output directory already exists".into());
@@ -158,6 +220,20 @@ pub fn build(resources: &Path, output: &Path) -> BuildResult<u32> {
 
     let manifest: Manifest =
         toml::from_str(&std::fs::read_to_string(resources.join("manifest.toml"))?)?;
+    let compiler = env!("GANNYU_RESOURCE_COMPILER_KEY");
+    let cache_root = std::env::var_os("GANNYU_RESOURCE_CACHE_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            resources
+                .parent()
+                .unwrap_or(resources)
+                .join("build/resource-cache")
+        })
+        .join(format!(
+            "native-{}-{}",
+            std::env::consts::OS,
+            std::env::consts::ARCH
+        ));
     let mut total = 0u32;
     for region_entry in &manifest.regions {
         if region_entry.status != "active" {
@@ -180,6 +256,24 @@ pub fn build(resources: &Path, output: &Path) -> BuildResult<u32> {
             continue;
         }
 
+        let relative_region = Path::new(&region_entry.path)
+            .parent()
+            .ok_or("region path has no parent")?;
+        let output_region = output.join(relative_region);
+        let cache_directory = cache_root.join(&region_entry.id);
+        let mut inputs = paths.clone();
+        inputs.push(region_path.clone());
+        if let Some(default_words) = region.dictionaries.default_words.as_deref() {
+            inputs.push(region_base.join(default_words));
+        }
+        let key = region_key(&inputs, compiler)?;
+        if let Some(cached) = read_region_cache(&cache_directory, &key) {
+            copy_cached_files(&cache_directory, &output_region, &cached.files)?;
+            println!("resource-cache [{}] hit", region_entry.id);
+            total += cached.count;
+            continue;
+        }
+        println!("resource-cache [{}] rebuild", region_entry.id);
         let mut dictionary = Dictionary::load_split_tsvs_uncached(&paths)?;
         validate_default_words(&region_entry.id, region_base, &region, &dictionary)?;
         let count = dictionary.entries().len();
@@ -187,10 +281,6 @@ pub fn build(resources: &Path, output: &Path) -> BuildResult<u32> {
             "gonnyu-resource-build: [{}] loaded {count} entries",
             region_entry.id
         );
-        let relative_region = Path::new(&region_entry.path)
-            .parent()
-            .ok_or("region path has no parent")?;
-        let output_region = output.join(relative_region);
         let output_dictionary = output_region.join("dictionaries");
         clear_generated_resources(&output_region, &output_dictionary)?;
         std::fs::create_dir_all(&output_dictionary)?;
@@ -217,6 +307,39 @@ pub fn build(resources: &Path, output: &Path) -> BuildResult<u32> {
             &keys,
             &frequencies,
         )?;
+        if region_key(&inputs, compiler)? != key {
+            return Err(format!(
+                "[{}] source changed during resource generation",
+                region_entry.id
+            )
+            .into());
+        }
+        let mut files = BTreeMap::new();
+        for name in [
+            "dictionaries/dictionary_runtime_cache.zst",
+            "indexes/fst_map.bin",
+            "indexes/postings.bin",
+            "indexes/topk.bin",
+        ] {
+            files.insert(name.to_owned(), file_digest(&output_region.join(name))?);
+        }
+        std::fs::create_dir_all(&cache_root)?;
+        let staging = cache_root.join(format!(".{}-{}", region_entry.id, std::process::id()));
+        if staging.exists() {
+            std::fs::remove_dir_all(&staging)?;
+        }
+        std::fs::create_dir_all(&staging)?;
+        copy_cached_files(&output_region, &staging, &files)?;
+        let record = RegionCache {
+            key,
+            count: count as u32,
+            files,
+        };
+        std::fs::write(staging.join("cache.toml"), toml::to_string(&record)?)?;
+        if cache_directory.exists() {
+            std::fs::remove_dir_all(&cache_directory)?;
+        }
+        std::fs::rename(staging, cache_directory)?;
         total += count as u32;
     }
     if total == 0 {
@@ -279,6 +402,30 @@ mod tests {
             .join("regions/test/dictionaries/default_words.txt")
             .is_file());
         assert!(!output.join("regions/test/dictionaries/words.tsv").exists());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn cache_validates_inputs_and_every_payload() {
+        let root = root();
+        std::fs::create_dir_all(&root).unwrap();
+        let mut files = std::collections::BTreeMap::new();
+        for name in ["a", "b", "c", "d"] {
+            std::fs::write(root.join(name), b"compiled").unwrap();
+            files.insert(
+                name.to_owned(),
+                super::file_digest(&root.join(name)).unwrap(),
+            );
+        }
+        let record = super::RegionCache {
+            key: "source-key".into(),
+            count: 1,
+            files,
+        };
+        std::fs::write(root.join("cache.toml"), toml::to_string(&record).unwrap()).unwrap();
+        assert!(super::read_region_cache(&root, "source-key").is_some());
+        assert!(super::read_region_cache(&root, "other-key").is_none());
+        std::fs::write(root.join("a"), b"corrupt").unwrap();
+        assert!(super::read_region_cache(&root, "source-key").is_none());
         std::fs::remove_dir_all(root).unwrap();
     }
 }

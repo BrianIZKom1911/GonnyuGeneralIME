@@ -3,6 +3,7 @@ schema:
   schema_id: gannyu_@REGION@
   name: @REGION_LABEL@
   version: "@VERSION@"
+@OPTIONS_DEPENDENCIES@
   author:
     - GannyuInputMethod contributors
   description: |
@@ -12,6 +13,22 @@ switches:
   - name: ascii_mode
     reset: 0
     states: [@REGION_LABEL@, 西]
+  - name: gannyu_no_annotations
+    states: [副标题开, 副标题关]
+  - name: gannyu_no_relations
+    states: [赣普连带开, 赣普连带关]
+  - name: gannyu_no_synonyms
+    states: [同义词连带开, 同义词连带关]
+  - name: gannyu_no_fuzzy
+    states: [模糊匹配开, 模糊匹配关]
+  - name: gannyu_no_mandarin
+    states: ["  普拼兼容开", "  普拼兼容关"]
+  - name: gannyu_no_wenbai
+    states: ["  文白匹配开", "  文白匹配关"]
+  - name: gannyu_no_fuzzy_rules
+    states: ["  其他模糊开", "  其他模糊关"]
+  - options: [gannyu_both, gannyu_new, gannyu_old]
+    states: [新老兼有, 新派, 老派]
 
 engine:
   processors:
@@ -31,11 +48,11 @@ engine:
     - fallback_segmentor
   translators:
     - punct_translator
-    - script_translator
+    - lua_translator@*gannyu_options_translator
   filters:
-    - lua_filter@*gannyu_annotation_filter
     - lua_filter@*gannyu_single_char_filter
     - lua_filter@*gannyu_relation_filter
+    - lua_filter@*gannyu_annotation_filter
     - uniquifier
 
 speller:
@@ -50,6 +67,7 @@ translator:
   enable_sentence: true
   enable_completion: true
   spelling_hints: 8
+  prism: gannyu_@REGION@
 
 menu:
   page_size: 9

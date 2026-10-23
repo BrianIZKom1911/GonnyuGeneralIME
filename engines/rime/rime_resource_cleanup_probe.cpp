@@ -208,6 +208,7 @@ int main() {
   GannyuPipelineHandle handle;
   handle.session = 1;
   handle.schema_id = "gannyu_test";
+  GlobalRuntime().handles = {&handle};
   int cases = 0;
   for (size_t limit : {size_t{0}, size_t{100}}) {
     for (bool use_iterator : {false, true}) {

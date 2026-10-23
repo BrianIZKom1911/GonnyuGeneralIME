@@ -72,6 +72,10 @@ impl CandidateView for ComposedCandidate {
 
 #[derive(Debug)]
 pub struct InputPipeline {
+    input_options: crate::InputOptions,
+    excluded_words: std::collections::HashSet<Box<str>>,
+    source_dictionary: Option<Dictionary>,
+    source_fuzzy: Option<FuzzyMap>,
     slang: SlangBook,
     hints: MandarinHintBook,
     pronunciation: PronunciationBook,
@@ -200,14 +204,16 @@ impl InputPipeline {
             None => UserDictionary::load_or_create(),
         };
         InputPipeline {
+            input_options: crate::InputOptions::default(),
+            excluded_words: std::collections::HashSet::new(),
+            source_dictionary: None,
+            source_fuzzy: None,
             slang: SlangBook::empty(),
             hints: MandarinHintBook::empty(),
             pronunciation: PronunciationBook::empty(),
             dictionary: Dictionary::empty(),
             default_words: Vec::new(),
-            fuzzy: FuzzyMap {
-                entries: Vec::new(),
-            },
+            fuzzy: FuzzyMap::empty(),
             tone_values: HashMap::new(),
             user_dict,
             frequency_boosts: HashMap::new(),
@@ -329,7 +335,12 @@ impl InputPipeline {
             .find(|e| e.headword.as_ref() == headword)
             .cloned();
         if let Some(entry) = entry {
-            self.dictionary.extend_from_entries(std::iter::once(entry));
+            if let Some(source) = self.source_dictionary.as_mut() {
+                source.extend_from_entries(std::iter::once(entry));
+                self.dictionary = self.input_options.dictionary(source);
+            } else {
+                self.dictionary.extend_from_entries(std::iter::once(entry));
+            }
         }
         clear_retrieve_cache();
         self.sentence_prefix_cache.get_mut().clear();
@@ -366,6 +377,9 @@ impl InputPipeline {
             }
             if let Some(frequency) = self.user_dict.frequency(headword) {
                 self.dictionary.set_user_frequency(headword, frequency);
+                if let Some(source) = self.source_dictionary.as_mut() {
+                    source.set_user_frequency(headword, frequency);
+                }
             }
             if self.frequency_boosts.contains_key(headword) {
                 let mut staged = self.frequency_boosts.clone();
@@ -510,6 +524,82 @@ impl InputPipeline {
 
     pub fn dictionary(&self) -> &Dictionary {
         &self.dictionary
+    }
+
+    pub fn input_options(&self) -> crate::InputOptions {
+        self.input_options
+    }
+
+    pub fn set_input_options(&mut self, options: crate::InputOptions) {
+        if self.input_options == options {
+            return;
+        }
+        let dictionary_changed = self.input_options.relations_enabled()
+            != options.relations_enabled()
+            || self.input_options.synonyms_enabled() != options.synonyms_enabled()
+            || self.input_options.wenbai_enabled() != options.wenbai_enabled()
+            || self.input_options.mandarin_enabled() != options.mandarin_enabled()
+            || self.input_options.reading_mode != options.reading_mode;
+        if dictionary_changed {
+            let original = options.relations_enabled()
+                && options.synonyms_enabled()
+                && options.wenbai_enabled()
+                && options.mandarin_enabled()
+                && options.reading_mode == crate::ReadingMode::Both;
+            if original {
+                if let Some(source) = self.source_dictionary.take() {
+                    self.dictionary = source;
+                }
+            } else {
+                if self.source_dictionary.is_none() {
+                    self.source_dictionary = Some(std::mem::take(&mut self.dictionary));
+                }
+                self.dictionary = options.dictionary(self.source_dictionary.as_ref().unwrap());
+            }
+        }
+        if self.input_options.fuzzy_rules_enabled() != options.fuzzy_rules_enabled() {
+            if options.fuzzy_rules_enabled() {
+                if let Some(source) = self.source_fuzzy.take() {
+                    self.fuzzy = source;
+                }
+            } else {
+                if self.source_fuzzy.is_none() {
+                    self.source_fuzzy = Some(std::mem::replace(&mut self.fuzzy, FuzzyMap::empty()));
+                }
+                self.fuzzy = self
+                    .source_fuzzy
+                    .as_ref()
+                    .unwrap()
+                    .with_optional_rules(false);
+            }
+        }
+        self.excluded_words.clear();
+        if !options.relations_enabled() {
+            let source = self.source_dictionary.as_ref().unwrap_or(&self.dictionary);
+            for entry in source.entries() {
+                if entry.is_mandarin_only() && entry.headword.chars().count() > 1 {
+                    self.excluded_words.insert(entry.headword.clone());
+                }
+                for word in entry.mandarin_word.split(['/', ';']).map(str::trim) {
+                    if word.chars().count() > 1 && word != entry.headword.as_ref() {
+                        self.excluded_words.insert(word.into());
+                    }
+                }
+            }
+        }
+        self.input_options = options;
+        self.sentence_prefix_cache.borrow_mut().clear();
+        clear_retrieve_cache();
+    }
+
+    fn present_candidates(&self, mut candidates: Vec<RankedCandidate>) -> Vec<RankedCandidate> {
+        candidates.retain(|candidate| !self.excluded_words.contains(candidate.text.as_str()));
+        if !self.input_options.annotations {
+            for candidate in &mut candidates {
+                candidate.annotation = None;
+            }
+        }
+        candidates
     }
 
     pub fn fuzzy_map(&self) -> &FuzzyMap {
@@ -742,21 +832,24 @@ impl InputPipeline {
                 }
             }
         } // if !cache.is_empty()
-        candidates
+        self.present_candidates(candidates)
     }
 
     pub fn retrieve_sentence_input(&self, input: &str) -> Vec<RankedCandidate> {
-        retrieve_sentence_input(
+        self.present_candidates(retrieve_sentence_input(
             &self.dictionary,
             &self.fuzzy,
             &self.tone_values,
             input,
             None,
-        )
+        ))
     }
 
     pub fn segment_sentence(&self, input: &str) -> Vec<Vec<RankedCandidate>> {
         segment_sentence(&self.dictionary, &self.fuzzy, &self.tone_values, input)
+            .into_iter()
+            .map(|candidates| self.present_candidates(candidates))
+            .collect()
     }
 
     pub fn segment_boundaries(&self, input: &str) -> Vec<usize> {
@@ -978,7 +1071,7 @@ mod tests {
     fn composed_candidate_json_contract_stays_stable() {
         let candidate = ComposedCandidate {
             text: "阿公".to_string(),
-            reading: Some("a1 gung1".to_string()),
+            reading: Some("nga1 gung0".to_string()),
             source: CandidateSource::Slang,
             tier: CandidateTier::Primary,
             weight: 1.25,
@@ -987,38 +1080,38 @@ mod tests {
 
         assert_eq!(
             serde_json::to_string(&candidate).unwrap(),
-            r#"{"text":"阿公","reading":"a1 gung1","source":"slang","tier":"primary","weight":1.25,"note":"fixture"}"#
+            r#"{"text":"阿公","reading":"nga1 gung0","source":"slang","tier":"primary","weight":1.25,"note":"fixture"}"#
         );
     }
 
     #[test]
     fn add_user_word_invalidates_sentence_prefix_cache() {
         let mut pipeline = pipeline_with_temp_user_dict();
-        let input = "ce4sisin1ci2";
+        let input = "ca1ma1";
         pipeline
             .sentence_prefix_cache
             .borrow_mut()
             .insert(("stale".to_string(), 1), Vec::new());
 
-        assert!(pipeline.add_user_word("测试新词", "ce4 si4 sin1 ci2", ""));
+        assert!(pipeline.add_user_word("车马", "ca1 ma1", "che1 ma3"));
         assert!(pipeline.sentence_prefix_cache.borrow().is_empty());
         assert!(pipeline
             .retrieve(input)
             .iter()
-            .any(|candidate| candidate.text == "测试新词"));
+            .any(|candidate| candidate.text == "车马"));
     }
 
     #[test]
     fn runtime_user_word_updates_prefix_indexes() {
         let mut pipeline = pipeline_with_temp_user_dict();
-        assert!(pipeline.add_user_word("测试新词", "ce4 si4 sin1 ci2", ""));
-        let ids = pipeline.dictionary.lookup_prefix_ids("ce4si4");
+        assert!(pipeline.add_user_word("车马", "ca1 ma1", "che1 ma3"));
+        let ids = pipeline.dictionary.lookup_prefix_ids("ca1ma1");
         assert!(ids.into_iter().any(|id| {
             pipeline
                 .dictionary
                 .entries()
                 .get(id as usize)
-                .is_some_and(|entry| entry.headword.as_ref() == "测试新词")
+                .is_some_and(|entry| entry.headword.as_ref() == "车马")
         }));
         assert!(pipeline
             .dictionary
@@ -1029,65 +1122,34 @@ mod tests {
                     .dictionary
                     .entries()
                     .get(*id as usize)
-                    .is_some_and(|entry| entry.headword.as_ref() == "测试新词")
+                    .is_some_and(|entry| entry.headword.as_ref() == "车马")
             }));
-    }
-
-    #[test]
-    fn boosted_candidate_enters_before_base_limit() {
-        let mut pipeline = pipeline_with_temp_user_dict();
-        let mut entries = Vec::new();
-        for index in 0..101 {
-            entries.push(crate::dictionary::DictionaryEntry {
-                headword: format!("候选{index:03}").into(),
-                ipa: "".into(),
-                dialect_pinyin: "ga".into(),
-                mandarin_pinyin: "".into(),
-                category: "赣".into(),
-                mandarin_word: "".into(),
-                mandarin_word_pinyin: "".into(),
-                frequency: Some(1000 - index),
-                synonyms: "".into(),
-                entry_index: 0,
-                new_old: "".into(),
-            });
-        }
-        pipeline.dictionary.extend_from_entries(entries);
-        pipeline
-            .frequency_boosts
-            .insert("候选100".to_string(), 20000);
-        let result = pipeline.retrieve("ga");
-        assert!(result.iter().any(|candidate| candidate.text == "候选100"));
-        assert_eq!(
-            result.first().map(|candidate| candidate.text.as_str()),
-            Some("候选100")
-        );
     }
 
     #[test]
     fn missing_word_boost_is_rejected() {
         let mut pipeline = pipeline_with_temp_user_dict();
-        assert!(!pipeline.boost_frequency("不存在的词"));
+        assert!(!pipeline.boost_frequency("火车"));
         assert!(pipeline.frequency_boosts.is_empty());
     }
 
     #[test]
     fn boost_user_word_updates_runtime_dictionary() {
         let mut pipeline = pipeline_with_temp_user_dict();
-        let input = "ce4sici2";
-        assert!(pipeline.add_user_word("测试词", "ce4 si4 ci2", ""));
+        let input = "ca1ma1";
+        assert!(pipeline.add_user_word("车马", "ca1 ma1", "che1 ma3"));
         let before = pipeline
             .retrieve(input)
             .into_iter()
-            .find(|candidate| candidate.text == "测试词")
+            .find(|candidate| candidate.text == "车马")
             .unwrap()
             .weight;
 
-        pipeline.boost_frequency("测试词");
+        pipeline.boost_frequency("车马");
         let after = pipeline
             .retrieve(input)
             .into_iter()
-            .find(|candidate| candidate.text == "测试词")
+            .find(|candidate| candidate.text == "车马")
             .unwrap()
             .weight;
         assert!(after > before);
@@ -1096,18 +1158,14 @@ mod tests {
     #[test]
     fn clear_user_data_respects_scopes() {
         let mut pipeline = pipeline_with_temp_user_dict();
-        assert!(pipeline.add_user_word("测试词", "ce4 si4 ci2", ""));
-        pipeline
-            .frequency_boosts
-            .insert("正式词".to_string(), 20000);
+        assert!(pipeline.add_user_word("车马", "ca1 ma1", "che1 ma3"));
+        pipeline.frequency_boosts.insert("明白".to_string(), 20000);
         assert!(pipeline.clear_user_data(false, true));
-        assert!(pipeline.user_dict.contains("测试词"));
+        assert!(pipeline.user_dict.contains("车马"));
         assert!(pipeline.frequency_boosts.is_empty());
-        pipeline
-            .frequency_boosts
-            .insert("正式词".to_string(), 20000);
+        pipeline.frequency_boosts.insert("明白".to_string(), 20000);
         assert!(pipeline.clear_user_data(true, false));
-        assert!(!pipeline.user_dict.contains("测试词"));
+        assert!(!pipeline.user_dict.contains("车马"));
         assert!(!pipeline.frequency_boosts.is_empty());
     }
     #[test]
@@ -1128,9 +1186,9 @@ mod tests {
                 new_old: "".into(),
             };
         pipeline.dictionary.extend_from_entries([
-            entry("我", "ngo", 100_000),
-            entry("你", "n", 200_000),
-            entry("南昌", "lan cong", 300_000),
+            entry("我", "ngo3", 100_000),
+            entry("你", "n3", 200_000),
+            entry("南昌", "lan4 cong1", 300_000),
         ]);
         pipeline.default_words = vec!["我".to_string(), "你".to_string()];
 

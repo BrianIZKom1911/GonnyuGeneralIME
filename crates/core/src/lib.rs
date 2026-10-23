@@ -2,6 +2,7 @@ mod association_cache;
 mod cache_obfuscation;
 mod candidate;
 mod dictionary;
+mod input_options;
 mod mandarin_hints;
 mod pipeline;
 mod pronunciation;
@@ -14,6 +15,7 @@ pub use trie::Trie;
 mod user_dict;
 
 pub use dictionary::{Dictionary, DictionaryEntry, DictionaryError};
+pub use input_options::{InputOptions, ReadingMode};
 pub use mandarin_hints::{MandarinHintBook, MandarinHintEntry, MandarinHintError};
 pub use pipeline::{
     CandidateSource, CandidateTier, ComposedCandidate, InputPipeline, PipelineError,

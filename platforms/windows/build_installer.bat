@@ -11,6 +11,7 @@ set "DLL_PATH_X64=%CMAKE_BUILD_DIR_X64%\GannyuTextService.dll"
 set "DLL_PATH_X86=%CMAKE_BUILD_DIR_X86%\GannyuTextService.dll"
 set "FFI_LIB_X64=%REPO_ROOT%\target\x86_64-pc-windows-msvc\release\gannyu_input_ffi.lib"
 set "FFI_LIB_X86=%REPO_ROOT%\target\i686-pc-windows-msvc\release\gannyu_input_ffi.lib"
+set "SANITIZER_PATH=%REPO_ROOT%\target\release\gannyu-sanitize-binary.exe"
 set "CMAKE_BUILD_TYPE=Release"
 for /f "tokens=3" %%i in ('findstr /r /c:"^version[ ]*=" "%REPO_ROOT%\Cargo.toml"') do set "GONNYU_VERSION=%%~i"
 if not defined GONNYU_VERSION (
@@ -80,6 +81,7 @@ pushd "%REPO_ROOT%"
 mkdir "%RESOURCE_BUILD_ROOT%" || goto :err
 cargo run -p gonnyu-resource-build --release -- "%REPO_ROOT%\resources" "%GONNYU_RESOURCE_DIR%" || goto :err
 cargo build --release -p gannyu-input-ffi --target x86_64-pc-windows-msvc || goto :err
+cargo build --release -p gannyu-sanitize-binary || goto :err
 popd
 
 if not exist "%CMAKE_BUILD_DIR_X64%" mkdir "%CMAKE_BUILD_DIR_X64%"
@@ -108,6 +110,7 @@ if not exist "%DLL_PATH_X86%" (
   goto :err
 )
 
+echo Validating release DLL runtime dependencies...
 call :assert_release_dll "%DLL_PATH_X64%" || goto :err
 call :assert_release_dll "%DLL_PATH_X86%" || goto :err
 
@@ -118,13 +121,13 @@ rem llvm-objcopy is available (e.g. from the Android NDK or LLVM), also strip
 rem the COFF symbol table; otherwise fall back to panic-string scrubbing only.
 set "LLVM_OBJCOPY="
 for /f "delims=" %%i in ('where llvm-objcopy 2^>nul') do if not defined LLVM_OBJCOPY set "LLVM_OBJCOPY=%%i"
-call :load_vs x64 || goto :err
+echo Sanitizing release DLLs...
 if defined LLVM_OBJCOPY (
-    cargo run -p gannyu-sanitize-binary --release -- "%DLL_PATH_X64%" --strip-tool "%LLVM_OBJCOPY%" || goto :err
-    cargo run -p gannyu-sanitize-binary --release -- "%DLL_PATH_X86%" --strip-tool "%LLVM_OBJCOPY%"
+    "%SANITIZER_PATH%" "%DLL_PATH_X64%" --strip-tool "%LLVM_OBJCOPY%" || goto :err
+    "%SANITIZER_PATH%" "%DLL_PATH_X86%" --strip-tool "%LLVM_OBJCOPY%"
 ) else (
-    cargo run -p gannyu-sanitize-binary --release -- "%DLL_PATH_X64%" --no-strip || goto :err
-    cargo run -p gannyu-sanitize-binary --release -- "%DLL_PATH_X86%" --no-strip
+    "%SANITIZER_PATH%" "%DLL_PATH_X64%" --no-strip || goto :err
+    "%SANITIZER_PATH%" "%DLL_PATH_X86%" --no-strip
 )
 if errorlevel 1 goto :err
 
@@ -135,6 +138,7 @@ if not exist "%BA_WIXEXT%" (
   goto :err
 )
 
+echo Building installer packages...
 wix build "%SCRIPT_DIR%Installer.wxs" -arch x64 -d "DllPathX64=%DLL_PATH_X64%" -d "DllPathX86=%DLL_PATH_X86%" -d "TutorialPath=%REPO_ROOT%\resources\tutorial\tutorial.html" -d "GonnyuProductVersion=%MSI_PRODUCT_VERSION%" -o "%MSI_PATH%" || goto :err
 wix build "%SCRIPT_DIR%InstallerBundle.wxs" -arch x64 -ext "%BA_WIXEXT%" -d "MsiPath=%MSI_PATH%" -d "GonnyuBundleVersion=%BUNDLE_PRODUCT_VERSION%" -o "%EXE_PATH%" || goto :err
 

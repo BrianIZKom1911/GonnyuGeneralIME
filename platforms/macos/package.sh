@@ -3,7 +3,7 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/../.." && pwd)"
-bundle="$repo_root/build/macos/GonnyuInputMethod.app"
+bundle="${GANNYU_MACOS_APP_BUNDLE:-$repo_root/build/macos/GonnyuInputMethod.app}"
 output_dir="${GANNYU_MACOS_PACKAGE_OUTPUT:-$repo_root/build/macos}"
 package_id="org.doohaey.inputmethod.gonnyu.pkg"
 unsigned_test="${GANNYU_MACOS_UNSIGNED_TEST:-0}"
