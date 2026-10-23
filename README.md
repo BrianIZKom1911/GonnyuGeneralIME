@@ -24,6 +24,7 @@
 ## 正式版本 1.2.4
 
 - data(dictionary): 南昌词典小修补。
+- data(dictionary): 补充新余词典并整理读音。
 - feat(settings): 增加输入设置项目。
 
 ## 目录

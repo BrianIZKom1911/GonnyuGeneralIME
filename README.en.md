@@ -24,6 +24,7 @@ Rime schema repositories are available for Lancong (Nanchang), Fenni (Fenyi), Fu
 ## Release 1.2.4
 
 - data(dictionary): Minor fixes to the Nanchang dictionary.
+- data(dictionary): Expand the Sinyi dictionary and refine readings.
 - feat(settings): Add input settings.
 
 ## Contents
