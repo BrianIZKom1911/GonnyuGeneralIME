@@ -206,46 +206,7 @@ final class GannyuInputController: IMKInputController {
 
     @objc(menu)
     override func menu() -> NSMenu! {
-        let menu = NSMenu(title: "Gonnyu")
-        let current = GannyuRegionStore.shared.currentID()
-        for region in (try? GannyuEngine.availableRegions()) ?? [] {
-            let item = NSMenuItem(title: region.nameZh, action: #selector(selectRegion(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = region.id
-            item.state = region.id == current ? .on : .off
-            menu.addItem(item)
-        }
-        menu.addItem(.separator())
-        let settings = NSMenu(title: "输入设置")
-        settings.autoenablesItems = false
-        let values = GannyuRegionStore.shared.inputOptions
-        for index in [0, 1, 6, 2, 3, 7, 4] {
-            let title = GannyuRegionStore.optionTitles[index]
-            let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
-            item.target = self
-            item.tag = index
-            item.indentationLevel = [3, 7, 4].contains(index) ? 1 : 0
-            item.state = values[index] != 0 ? .on : .off
-            item.isEnabled = [3, 7, 4].contains(index) ? values[2] != 0 : true
-            settings.addItem(item)
-        }
-        settings.addItem(.separator())
-        for (index, title) in ["新老兼有", "新派", "老派"].enumerated() {
-            let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
-            item.target = self
-            item.tag = 10 + index
-            item.state = values[5] == Int32(index) ? .on : .off
-            settings.addItem(item)
-        }
-        let entry = NSMenuItem(title: "输入设置", action: nil, keyEquivalent: "")
-        entry.submenu = settings
-        menu.addItem(entry)
-        return menu
-    }
-
-    @objc private func selectInputOption(_ item: NSMenuItem) {
-        let values = GannyuRegionStore.shared.inputOptions
-        GannyuRegionStore.shared.setInputOption(item.tag < 10 ? item.tag : 5, value: item.tag < 10 ? (values[item.tag] == 0 ? 1 : 0) : Int32(item.tag - 10))
+        nil
     }
 
     @objc private func inputOptionsDidChange() {
@@ -712,11 +673,6 @@ final class GannyuInputController: IMKInputController {
         if let engine, let result = try? engine.switchRegion(region) {
             render(result, client: client())
         }
-    }
-
-    @objc private func selectRegion(_ sender: NSMenuItem) {
-        guard let region = sender.representedObject as? String else { return }
-        _ = GannyuRegionStore.shared.select(region)
     }
 }
 

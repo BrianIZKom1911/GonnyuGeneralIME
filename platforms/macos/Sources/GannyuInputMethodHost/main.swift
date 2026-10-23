@@ -74,6 +74,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fputs("failed to start host: \(error)\n", stderr)
             NSApp.terminate(nil)
         }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(inputOptionsDidChange),
+            name: GannyuRegionStore.optionsDidChange,
+            object: nil
+        )
         installStatusItem()
         DistributedNotificationCenter.default().addObserver(
             self,
@@ -114,11 +120,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(item)
         }
         menu.addItem(.separator())
-        menu.addItem(withTitle: "Gonnyu 输入法", action: nil, keyEquivalent: "")
+        let settingsEntry = NSMenuItem(title: "输入设置", action: nil, keyEquivalent: "")
+        settingsEntry.submenu = inputSettingsMenu()
+        menu.addItem(settingsEntry)
         let currentLabel = regions.first(where: { $0.id == currentID })?.nameZh ?? "未加载"
         item.button?.title = "赣·\(currentLabel)"
         item.menu = menu
         statusItem = item
+    }
+
+    private func inputSettingsMenu() -> NSMenu {
+        let settings = NSMenu(title: "输入设置")
+        settings.autoenablesItems = false
+        let values = GannyuRegionStore.shared.inputOptions
+        for index in [0, 1, 6, 2, 3, 7, 4] {
+            let item = NSMenuItem(
+                title: GannyuRegionStore.optionTitles[index],
+                action: #selector(selectInputOption(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.tag = index
+            item.indentationLevel = [3, 7, 4].contains(index) ? 1 : 0
+            item.state = values[index] != 0 ? .on : .off
+            item.isEnabled = [3, 7, 4].contains(index) ? values[2] != 0 : true
+            settings.addItem(item)
+        }
+        settings.addItem(.separator())
+        for (index, title) in ["新老兼有", "新派", "老派"].enumerated() {
+            let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
+            item.target = self
+            item.tag = 10 + index
+            item.state = values[5] == Int32(index) ? .on : .off
+            settings.addItem(item)
+        }
+        return settings
+    }
+
+    @objc private func selectInputOption(_ item: NSMenuItem) {
+        let values = GannyuRegionStore.shared.inputOptions
+        let index = item.tag < 10 ? item.tag : 5
+        let value = item.tag < 10 ? (values[index] == 0 ? 1 : 0) : Int32(item.tag - 10)
+        GannyuRegionStore.shared.setInputOption(index, value: value)
+    }
+
+    @objc private func inputOptionsDidChange() {
+        do {
+            try engine?.setInputOptions(GannyuRegionStore.shared.inputOptions)
+        } catch {
+            NSLog("[GonnyuInputMethodHost] input options failed: %@", String(describing: error))
+        }
+        installStatusItem()
     }
 
     @objc private func selectRegion(_ sender: NSMenuItem) {
