@@ -75,7 +75,12 @@ def test_macos_workflow_rebuilds_and_inspects_pkg() -> None:
     assert "MACOS_DEVELOPER_ID_INSTALLER_P12_BASE64" in content
     assert "APPLE_NOTARY_KEY_P8_BASE64" in content
     assert "GANNYU_MACOS_SIGNING_KEYCHAIN" in content
-    assert "timeout-minutes: 45" in content
+    assert "GANNYU_MACOS_BUILD_STAGE: engine" in content
+    assert "GANNYU_MACOS_BUILD_STAGE: resources" in content
+    assert "GANNYU_MACOS_BUILD_STAGE: app" in content
+    assert "timeout-minutes: 35" in content
+    assert "timeout-minutes: 30" in content
+    assert "timeout-minutes: 10" in content
     assert 'CMAKE_BUILD_PARALLEL_LEVEL: "4"' in content
     assert "timeout-minutes: 15" in content
     assert "release_signing:" in content

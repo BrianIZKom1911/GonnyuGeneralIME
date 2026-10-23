@@ -21,9 +21,12 @@ fi
   exit 1
 }
 
-PYTHON_BIN="$python_bin" bash "$script_dir/build_host.sh"
+deployer="${GANNYU_RIME_DEPLOYER:-$host_build_root/build/bin/rime_deployer}"
+if [[ -z "${GANNYU_RIME_DEPLOYER:-}" ]]; then
+  GANNYU_RIME_HOST_GENERATE_RESOURCES=0 PYTHON_BIN="$python_bin" bash "$script_dir/build_host.sh"
+fi
 "$python_bin" "$script_dir/build_resources.py" \
   --output "$output_root" \
-  --deployer "$host_build_root/build/bin/rime_deployer"
+  --deployer "$deployer"
 
 echo "prepared canonical mobile Rime resources: $output_root"

@@ -41,48 +41,62 @@ cd "$repo_root"
 adapter_library="$rime_build_root/adapter/libgannyu_rime_engine.a"
 librime_library="$rime_build_root/prefix/lib/librime.a"
 resource_manifest="$rime_resource_root/resource-manifest.json"
+swift_build_root="${GANNYU_MACOS_SWIFT_BUILD_ROOT:-$script_dir/.build}"
+export GANNYU_MACOS_RIME_BUILD_ROOT="$rime_build_root"
+run_with_heartbeat() {
+  python3 "$script_dir/run_with_heartbeat.py" "$@"
+}
 engine_inputs=(
+  "$script_dir/build_rime_engine.sh"
+  "$script_dir/native_cache.py"
   "$repo_root/engines/rime/CMakeLists.txt"
   "$repo_root/engines/rime/gannyu_rime_engine.cpp"
+  "$repo_root/crates/ffi/include/gannyu_input.h"
+  "$repo_root/platforms/rime/mobile/boost_regex/CMakeLists.txt"
   "$repo_root/platforms/rime/mobile/engine-lock.json"
 )
 
-engine_rebuild=0
-if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$adapter_library" || ! -f "$librime_library" ]]; then
-  engine_rebuild=1
-else
-  for input in "${engine_inputs[@]}"; do
-    if [[ "$input" -nt "$adapter_library" ]]; then
-      engine_rebuild=1
-      break
-    fi
-  done
-fi
-if [[ "$engine_rebuild" == "1" ]]; then
-  GANNYU_MACOS_RIME_BUILD_ROOT="$rime_build_root" bash "$script_dir/build_rime_engine.sh"
-else
-  echo "reusing cached macOS librime engine: $rime_build_root"
-fi
+build_stage="${GANNYU_MACOS_BUILD_STAGE:-all}"
+case "$build_stage" in all|engine|resources|app) ;; *) echo "invalid macOS build stage: $build_stage" >&2; exit 2 ;; esac
+if [[ "$build_stage" == "all" || "$build_stage" == "engine" ]]; then
+  engine_rebuild=0
+  if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$adapter_library" || ! -f "$librime_library" || ! -x "$rime_build_root/adapter/gannyu_rime_deployer" ]]; then
+    engine_rebuild=1
+  else
+    for input in "${engine_inputs[@]}"; do
+      if [[ "$input" -nt "$adapter_library" ]]; then
+        engine_rebuild=1
+        break
+      fi
+    done
+  fi
+  if [[ "$engine_rebuild" == "1" ]]; then
+    run_with_heartbeat "macOS native engine" env GANNYU_MACOS_RIME_BUILD_ROOT="$rime_build_root" bash "$script_dir/build_rime_engine.sh"
+  else
+    echo "reusing cached macOS librime engine: $rime_build_root"
+  fi
 
-resource_rebuild=0
-if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$resource_manifest" || ! -d "$rime_resource_root/shared" || ! -d "$rime_resource_root/prebuilt" || ! -f "$rime_resource_root/shared/lua/gannyu_data_lifecycle.lua" ]]; then
-  resource_rebuild=1
-elif find "$repo_root/resources" "$repo_root/platforms/rime" -type f -newer "$resource_manifest" -print -quit | grep -q .; then
-  resource_rebuild=1
 fi
-if [[ "$resource_rebuild" == "1" ]]; then
-  GANNYU_MACOS_RIME_RESOURCE_OUTPUT="$rime_resource_root" bash "$script_dir/prepare_rime_resources.sh"
-else
-  echo "reusing cached macOS Rime resources: $rime_resource_root"
+if [[ "$build_stage" == "engine" ]]; then exit 0; fi
+[[ -f "$adapter_library" && -f "$librime_library" && -x "$rime_build_root/adapter/gannyu_rime_deployer" ]] || { echo "build the macOS engine stage first" >&2; exit 2; }
+if [[ "$build_stage" != "app" ]]; then
+  resource_rebuild=0
+  if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$resource_manifest" || ! -d "$rime_resource_root/shared" || ! -d "$rime_resource_root/prebuilt" || ! -f "$rime_resource_root/shared/lua/gannyu_data_lifecycle.lua" ]]; then
+    resource_rebuild=1
+  elif find "$repo_root/resources" "$repo_root/platforms/rime" -type f -newer "$resource_manifest" -print -quit | grep -q .; then
+    resource_rebuild=1
+  fi
+  if [[ "$resource_rebuild" == "1" ]]; then
+    run_with_heartbeat "macOS resources" env GANNYU_RIME_DEPLOYER="$rime_build_root/adapter/gannyu_rime_deployer" GANNYU_MACOS_RIME_RESOURCE_OUTPUT="$rime_resource_root" bash "$script_dir/prepare_rime_resources.sh"
+  else
+    echo "reusing cached macOS Rime resources: $rime_resource_root"
+  fi
 fi
-package_rime_root="$repo_root/build/rime-macos"
-if [[ ! -e "$package_rime_root" ]]; then
-  mkdir -p "$(dirname "$package_rime_root")"
-  ln -s "$rime_build_root" "$package_rime_root"
-fi
-swift build --package-path "$script_dir" -c release --arch arm64 --arch x86_64
+[[ -f "$resource_manifest" ]] || { echo "build the macOS resources stage first" >&2; exit 2; }
+if [[ "$build_stage" == "resources" ]]; then exit 0; fi
+run_with_heartbeat "macOS Swift application" swift build --package-path "$script_dir" --scratch-path "$swift_build_root" -c release --arch arm64 --arch x86_64
 
-bin_dir="$(swift build --package-path "$script_dir" -c release --arch arm64 --arch x86_64 --show-bin-path)"
+bin_dir="$(swift build --package-path "$script_dir" --scratch-path "$swift_build_root" -c release --arch arm64 --arch x86_64 --show-bin-path)"
 version="$(python3 - <<'PYTHON'
 import re
 from pathlib import Path

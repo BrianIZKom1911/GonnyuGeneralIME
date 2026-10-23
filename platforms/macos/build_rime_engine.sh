@@ -58,9 +58,6 @@ common_cmake=(
   -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 )
 
-rm -rf "$build_root"
-mkdir -p "$build_root"
-
 run_with_heartbeat() {
   local label="$1"
   shift
@@ -76,49 +73,60 @@ build_dependency() {
     cmake --build "$build_root/deps/$name" --target install
 }
 
-build_dependency glog -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DWITH_GFLAGS=OFF
-build_dependency leveldb -DBUILD_SHARED_LIBS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF -DLEVELDB_BUILD_TESTS=OFF -DHAVE_CRC32C=OFF -DHAVE_SNAPPY=OFF -DHAVE_TCMALLOC=OFF
-build_dependency marisa-trie -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DENABLE_TOOLS=OFF
-build_dependency opencc -DBUILD_SHARED_LIBS=OFF -DENABLE_GTEST=OFF -DENABLE_BENCHMARK=OFF -DBUILD_PYTHON=OFF
-build_dependency yaml-cpp -DBUILD_SHARED_LIBS=OFF -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
+if [[ "${GANNYU_MACOS_REUSE_PINNED_ENGINE:-0}" == "1" && -z "${GANNYU_RIME_BOOST_INCLUDE:-}" ]] \
+  && "$python_bin" "$script_dir/native_cache.py" check "$prefix"; then
+  echo "verified pinned macOS native libraries: $prefix"
+else
+  rm -rf "$build_root"
+  mkdir -p "$build_root"
+  build_dependency glog -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DWITH_GFLAGS=OFF
+  build_dependency leveldb -DBUILD_SHARED_LIBS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF -DLEVELDB_BUILD_TESTS=OFF -DHAVE_CRC32C=OFF -DHAVE_SNAPPY=OFF -DHAVE_TCMALLOC=OFF
+  build_dependency marisa-trie -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DENABLE_TOOLS=OFF
+  build_dependency opencc -DBUILD_SHARED_LIBS=OFF -DENABLE_GTEST=OFF -DENABLE_BENCHMARK=OFF -DBUILD_PYTHON=OFF
+  build_dependency yaml-cpp -DBUILD_SHARED_LIBS=OFF -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
 
-boost_build="$build_root/boost-regex"
-cmake -S "$mobile_dir/boost_regex" -B "$boost_build" "${common_cmake[@]}" \
-  -DGANNYU_BOOST_ROOT="$boost_include"
-run_with_heartbeat "boost-regex build" \
-  cmake --build "$boost_build" --target install
-boost_regex_library="$prefix/lib/libboost_regex.a"
-[[ -f "$boost_regex_library" ]] || { echo "Boost.Regex was not built: $boost_regex_library" >&2; exit 2; }
+  boost_build="$build_root/boost-regex"
+  cmake -S "$mobile_dir/boost_regex" -B "$boost_build" "${common_cmake[@]}" \
+    -DGANNYU_BOOST_ROOT="$boost_include"
+  run_with_heartbeat "boost-regex build" \
+    cmake --build "$boost_build" --target install
+  boost_regex_library="$prefix/lib/libboost_regex.a"
+  [[ -f "$boost_regex_library" ]] || { echo "Boost.Regex was not built: $boost_regex_library" >&2; exit 2; }
 
-env RIME_PLUGINS="librime-lua" cmake -S "$librime_root" -B "$build_root/librime" "${common_cmake[@]}" \
-  -DCMAKE_PREFIX_PATH="$prefix" \
-  -DBoost_NO_BOOST_CMAKE=ON \
-  -DBoost_NO_SYSTEM_PATHS=ON \
-  -DBoost_INCLUDE_DIR="$boost_include" \
-  -DBoost_INCLUDE_DIRS="$boost_include" \
-  -DBoost_LIBRARY_DIRS="$prefix/lib" \
-  -DBoost_REGEX_LIBRARY_RELEASE="$boost_regex_library" \
-  -DBoost_LIBRARIES="$boost_regex_library" \
-  -DBUILD_SHARED_LIBS=OFF \
-  -DBUILD_STATIC=ON \
-  -DBUILD_MERGED_PLUGINS=ON \
-  -DENABLE_EXTERNAL_PLUGINS=OFF \
-  -DBUILD_TEST=OFF \
-  -DINSTALL_PRIVATE_HEADERS=ON \
-  -DGlog_INCLUDE_PATH="$prefix/include" -DGlog_LIBRARY="$prefix/lib/libglog.a" \
-  -DYamlCpp_INCLUDE_PATH="$prefix/include" -DYamlCpp_NEW_API="$prefix/include" -DYamlCpp_LIBRARY="$prefix/lib/libyaml-cpp.a" \
-  -DLevelDb_INCLUDE_PATH="$prefix/include" -DLevelDb_LIBRARY="$prefix/lib/libleveldb.a" \
-  -DMarisa_INCLUDE_PATH="$prefix/include" -DMarisa_LIBRARY="$prefix/lib/libmarisa.a" \
-  -DOpencc_INCLUDE_PATH="$prefix/include" -DOpencc_LIBRARY="$prefix/lib/libopencc.a"
-run_with_heartbeat "librime build" cmake --build "$build_root/librime"
-run_with_heartbeat "librime install" cmake --install "$build_root/librime"
+  env RIME_PLUGINS="librime-lua" cmake -S "$librime_root" -B "$build_root/librime" "${common_cmake[@]}" \
+    -DCMAKE_PREFIX_PATH="$prefix" \
+    -DBoost_NO_BOOST_CMAKE=ON \
+    -DBoost_NO_SYSTEM_PATHS=ON \
+    -DBoost_INCLUDE_DIR="$boost_include" \
+    -DBoost_INCLUDE_DIRS="$boost_include" \
+    -DBoost_LIBRARY_DIRS="$prefix/lib" \
+    -DBoost_REGEX_LIBRARY_RELEASE="$boost_regex_library" \
+    -DBoost_LIBRARIES="$boost_regex_library" \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DBUILD_STATIC=ON \
+    -DBUILD_MERGED_PLUGINS=ON \
+    -DENABLE_EXTERNAL_PLUGINS=OFF \
+    -DBUILD_TEST=OFF \
+    -DINSTALL_PRIVATE_HEADERS=ON \
+    -DGlog_INCLUDE_PATH="$prefix/include" -DGlog_LIBRARY="$prefix/lib/libglog.a" \
+    -DYamlCpp_INCLUDE_PATH="$prefix/include" -DYamlCpp_NEW_API="$prefix/include" -DYamlCpp_LIBRARY="$prefix/lib/libyaml-cpp.a" \
+    -DLevelDb_INCLUDE_PATH="$prefix/include" -DLevelDb_LIBRARY="$prefix/lib/libleveldb.a" \
+    -DMarisa_INCLUDE_PATH="$prefix/include" -DMarisa_LIBRARY="$prefix/lib/libmarisa.a" \
+    -DOpencc_INCLUDE_PATH="$prefix/include" -DOpencc_LIBRARY="$prefix/lib/libopencc.a"
+  run_with_heartbeat "librime build" cmake --build "$build_root/librime"
+  run_with_heartbeat "librime install" cmake --install "$build_root/librime"
+
+  "$python_bin" "$script_dir/native_cache.py" write "$prefix"
+fi
 
 cmake -S "$repo_root/engines/rime" -B "$build_root/adapter" "${common_cmake[@]}" \
   -DCMAKE_PREFIX_PATH="$prefix" \
   -DRIME_INCLUDE_DIR="$prefix/include" \
   -DRIME_LIBRARY="$prefix/lib/librime.a" \
   -DRIME_DEPENDENCY_LIBRARIES="$prefix/lib/libleveldb.a;$prefix/lib/libmarisa.a;$prefix/lib/libopencc.a;$prefix/lib/libyaml-cpp.a;$prefix/lib/libglog.a;$prefix/lib/libboost_regex.a" \
-  -DGANNYU_RIME_BUILD_PROBES=ON
+  -DGANNYU_RIME_DEPLOYER_SOURCE="$librime_root/tools/rime_deployer.cc" \
+  -DGANNYU_RIME_DEPLOYER_INCLUDE_DIR="$boost_include" \
+  -DGANNYU_RIME_BUILD_PROBES=OFF
 run_with_heartbeat "Gannyu Rime adapter build" cmake --build "$build_root/adapter"
 
 for library in "$build_root/adapter/libgannyu_rime_engine.a" "$prefix/lib/librime.a"; do

@@ -15,7 +15,7 @@ def test_macos_platform_exposes_build_and_smoke_entrypoints() -> None:
     assert 'build_rime_engine.sh' in build_script
     assert 'prepare_rime_resources.sh' in build_script
     assert 'Contents/Resources/rime' in build_script
-    assert 'swift build --package-path "$script_dir" -c release' in build_script
+    assert 'swift build --package-path "$script_dir" --scratch-path "$swift_build_root" -c release' in build_script
     assert '--arch arm64 --arch x86_64' in build_script
     assert 'lipo "$bundle_root/Contents/MacOS/GannyuInputMethodHost" -verify_arch arm64 x86_64' in build_script
     assert "Info.plist.template" in build_script

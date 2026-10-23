@@ -35,8 +35,6 @@ if [[ ! -f "$boost_include/boost/version.hpp" && -z "${GANNYU_RIME_BOOST_INCLUDE
 fi
 [[ -f "$boost_include/boost/version.hpp" ]] || { echo "Boost headers not found" >&2; exit 2; }
 
-# Recreate the derived Android native output before CMake configuration.
-rm -rf "$build_root"
 mkdir -p "$build_root"
 
 common=(

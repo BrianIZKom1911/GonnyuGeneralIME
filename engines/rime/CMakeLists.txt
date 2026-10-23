@@ -21,6 +21,18 @@ else()
   target_compile_options(gannyu_rime_engine PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
+set(GANNYU_RIME_DEPLOYER_SOURCE "" CACHE FILEPATH "Pinned librime deployer source")
+set(GANNYU_RIME_DEPLOYER_INCLUDE_DIR "" CACHE PATH "Pinned Boost headers for the deployer")
+if(GANNYU_RIME_DEPLOYER_SOURCE)
+  add_executable(gannyu_rime_deployer "${GANNYU_RIME_DEPLOYER_SOURCE}")
+  target_compile_definitions(gannyu_rime_deployer PRIVATE GLOG_USE_GLOG_EXPORT GLOG_STATIC_DEFINE YAML_CPP_STATIC_DEFINE BOOST_DLL_USE_STD_FS RIME_IMPORTS)
+  target_include_directories(gannyu_rime_deployer PRIVATE "${RIME_INCLUDE_DIR}" "${GANNYU_RIME_DEPLOYER_INCLUDE_DIR}")
+  target_link_libraries(gannyu_rime_deployer PRIVATE "${RIME_LIBRARY}" ${RIME_DEPENDENCY_LIBRARIES})
+  if(APPLE AND RIME_LIBRARY MATCHES "\\.a$")
+    target_link_options(gannyu_rime_deployer PRIVATE "LINKER:-force_load,${RIME_LIBRARY}")
+  endif()
+endif()
+
 option(GANNYU_RIME_BUILD_PROBES "Build host-only Rime adapter probes" ON)
 
 if(GANNYU_RIME_BUILD_PROBES)

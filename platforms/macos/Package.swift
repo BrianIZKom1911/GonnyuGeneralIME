@@ -1,5 +1,8 @@
 // swift-tools-version: 5.8
 import PackageDescription
+import Foundation
+
+let rimeBuildRoot = ProcessInfo.processInfo.environment["GANNYU_MACOS_RIME_BUILD_ROOT"] ?? "../../build/rime-macos"
 
 let package = Package(
     name: "GannyuMacOS",
@@ -20,10 +23,10 @@ let package = Package(
             dependencies: ["CGannyuInput"],
             path: "Sources/GannyuMacOSSupport",
             linkerSettings: [.unsafeFlags([
-                "-L", "../../build/rime-macos/adapter",
-                "-L", "../../build/rime-macos/prefix/lib",
-                "-Xlinker", "-force_load", "-Xlinker", "../../build/rime-macos/adapter/libgannyu_rime_engine.a",
-                "-Xlinker", "-force_load", "-Xlinker", "../../build/rime-macos/prefix/lib/librime.a",
+                "-L", "\(rimeBuildRoot)/adapter",
+                "-L", "\(rimeBuildRoot)/prefix/lib",
+                "-Xlinker", "-force_load", "-Xlinker", "\(rimeBuildRoot)/adapter/libgannyu_rime_engine.a",
+                "-Xlinker", "-force_load", "-Xlinker", "\(rimeBuildRoot)/prefix/lib/librime.a",
                 "-lleveldb", "-lmarisa", "-lopencc", "-lyaml-cpp", "-lglog", "-lboost_regex", "-lc++"
             ])]
         ),

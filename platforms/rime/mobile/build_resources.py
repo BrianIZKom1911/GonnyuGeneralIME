@@ -82,8 +82,9 @@ def build(output: Path, deployer: Path) -> None:
     if not deployer.is_file():
         raise FileNotFoundError(f"missing pinned rime_deployer: {deployer}")
     output = output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
     regions = active_regions()
-    with tempfile.TemporaryDirectory(prefix="gonnyu-rime-mobile-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="gonnyu-rime-mobile-", dir=output.parent) as temporary:
         root = Path(temporary)
         shared = root / "shared"
         user = root / "user"
@@ -93,8 +94,8 @@ def build(output: Path, deployer: Path) -> None:
         if output.exists():
             shutil.rmtree(output)
         (output / "shared").parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(shared, output / "shared")
-        shutil.copytree(prebuilt, output / "prebuilt")
+        shutil.move(str(shared), output / "shared")
+        shutil.move(str(prebuilt), output / "prebuilt")
         write_manifest(output, regions)
 
 
