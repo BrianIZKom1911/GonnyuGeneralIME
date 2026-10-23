@@ -221,12 +221,9 @@ def build(output: Path, deployer: Path) -> None:
                 print(f"resource-cache predeployment [{region}] {'reuse eligible' if same else 'changed'}", flush=True)
         print("resource-cache predeployment: validate changed inputs", flush=True)
         run(str(deployer), "--build", str(user), str(shared), str(prebuilt))
-        old_shared = output / "shared"
-        if old_shared.exists():
-            shutil.rmtree(old_shared)
-        old_prebuilt = output / "prebuilt"
-        if old_prebuilt.exists():
-            shutil.rmtree(old_prebuilt)
+        if output.exists():
+            shutil.rmtree(output)
+        output.mkdir(parents=True)
         shutil.move(str(shared), output / "shared")
         shutil.move(str(prebuilt), output / "prebuilt")
         write_manifest(output, regions)

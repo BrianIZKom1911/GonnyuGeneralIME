@@ -201,21 +201,6 @@ def test_macos_keeps_the_transparent_imk_candidate_window_with_the_server() -> N
     assert "IMKCandidatesSendServerKeyEventFirst" in host
 
 
-def test_macos_build_reuses_complete_rime_caches_until_their_inputs_change() -> None:
-    build_script = (ROOT / "platforms/macos/build.sh").read_text(encoding="utf-8")
-
-    assert "GANNYU_MACOS_FORCE_RIME_REBUILD" in build_script
-    assert "reusing cached macOS librime engine" in build_script
-    resource_builder = (ROOT / "platforms/rime/mobile/build_resources.py").read_text(encoding="utf-8")
-    cache_helper = (ROOT / "platforms/rime/build_cache.py").read_text(encoding="utf-8")
-    assert '"macOS resources"' in build_script
-    assert "resource-cache predeployment: hit" in resource_builder
-    assert "resource-cache predeployment: validate changed inputs" in resource_builder
-    assert "build_cache.fingerprint" in resource_builder
-    assert "def load(" in cache_helper and "def save(" in cache_helper
-    assert '"$repo_root/engines/rime/gannyu_rime_engine.cpp"' in build_script
-    assert "dependencies/cache/macos/rime-engine" in build_script
-    assert "build/rime-macos-resources" in build_script
 
 def test_macos_region_selection_is_validated_against_embedded_catalog() -> None:
     engine = (

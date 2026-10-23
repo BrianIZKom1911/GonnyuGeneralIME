@@ -69,19 +69,19 @@ fn main() {
     let root = manifest.parent().unwrap().parent().unwrap();
     let mut digest = Sha256::new();
     for relative in ["crates/core/src", "crates/resource-build/src"] {
-        collect(&root.join(relative), &root, &mut digest);
+        collect(&root.join(relative), root, &mut digest);
     }
 
     let lock_path = root.join("Cargo.lock");
     let lock = std::fs::read_to_string(&lock_path).unwrap();
     add_bytes(
         &lock_path,
-        &root,
+        root,
         &mut digest,
         normalized_lock(&lock).as_bytes(),
     );
     for relative in ["crates/core/Cargo.toml", "crates/resource-build/Cargo.toml"] {
-        add(&root.join(relative), &root, &mut digest);
+        add(&root.join(relative), root, &mut digest);
     }
 
     // build.rs only defines this fingerprint; preserve the previous fingerprint
@@ -89,7 +89,7 @@ fn main() {
     let build_script = root.join("crates/resource-build/build.rs");
     add_bytes(
         &build_script,
-        &root,
+        root,
         &mut digest,
         CACHE_BASELINE_BUILD_SCRIPT,
     );

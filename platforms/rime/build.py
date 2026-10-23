@@ -56,8 +56,9 @@ VERSION_LINE = re.compile(r'(?m)^version: "([^"]+)"$')
 LEGACY_BUILD_HASHES = (
     ("e7df51dc8ac45da642969c98bec9df8a44d9e378c73d402f06d60f009b76a055", True),
     ("573c26d5ac3d1446e28a4a6481e40569be28b2e57285d55aa2ffb5191b3f4455", False),
+    ("07cf83af0d45625123dbf4ddffcfc48978f9328ff8f1e1d1dfa9cbe1bd59a560", False),
 )
-LEGACY_RESOURCE_LOGIC_HASH = "6476de38df35b7e69b8393b4aafdad6ad73cf333711fc23a951f02051cce448b"
+LEGACY_RESOURCE_LOGIC_HASH = "2ed1ac480a043ac10be214841d8009e9aab67d56ff23e2eb971304179a5689e9"
 RESOURCE_LOGIC_FUNCTIONS = frozenset((
     "region_name", "split_values", "syllables", "strip_tone",
     "lua_quote", "load_entries", "build_new_old", "build_paired_readings",
@@ -761,18 +762,24 @@ def legacy_fingerprint(paths: list[Path], options: str, old_builder_hash: str) -
 
 
 def resource_logic_fingerprint() -> str:
+    def dump(node: ast.AST) -> str:
+        try:
+            return ast.dump(node, include_attributes=False, show_empty=True)
+        except TypeError:
+            return ast.dump(node, include_attributes=False)
+
     tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
     selected = []
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in RESOURCE_LOGIC_FUNCTIONS:
-            selected.append(ast.dump(node, include_attributes=False))
+            selected.append(dump(node))
         elif isinstance(node, ast.ClassDef) and node.name == "Entry":
-            selected.append(ast.dump(node, include_attributes=False))
+            selected.append(dump(node))
         elif isinstance(node, ast.Assign) and any(
             isinstance(target, ast.Name) and target.id in RESOURCE_LOGIC_CONSTANTS
             for target in node.targets
         ):
-            selected.append(ast.dump(node, include_attributes=False))
+            selected.append(dump(node))
     return hashlib.sha256("\n".join(selected).encode()).hexdigest()
 
 
