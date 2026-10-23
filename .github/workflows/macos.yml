@@ -64,7 +64,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/rime-macos-resources
-          key: regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          key: regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-${{ hashFiles('platforms/rime/**', 'resources/manifest.toml', 'resources/regions/**', 'engines/rime/**', 'LICENSE') }}
           restore-keys: |
             regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Identify pinned native toolchain
@@ -164,7 +164,6 @@ jobs:
           CMAKE_BUILD_PARALLEL_LEVEL: "4"
         run: bash platforms/macos/build.sh
       - name: Generate current-source Rime resources
-        timeout-minutes: 30
         env:
           GANNYU_MACOS_BUILD_STAGE: resources
         run: bash platforms/macos/build.sh

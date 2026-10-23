@@ -32,11 +32,17 @@ jobs:
           version="$(awk -F '"' '/^version[[:space:]]*=/ { print $2; exit }' Cargo.toml)"
           printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: resource_cache
+        shell: bash
+        run: python3 crates/resource-build/resource_cache_key.py >> "$GITHUB_OUTPUT"
       - name: Restore regional resource outputs
         uses: actions/cache@v4
         with:
           path: build/resource-cache
-          key: regional-fcitx5-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          key: regional-fcitx5-${{ runner.os }}-${{ runner.arch }}-v1-${{ steps.resource_cache.outputs.key }}
           restore-keys: |
             regional-fcitx5-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Identify Rust compiler
@@ -50,9 +56,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: rust-fcitx5-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('Cargo.toml', 'crates/**') }}
+          key: rust-fcitx5-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-${{ steps.resource_cache.outputs.rust_key }}
           restore-keys: |
-            rust-fcitx5-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-${{ hashFiles('Cargo.lock') }}-
+            rust-fcitx5-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-
       - run: sudo apt-get update
       - run: sudo apt-get install --yes cmake pkg-config fcitx5-modules-dev libfcitx5core-dev
       - env:

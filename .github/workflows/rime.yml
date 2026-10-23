@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/rime
-          key: regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          key: regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-${{ hashFiles('platforms/rime/build.py', 'platforms/rime/fuzzy.py', 'platforms/rime/build_cache.py', 'platforms/rime/gannyu.schema.yaml', 'platforms/rime/*.lua', 'resources/manifest.toml', 'resources/regions/**', 'LICENSE') }}
           restore-keys: |
             regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-
       - run: bash platforms/rime/package.sh

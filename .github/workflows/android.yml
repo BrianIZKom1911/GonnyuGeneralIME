@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/rime-mobile/mobile-resources
-          key: regional-android-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          key: regional-android-${{ runner.os }}-${{ runner.arch }}-v1-${{ hashFiles('platforms/rime/**', 'resources/manifest.toml', 'resources/regions/**', 'engines/rime/**', 'LICENSE') }}
           restore-keys: |
             regional-android-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Restore locked native sources

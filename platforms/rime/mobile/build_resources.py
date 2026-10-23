@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -81,12 +82,72 @@ def write_manifest(output: Path, regions: list[str]) -> None:
     )
 
 
+def cache_files(shared: Path, include_manifest: bool = False) -> list[Path]:
+    return [
+        path for path in shared.rglob("*")
+        if path.is_file()
+        and not path.name.startswith(".gannyu-cache-")
+        and (include_manifest or path.name != "resource-manifest.json")
+    ]
+
+
+def deployment_fingerprint(shared: Path, deployer: Path) -> str:
+    records = []
+    for path in sorted(cache_files(shared)):
+        relative = path.relative_to(shared).as_posix()
+        content = path.read_bytes()
+        if relative == "default.yaml":
+            content = re.sub(
+                rb'(?m)^config_version: "[^"]+"$',
+                b'config_version: "<resource-config>"',
+                content,
+                count=1,
+            )
+        records.append((relative, hashlib.sha256(content).hexdigest()))
+    options = build_cache.digest(deployer)
+    return hashlib.sha256(json.dumps([options, records], sort_keys=True).encode()).hexdigest()
+
+
+def deployment_inputs_match(previous: Path, current: Path) -> bool:
+    def records(root: Path) -> dict[str, bytes]:
+        result = {}
+        for path in cache_files(root):
+            relative = path.relative_to(root).as_posix()
+            content = path.read_bytes()
+            if relative == "default.yaml":
+                content = re.sub(
+                    rb'(?m)^config_version: "[^"]+"$',
+                    b'config_version: "<resource-config>"',
+                    content,
+                    count=1,
+                )
+            result[relative] = content
+        return result
+
+    return records(previous) == records(current)
+
+
+def publish_shared(output: Path, shared: Path, regions: list[str]) -> None:
+    current_shared = output / "shared"
+    if current_shared.exists():
+        shutil.rmtree(current_shared)
+    shutil.move(str(shared), current_shared)
+    write_manifest(output, regions)
+
+
 def build(output: Path, deployer: Path) -> None:
     if not deployer.is_file():
         raise FileNotFoundError(f"missing pinned rime_deployer: {deployer}")
     output = output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     regions = active_regions()
+    previous_shared = output / "shared"
+    previous_source_key = None
+    if previous_shared.is_dir():
+        previous_files = cache_files(previous_shared, include_manifest=True)
+        previous_source_key = build_cache.fingerprint(
+            previous_shared, previous_files, build_cache.digest(deployer)
+        )
     with tempfile.TemporaryDirectory(prefix="gonnyu-rime-mobile-", dir=output.parent) as temporary:
         root = Path(temporary)
         shared = root / "shared"
@@ -104,12 +165,34 @@ def build(output: Path, deployer: Path) -> None:
                         path.unlink()
                 stamp.unlink()
         run(sys.executable, str(RIME_BUILD), "--region", "all", "--display-name", "apple", "--output", str(shared))
-        source_files = [path for path in shared.rglob("*") if path.is_file()
-                        and not path.name.startswith(".gannyu-cache-")]
-        source_key = build_cache.fingerprint(shared, source_files, build_cache.digest(deployer))
+        source_key = deployment_fingerprint(shared, deployer)
         deployment_stamp = output / ".gannyu-cache-deployment.json"
-        if build_cache.load(deployment_stamp, output, source_key) is not None:
+        deployment_cache = build_cache.load(deployment_stamp, output, source_key)
+        if deployment_cache is not None:
             print("resource-cache predeployment: hit", flush=True)
+            publish_shared(output, shared, regions)
+            build_cache.save(
+                deployment_stamp,
+                output,
+                source_key,
+                [path for path in (output / "prebuilt").rglob("*") if path.is_file()],
+                deployment_cache["counts"],
+            )
+            return
+        if (
+            previous_source_key
+            and build_cache.load(deployment_stamp, output, previous_source_key) is not None
+            and deployment_inputs_match(previous_shared, shared)
+        ):
+            print("resource-cache predeployment: migrated hit", flush=True)
+            publish_shared(output, shared, regions)
+            build_cache.save(
+                deployment_stamp,
+                output,
+                source_key,
+                [path for path in (output / "prebuilt").rglob("*") if path.is_file()],
+                {"engine": build_cache.digest(deployer)},
+            )
             return
         previous = {}
         try:
@@ -138,9 +221,12 @@ def build(output: Path, deployer: Path) -> None:
                 print(f"resource-cache predeployment [{region}] {'reuse eligible' if same else 'changed'}", flush=True)
         print("resource-cache predeployment: validate changed inputs", flush=True)
         run(str(deployer), "--build", str(user), str(shared), str(prebuilt))
-        if output.exists():
-            shutil.rmtree(output)
-        (output / "shared").parent.mkdir(parents=True, exist_ok=True)
+        old_shared = output / "shared"
+        if old_shared.exists():
+            shutil.rmtree(old_shared)
+        old_prebuilt = output / "prebuilt"
+        if old_prebuilt.exists():
+            shutil.rmtree(old_prebuilt)
         shutil.move(str(shared), output / "shared")
         shutil.move(str(prebuilt), output / "prebuilt")
         write_manifest(output, regions)

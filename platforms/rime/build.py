@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import csv
 import hashlib
 import itertools
@@ -48,7 +49,26 @@ HEADERS = (
     "新旧标记",
 )
 MAX_FORMS = 64
-VERSION_LINE = re.compile(r'(?m)^version: "[^"]+"$')
+VERSION_LINE = re.compile(r'(?m)^version: "([^"]+)"$')
+# These are the builder hashes used by the last successful macOS cache and by
+# the immediately preceding cache-fix build. They allow a one-time, verified
+# migration of their stamps without rebuilding unchanged regional resources.
+LEGACY_BUILD_HASHES = (
+    ("e7df51dc8ac45da642969c98bec9df8a44d9e378c73d402f06d60f009b76a055", True),
+    ("573c26d5ac3d1446e28a4a6481e40569be28b2e57285d55aa2ffb5191b3f4455", False),
+)
+LEGACY_RESOURCE_LOGIC_HASH = "6476de38df35b7e69b8393b4aafdad6ad73cf333711fc23a951f02051cce448b"
+RESOURCE_LOGIC_FUNCTIONS = frozenset((
+    "region_name", "split_values", "syllables", "strip_tone",
+    "lua_quote", "load_entries", "build_new_old", "build_paired_readings",
+    "format_pair_display", "display_pair_priority", "matching_pair",
+    "matching_pair_for_lookup", "annotated_reading", "strip_prefix_labels",
+    "trailing_tone", "suppress_neutral_displays", "build_metadata",
+    "build_preferred_readings", "build_synonym_relations", "entry_codes",
+    "write_dictionary", "build_single_character_frequencies", "write_annotation_store",
+    "write_lua_data", "selected_entries", "write_option_resources", "build_uncached",
+))
+RESOURCE_LOGIC_CONSTANTS = frozenset(("HEADERS", "MAX_FORMS", "LUA_NAMES"))
 
 def active_regions() -> tuple[str, ...]:
     """Return active regions with the manifest default first.
@@ -728,6 +748,34 @@ def write_resource_manifest(output: Path, regions: tuple[str, ...], package_file
         encoding="utf-8",
     )
 
+
+def legacy_fingerprint(paths: list[Path], options: str, old_builder_hash: str) -> str:
+    records = [
+        (
+            path.relative_to(ROOT).as_posix(),
+            old_builder_hash if path == PLATFORM_DIR / "build.py" else build_cache.digest(path),
+        )
+        for path in sorted(set(paths))
+    ]
+    return hashlib.sha256(json.dumps([options, records], sort_keys=True).encode()).hexdigest()
+
+
+def resource_logic_fingerprint() -> str:
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    selected = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in RESOURCE_LOGIC_FUNCTIONS:
+            selected.append(ast.dump(node, include_attributes=False))
+        elif isinstance(node, ast.ClassDef) and node.name == "Entry":
+            selected.append(ast.dump(node, include_attributes=False))
+        elif isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id in RESOURCE_LOGIC_CONSTANTS
+            for target in node.targets
+        ):
+            selected.append(ast.dump(node, include_attributes=False))
+    return hashlib.sha256("\n".join(selected).encode()).hexdigest()
+
+
 def build(region: str, output: Path, display_name: str = "short") -> dict[str, int]:
     region_dir = ROOT / "resources" / "regions" / region
     config_path = region_dir / "region.toml"
@@ -744,19 +792,34 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
     key = build_cache.fingerprint(ROOT, paths, display_name)
     stamp = output / f".gannyu-cache-{region}.json"
     cached = build_cache.load(stamp, output, key)
+    if (
+        cached is None
+        and stamp.is_file()
+        and resource_logic_fingerprint() == LEGACY_RESOURCE_LOGIC_HASH
+    ):
+        try:
+            stamp_data = json.loads(stamp.read_text(encoding="utf-8"))
+            cached_files = stamp_data.get("files", {})
+            cached_version = next(
+                match.group(1)
+                for name in cached_files
+                if name.endswith((".schema.yaml", ".dict.yaml"))
+                and (match := VERSION_LINE.search((output / name).read_text(encoding="utf-8")))
+            )
+        except (OSError, ValueError, KeyError, TypeError, StopIteration):
+            cached_version = ""
+        for legacy_build_hash, versioned_options in LEGACY_BUILD_HASHES:
+            if not cached_version:
+                break
+            legacy_options = f"{cached_version}:{display_name}" if versioned_options else display_name
+            legacy_key = legacy_fingerprint(paths, legacy_options, legacy_build_hash)
+            cached = build_cache.load(stamp, output, legacy_key)
+            if cached is not None:
+                print(f"resource-cache [{region}] legacy hit", flush=True)
+                break
     if cached is not None:
         cached_files = [output / name for name in cached["files"]]
-        metadata_changed = False
-        for path in cached_files:
-            if path.name.endswith((".schema.yaml", ".dict.yaml")):
-                content = path.read_text(encoding="utf-8")
-                updated, replacements = VERSION_LINE.subn(f'version: "{VERSION}"', content, count=1)
-                if replacements != 1:
-                    raise RuntimeError(f"cannot refresh cached Rime version in {path}")
-                if updated != content:
-                    path.write_text(updated, encoding="utf-8")
-                    metadata_changed = True
-        if metadata_changed:
+        if cached["key"] != key:
             build_cache.save(stamp, output, key, cached_files, cached["counts"])
         print(f"resource-cache [{region}] hit", flush=True)
         return cached["counts"]

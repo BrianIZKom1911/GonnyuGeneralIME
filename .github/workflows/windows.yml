@@ -32,11 +32,17 @@ jobs:
           version="$(awk -F '"' '/^version[[:space:]]*=/ { print $2; exit }' Cargo.toml)"
           printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: resource_cache
+        shell: bash
+        run: python crates/resource-build/resource_cache_key.py >> "$GITHUB_OUTPUT"
       - name: Restore regional resource outputs
         uses: actions/cache@v4
         with:
           path: build/resource-cache
-          key: regional-windows-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          key: regional-windows-${{ runner.os }}-${{ runner.arch }}-v1-${{ steps.resource_cache.outputs.key }}
           restore-keys: |
             regional-windows-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Identify Rust compiler
@@ -50,9 +56,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: rust-windows-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('Cargo.toml', 'crates/**') }}
+          key: rust-windows-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-${{ steps.resource_cache.outputs.rust_key }}
           restore-keys: |
-            rust-windows-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-${{ hashFiles('Cargo.lock') }}-
+            rust-windows-${{ runner.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.version }}-
       - shell: pwsh
         run: rustup target add x86_64-pc-windows-msvc i686-pc-windows-msvc
       - uses: actions/setup-dotnet@v4
