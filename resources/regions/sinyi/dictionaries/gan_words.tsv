@@ -102,7 +102,7 @@
 而间	i2 ka1	yi2 ga1	er3 jian1	赣	现在	xian4 zai4	128483	样间	
 样间	ioŋ1* ka1	yong1* ga1	yang4 jian1	赣	现在	xian4 zai4	127000		
 应今	in2 tɕin1	yin2 jin1	ying1 jin1	赣	如今	ru2 jin1	127000		
-如今	ɵ2 tɕin1	eo2 jin1	ru2 jin1	官			125000		
+如今	ɵ2 tɕin1	eo2 jin1	ru2 jin1	官	当今	dang1 jin1	125000		
 啥么	sa2 ma1	sa2 ma1	sha2 me5	赣	什么	shen2 me5	129163	啥里	
 啥里	sa2 li1	sa2 li1	sha2 li5	赣	什么	shen2 me5	129163		
 应事	in1* sɿ4	yin1* sï4	ying1 shi4	白	何以/如何	he2 yi3/ru2 he2	125000		
@@ -147,19 +147,19 @@
 细时间	si2 ɕi2 ka1	si2 xi2 ga1	xi4 shi2 jian1	赣	小时候	xiao3 shi2 hou4	128000		
 天光	tʰiɛn1* kuoŋ0	tiên1* guong0	dian4 guang1	赣	天亮	tian1 liang4	123426		
 清晨麻早	tɕʰin1* sit0 ma1 tsau3	qin1* sit0 ma1 zau3	qing1 chen2 ma2 zao3	白	清晨	qing1 chen2	123426	清早	
-上昼	soŋ4 tɪu2	song2 deu2	shang4 zhou4	赣	上午	shang4 wu3	125000				
+上昼	soŋ4 tɪu2	song2 deu2	shang4 zhou4	赣	上午	shang4 wu3	125000		
 下昼	ha2 tɪu2	ha2 deu2	xia4 zhou4	赣	下午	xia4 wu3	125000		
 昼间	tɪu2 ka1	deu2 ga1	zhou4 jian1	赣	中午	zhong1 wu3	125000		
 日间	ȵit5 ka1	nit5 ga1	ri4 jian1	赣	白天	bai2 tian1	125000		
 夜间	ia1 ka1	ya1 ga1	ye4 jian1	赣	晚上	wan3 shang4	125000		
 夜门尐	ia2 mun2 tɕit5	ya2 mun2 jit5	ye4 men2 jie2	赣	黄昏/入夜	huang2 hun1/ru4 ye4	122000		
-夜里	ia2 li1	ya2 li1	ye4 li3	赣			120000		
+夜里	ia2 li1	ya2 li1	ye4 li3	赣	夜晚	ye4 wan3	120000		
 暗夜里	ŋɔn4 ia2 li1	ngon4 ya2 li1	an4 ye4 li3	赣	深夜	shen1 ye4	120000		
 一工	it5 kuŋ1	yit5 gung1	yi1 gong1	赣	一天	yi1 tian1	127500	一日	
 今下	tɕi1 a0	ji1 a0	jin1 xia4	赣	今天	jin1 tian1	129000		
-明日	miaŋ1* ȵit5	miang1* nit5	ming2 ri4	官			125000		
-明日	miaŋ1* ȵin1	miang1* nin1	ming2 ri4	官			125000		又1
-昨日	tsʰoʔ5* ȵit5	cok5* nit5	zuo2 ri4	官			125000		
+明日	miaŋ1* ȵit5	miang1* nit5	ming2 ri4	官	明天	ming2 tian1	125000		
+明日	miaŋ1* ȵin1	miang1* nin1	ming2 ri4	官	明天	ming2 tian1	125000		又1
+昨日	tsʰoʔ5* ȵit5	cok5* nit5	zuo2 ri4	官	昨天	zuo2 tian1	125000		
 前日	tɕʰiɛn1* ȵit5	qiên1* nit5	qian2 ri4	赣	前天	qian2 tian1	122000		
 后日	hɛu4 ȵit5	hêu4 nit5	hou4 ri4	赣	后天	hou4 tian1	122000		
 明年	miaŋ2 ȵiɛn1	miang2 niên1	ming2 nian2	官			125000		
@@ -234,7 +234,7 @@
 作头	tsoʔ5 ɛu1	zok5 êu1	zuo4 tou2	赣	敌人	di2 ren2	122500		
 挬佬	pɛt5 lau1	bêt5 lau1	bo2 lao3	赣	浑蛋	hun2 dan4	120000		
 鞑子	tat5 tsɿ3	dat5 zï3	da2 zi5	赣	傻子	sha3 zi5	120000		
-懂婆子	tuŋ3 pʰo1* tsɿ0	dung3 po1* zï0	dong3 po2 zi5	赣	颠女人	dian1 nv3 ren2	100000
+懂婆子	tuŋ3 pʰo1* tsɿ0	dung3 po1* zï0	dong3 po2 zi5	赣	颠女人	dian1 nv3 ren2	100000		
 告花儿	kau2 ua1 li0	gau2 wa1 li0	gao4 hua1 er2	赣	乞丐	qi3 gai4	100000		
 内惧	lui4 tɕi2	lui4 ji2	nei4 ju4	赣	拘礼	ju1 li3	127338		
 内惧	luoi4 tsɿ2	luoi4 zï2	nei4 ju4	赣	拘礼	ju1 li3	127338		
@@ -360,7 +360,7 @@
 搣断	miɛt5 hɔn3	miêt5 hon3	mie4 duan4	赣	掰断	bai1 duan4	120000		
 䋎到	tan2 tau4*	dan2 dau4*	zhan4 dao4	赣	展开摊着	zhan3 kai1 tan1 zhe5	127586	袒到/袒哩	
 袒到	tan3 tau4*	dan3 dau4*	tan3 dao4	赣	展开摊着	zhan3 kai1 tan1 zhe5	127586	袒哩	
-袒哩许里	tan3 li2 hɛ1* li1	dan3 li2 hê1* li1	tan3 li5 xu3 li3	赣	展开摊在那	zhan3 kai1 tan1 zai4 na4	127586	
+袒哩许里	tan3 li2 hɛ1* li1	dan3 li2 hê1* li1	tan3 li5 xu3 li3	赣	展开摊在那	zhan3 kai1 tan1 zai4 na4	127586		
 䋎起来	tan2 tɕʰi3 lai1	dan2 qi3 lai1	zhan4 qi3 lai2	赣	摊开来	tan1 kai1 lai2	127586	袒起来	
 撴到	tun4* tau0	dun4* dau0	dun1 dao4	赣	竖着	shu4 zhe5	106972	撴哩	
 撴哩许里	tun4* li2 hɛ1* li1	dun4* li2 hê1* li1	dun1 li5 xu3 li3	赣	竖在那	shu4 zai4 na4	106972		
@@ -413,7 +413,7 @@
 舞吥哩	u3 uat5 li0	wu3 wat5 li0	wu3 fa2 li5	赣	弄掉了	nong4 diao4 le5	127285		
 喫吥哩	tɕʰiaʔ5* po0 li0	qiak5* bo0 li0	chi1 fou3 li5	赣	吃掉了	chi1 diao4 le5	127285		
 舞乏哩	u3 uat5 li0	wu3 wat5 li0	wu3 fa2 li5	赣	弄完了	nong4 wan2 le5	127285		
-做乏哩	tsɿ2 uat5 li0	zï2 wat5 li0	zuo4 fa2 li5	赣	做完了	zuo4 wan2 le5	127285	
+做乏哩	tsɿ2 uat5 li0	zï2 wat5 li0	zuo4 fa2 li5	赣	做完了	zuo4 wan2 le5	127285		
 话乏哩	ua2 uat5 li0	wa2 wat5 li0	hua4 fa2 li5	赣	说完了	shuo1 wan2 le5	127285		
 喫乏哩	tɕʰiaʔ5* uat5 li0	qiak5* wat5 li0	chi1 fa2 li5	赣	吃完了	chi1 wan2 le5	127285		
 归去	kui1 tɕʰiɛ0	gui1 qiê0	gui1 qu4	赣	回去	hui2 qu4	129028		
@@ -423,7 +423,7 @@
 作瞌	tsoʔ5 kʰɔt5*	zok5 kot5*	zuo1 ke1	赣	睡意上来	shui4 yi4 shang4 lai2	125000	打瞌睏	
 失瞌	sɛʔ5 kʰɔt5*	sêk5 kot5*	shi1 ke1	赣	缺觉	que1 jiao4	125000		
 打瞌睏	ta3 kʰɔt5 kun4*	da3 kot5 gun4*	da3 ke1 kun4	赣	打瞌睡	da3 ke1 shui4	120000	作瞌	
-打赤膊	ta3 tɕʰiaʔ5 poʔ0	da3 qiak5* bok0	da3 chi4 bo2	赣	裸身	luo3 shen1	100000	
+打赤膊	ta3 tɕʰiaʔ5 poʔ0	da3 qiak5* bok0	da3 chi4 bo2	赣	裸身	luo3 shen1	100000		
 打赤脚	ta3 tʰaʔ5 tɕioʔ0	da3 tak5* jiok0	da3 chi4 jiao3	赣	赤脚	chi4 jiao3	100000		
 打脷肚	ta3 li4 tu4	da3 li4 du4	da3 li4 du4	白	不穿裤子	bu4 chuan1 ku4 zi5	100000		
 发性	uat5 saŋ2	wat5 sang2	fa1 xing4	赣	发脾气/生气	fa1 pi2 qi4/sheng1 qi4	127954		
@@ -484,7 +484,7 @@
 供细人	tɕiuŋ1 si2 ȵin2	jiung1 si2 nin2	gong1 xi4 ren2	赣	养小孩	yang3 xiao3 hai2	125000		
 解谷	kai2 kuʔ5	gai2 guk5	jie3 gu3	赣	缴送公粮	jiao3 song4 gong1 liang2	106926		
 解木头	kai2 muʔ5 tʰɛu0	gai2 muk5 têu0	jie3 mu4 tou5	赣	锯木头	ju4 mu4 tou5	116926	锯木头	
-开㿭	kʰɔi tsʰaʔ5*	koi1* cak5*	kai1 che4	赣	皮肤开裂	pi2 fu1 kai1 lie4		124761		
+开㿭	kʰɔi1* tsʰaʔ5*	koi1* cak5*	kai1 che4	赣	皮肤开裂	pi2 fu1 kai1 lie4	124761		
 㪗气	hɛu3 tɕʰi2	hêu3 qi2	tou3 qi4	赣	透气/喘气	tou4 qi4/chuan3 qi4	126269		
 结巴子	tɕiɛt5 pa1 tsɿ0	jiêt5 ba1 zï0	jie1 ba5 zi5	赣	口吃	kou3 chi1	135		
 打摆子	ta3 pai3 tsɿ1	da3 bai3 zï1	da3 bai3 zi5	赣	疟疾	nve4 ji2	100019		
@@ -524,7 +524,7 @@
 话张哩	ua2 toŋ1 li2	wa2 dong1 li2	hua4 zhang1 li5	赣	讲通了	jiang3 tong1 le5	120000		
 话不张	ua2 put0 toŋ1	wa2 but0 dong1	hua4 bu4 zhang1	赣	讲不通/没法儿讲	jiang3 bu4 tong1/mei2 fa'er1 jiang3	120000		
 话不得事	ua2 put0 tɛʔ0 sɿ4	wa2 but0 dêk0 sï4	hua4 bu4 de2 shi4	赣	说不了话	shuo1 bu4 liao3 hua4	120000		
-行不得路	haŋ2 put0 tɛʔ0 lu4	hang2 but0 dêk0 lu4	xing2 bu4 de2 lu4	赣	走不了路	zou3 bu4 liao3 lu4	120000	
+行不得路	haŋ2 put0 tɛʔ0 lu4	hang2 but0 dêk0 lu4	xing2 bu4 de2 lu4	赣	走不了路	zou3 bu4 liao3 lu4	120000		
 旋做旋喫	tɕʰiɛn4 tsɿ2 tɕʰiɛn4 tɕʰiaʔ5*	qiên4 zï2 qiên4 qiak5* 	xuan2 zuo4 xuan2 chi1	赣	边做边吃	bian1 zuo4 bian1 chi1	120149		
 死命	sɿ3 miaŋ4	sï3 miang4	si3 ming4	赣	拼命	pin1 ming4	122000		
 下蛮	ha2 man2	ha2 man2	xia4 man2	赣	用劲	yong4 jin4	122000		
@@ -592,9 +592,9 @@
 足哩	tɕiuʔ5 li2	jiuk5 li2	zu2 li5	赣	过头了	guo4 tou2 le5	120000		
 绝哩	tɕʰyɔt6 li2	qyuot6 li2	jue2 li5	赣	绝了	jue3 le5	120000		
 绝哩灭	tɕʰyɔt6 li2 miɛt5	qyuot6 li2 miêt5	jue2 li5 mie4	赣	太绝了	tai4 jue3 le5	100000	绝哩毛	
-绝哩毛	tɕʰyɔt6 li2 mau2	qyuot6 li2 mau2	jue2 li5 mao2	赣	太绝了	tai4 jue3 le5	100000	
+绝哩毛	tɕʰyɔt6 li2 mau2	qyuot6 li2 mau2	jue2 li5 mao2	赣	太绝了	tai4 jue3 le5	100000		
 绝你哩灭	tɕʰyɔt6 ȵi3 li0 miɛt5	qyuot6 ni3 li0 miêt5	jue2 ni3 li5 mie4	赣	太致命了	tai4 zhi4 ming4 le5	100000	绝你哩毛	
-绝你哩毛	tɕʰyɔt6 ȵi3 li0 mau2	qyuot6 ni3 li0 mau2	jue2 ni3 li5 mao2	赣	太致命了	tai4 zhi4 ming4 le5	100000	
+绝你哩毛	tɕʰyɔt6 ȵi3 li0 mau2	qyuot6 ni3 li0 mau2	jue2 ni3 li5 mao2	赣	太致命了	tai4 zhi4 ming4 le5	100000		
 收命	sɪu1 mian4	seu1 miang4	shou1 ming4	赣	要命	yao4  ming4	125000		
 死西	sɿ3 ɕi1	sï3 xi1	si3 xi1	赣	完蛋	wan2 dan4	100000	埋人	
 你死西	ȵi1 sɿ3 ɕi1	ni1 sï3 xi1	ni3 si3 xi3	赣	你妈的	ni3 ma1 de5	125000		
@@ -697,7 +697,7 @@
 一泊	it5 pʰɔʔ5*	yit5 pok5*	yi1 po1	赣	一泡	yi1 pao4	100000		
 一泊屎	it5 pʰɔʔ5* ɕi3	yit5 pok5* xi3	yi1 po1 shi3	白	一泡屎	yi1 pao4 shi3	100000		
 老官天	lau3 kuɔn1 tʰiɛn1*	lau3 guon1 tiên1*	lao3 guan1 tian1	白	老天爷	lao3 tian1 ye2	120000		
-星粒子	saŋ1 liət5 tsɿ0	sang1 liet5 zï0	xing1 li4 zi5	白	星星	xing1 xing1	100000
+星粒子	saŋ1 liət5 tsɿ0	sang1 liet5 zï0	xing1 li4 zi5	白	星星	xing1 xing1	100000		
 落雨	loʔ5 i3	lok5 yi3	luo4 yu3	赣	下雨	xia1 yu3	125000		
 落雨	loʔ5 ɵ3	lok5 eo3	luo4 yu3	赣	下雨	xia1 yu3	125000		又1
 日子	liəʔ5 tsɿ3	liek5 zï3	ri4 zi5	赣	太阳	tai4 yang2	125537		
@@ -767,7 +767,7 @@
 清汤	tɕʰin1 hoŋ1	qin1 hong1	qing1 tang1	赣	馄饨	hun2 tun2	100018		
 腌粉	iɛt5 fun3	yêt5 fun3	yan1 fen3	白			90000		
 昼饭	tɪu2 uan1	deu2 wan1	zhou4 fan4	赣	午饭	wu3 fan4	125000		
-夜饭	ia2 uan1	ya2 wan1	ye4 fan4	赣	晚饭	wan3 fan4	125000	
+夜饭	ia2 uan1	ya2 wan1	ye4 fan4	赣	晚饭	wan3 fan4	125000		
 暗饭	ŋɔn4 uan1	ngon4 wan1	an4 fan4	赣	晚饭	wan3 fan4	125000		
 賸饭	iaŋ4 uan1	yang4 wan1	sheng4 fan4	白	剩饭	sheng4 fan4	120000		
 牙祭	ŋa2 tɕi4	nga2 ji4	ya2 ji4	赣	盛宴	sheng4 yan4	100000		
