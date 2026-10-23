@@ -80,17 +80,7 @@ fi
 if [[ "$build_stage" == "engine" ]]; then exit 0; fi
 [[ -f "$adapter_library" && -f "$librime_library" && -x "$rime_build_root/adapter/gannyu_rime_deployer" ]] || { echo "build the macOS engine stage first" >&2; exit 2; }
 if [[ "$build_stage" != "app" ]]; then
-  resource_rebuild=0
-  if [[ "${GANNYU_MACOS_FORCE_RIME_REBUILD:-0}" == "1" || ! -f "$resource_manifest" || ! -d "$rime_resource_root/shared" || ! -d "$rime_resource_root/prebuilt" || ! -f "$rime_resource_root/shared/lua/gannyu_data_lifecycle.lua" ]]; then
-    resource_rebuild=1
-  elif find "$repo_root/resources" "$repo_root/platforms/rime" -type f -newer "$resource_manifest" -print -quit | grep -q .; then
-    resource_rebuild=1
-  fi
-  if [[ "$resource_rebuild" == "1" ]]; then
-    run_with_heartbeat "macOS resources" env GANNYU_RIME_DEPLOYER="$rime_build_root/adapter/gannyu_rime_deployer" GANNYU_MACOS_RIME_RESOURCE_OUTPUT="$rime_resource_root" bash "$script_dir/prepare_rime_resources.sh"
-  else
-    echo "reusing cached macOS Rime resources: $rime_resource_root"
-  fi
+  run_with_heartbeat "macOS resources" env GANNYU_RIME_DEPLOYER="$rime_build_root/adapter/gannyu_rime_deployer" GANNYU_MACOS_RIME_RESOURCE_OUTPUT="$rime_resource_root" bash "$script_dir/prepare_rime_resources.sh"
 fi
 [[ -f "$resource_manifest" ]] || { echo "build the macOS resources stage first" >&2; exit 2; }
 if [[ "$build_stage" == "resources" ]]; then exit 0; fi

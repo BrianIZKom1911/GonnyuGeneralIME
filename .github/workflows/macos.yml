@@ -60,6 +60,13 @@ jobs:
           test -n "$version"
           printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
       - run: brew install cmake ninja
+      - name: Restore regional resource outputs
+        uses: actions/cache@v4
+        with:
+          path: build/rime-macos-resources
+          key: regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          restore-keys: |
+            regional-macos-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Identify pinned native toolchain
         id: engine_cache
         run: echo "key=$(python3 platforms/macos/native_cache.py key)" >> "$GITHUB_OUTPUT"

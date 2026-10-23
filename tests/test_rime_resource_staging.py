@@ -42,3 +42,34 @@ def test_resources_move_after_success_and_preserve_old_output_on_failure(tmp_pat
         assert not (output / "old").exists()
     assert len(calls) == 2
     assert not list(tmp_path.glob("gonnyu-rime-mobile-*"))
+
+
+def test_unchanged_resources_skip_predeployment_and_corruption_rebuilds(tmp_path, monkeypatch):
+    output = tmp_path / "resources"
+    deployer = tmp_path / "rime_deployer"
+    deployer.touch()
+    monkeypatch.setattr(build_resources, "active_regions", lambda: ["lancong"])
+    calls = []
+
+    def run(*command):
+        if command[0] == str(deployer):
+            calls.append("deploy")
+            prebuilt = Path(command[-1])
+            prebuilt.mkdir(parents=True, exist_ok=True)
+            (prebuilt / "built").write_text("compiled")
+        else:
+            shared = Path(command[-1])
+            shared.mkdir(exist_ok=True)
+            (shared / "source").write_text("generated")
+
+    monkeypatch.setattr(build_resources, "run", run)
+    build_resources.build(output, deployer)
+    build_resources.build(output, deployer)
+    assert calls == ["deploy"]
+    (output / "prebuilt/built").write_text("corrupt")
+    build_resources.build(output, deployer)
+    assert calls == ["deploy", "deploy"]
+    assert (output / "prebuilt/built").read_text() == "compiled"
+    deployer.write_bytes(b"updated engine")
+    build_resources.build(output, deployer)
+    assert calls == ["deploy", "deploy", "deploy"]

@@ -13,6 +13,9 @@ import tempfile
 import tomllib
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import build_cache
+
 
 ROOT = Path(__file__).resolve().parents[3]
 RIME_BUILD = ROOT / "platforms" / "rime" / "build.py"
@@ -47,7 +50,7 @@ def write_manifest(output: Path, regions: list[str]) -> None:
     files = []
     for path in sorted(item for item in output.rglob("*") if item.is_file()):
         relative = path.relative_to(output).as_posix()
-        if relative == "resource-manifest.json":
+        if relative == "resource-manifest.json" or path.name.startswith(".gannyu-cache-"):
             continue
         files.append(
             {
@@ -89,7 +92,51 @@ def build(output: Path, deployer: Path) -> None:
         shared = root / "shared"
         user = root / "user"
         prebuilt = user / "build"
+        if (output / "shared").is_dir():
+            shutil.copytree(output / "shared", shared, copy_function=shutil.copy2)
+        removed_regions = []
+        for stamp in shared.glob(".gannyu-cache-*.json"):
+            region = stamp.name[len(".gannyu-cache-"):-len(".json")]
+            if region not in regions:
+                removed_regions.append(region)
+                for path in shared.rglob(f"gannyu_{region}*"):
+                    if path.is_file():
+                        path.unlink()
+                stamp.unlink()
         run(sys.executable, str(RIME_BUILD), "--region", "all", "--display-name", "apple", "--output", str(shared))
+        source_files = [path for path in shared.rglob("*") if path.is_file()
+                        and not path.name.startswith(".gannyu-cache-")]
+        source_key = build_cache.fingerprint(shared, source_files, build_cache.digest(deployer))
+        deployment_stamp = output / ".gannyu-cache-deployment.json"
+        if build_cache.load(deployment_stamp, output, source_key) is not None:
+            print("resource-cache predeployment: hit", flush=True)
+            return
+        previous = {}
+        try:
+            previous = json.loads(deployment_stamp.read_text())
+        except (OSError, ValueError):
+            pass
+        if previous.get("counts", {}).get("engine") == build_cache.digest(deployer) and (output / "prebuilt").is_dir():
+            shutil.copytree(output / "prebuilt", prebuilt, copy_function=shutil.copy2)
+            for name, checksum in previous.get("files", {}).items():
+                old = output / name
+                staged = prebuilt / Path(name).relative_to("prebuilt")
+                if not old.is_file() or build_cache.digest(old) != checksum:
+                    staged.unlink(missing_ok=True)
+        for region in removed_regions:
+            for path in prebuilt.glob(f"gannyu_{region}*"):
+                if path.is_file():
+                    path.unlink()
+        for region in regions:
+            before = output / "shared" / f".gannyu-cache-{region}.json"
+            after = shared / f".gannyu-cache-{region}.json"
+            if before.is_file() and after.is_file():
+                try:
+                    same = json.loads(before.read_text()).get("key") == json.loads(after.read_text()).get("key")
+                except (OSError, ValueError, AttributeError):
+                    same = False
+                print(f"resource-cache predeployment [{region}] {'reuse eligible' if same else 'changed'}", flush=True)
+        print("resource-cache predeployment: validate changed inputs", flush=True)
         run(str(deployer), "--build", str(user), str(shared), str(prebuilt))
         if output.exists():
             shutil.rmtree(output)
@@ -97,6 +144,9 @@ def build(output: Path, deployer: Path) -> None:
         shutil.move(str(shared), output / "shared")
         shutil.move(str(prebuilt), output / "prebuilt")
         write_manifest(output, regions)
+        build_cache.save(output / ".gannyu-cache-deployment.json", output, source_key,
+                         [path for path in (output / "prebuilt").rglob("*") if path.is_file()],
+                         {"engine": build_cache.digest(deployer)})
 
 
 def main() -> None:

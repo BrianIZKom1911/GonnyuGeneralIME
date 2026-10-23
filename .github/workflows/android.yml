@@ -46,6 +46,13 @@ jobs:
         with:
           packages: platform-tools
       - run: sdkmanager "ndk;26.3.11579264"
+      - name: Restore regional resource outputs
+        uses: actions/cache@v4
+        with:
+          path: build/rime-mobile/mobile-resources
+          key: regional-android-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          restore-keys: |
+            regional-android-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Restore locked native sources
         uses: actions/cache@v4
         with:

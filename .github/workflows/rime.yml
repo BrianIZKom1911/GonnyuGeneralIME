@@ -32,6 +32,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Restore regional resource outputs
+        uses: actions/cache@v4
+        with:
+          path: build/rime
+          key: regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          restore-keys: |
+            regional-rime-${{ runner.os }}-${{ runner.arch }}-v1-
       - run: bash platforms/rime/package.sh
       - uses: actions/upload-artifact@v4
         with:

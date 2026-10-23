@@ -18,8 +18,10 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 try:
+    from . import build_cache
     from .fuzzy import compile_algebra, essential_rules, load_rules
 except ImportError:
+    import build_cache
     from fuzzy import compile_algebra, essential_rules, load_rules
 
 
@@ -694,7 +696,7 @@ def write_resource_manifest(output: Path, regions: tuple[str, ...], package_file
     paths = (output / name for name in package_files) if package_files is not None else output.rglob("*")
     for path in sorted(paths):
         relative = path.relative_to(output).as_posix()
-        if relative == "resource-manifest.json":
+        if relative == "resource-manifest.json" or path.name.startswith(".gannyu-cache-"):
             continue
         if not path.is_file():
             if package_files is not None:
@@ -726,6 +728,46 @@ def write_resource_manifest(output: Path, regions: tuple[str, ...], package_file
     )
 
 def build(region: str, output: Path, display_name: str = "short") -> dict[str, int]:
+    region_dir = ROOT / "resources" / "regions" / region
+    config_path = region_dir / "region.toml"
+    with config_path.open("rb") as handle:
+        config = tomllib.load(handle)
+    paths = [config_path, ROOT / "LICENSE", PLATFORM_DIR / "build.py",
+             PLATFORM_DIR / "fuzzy.py", PLATFORM_DIR / "build_cache.py",
+             PLATFORM_DIR / "gannyu.schema.yaml",
+             *(PLATFORM_DIR / name for name in LUA_NAMES)]
+    paths.extend(region_dir / config["language"][name]
+                 for name in ("chars", "words", "gan_chars", "gan_words")
+                 if config["language"].get(name))
+    paths.append((region_dir / config["phonology"]["fuzzy_map"]).resolve())
+    key = build_cache.fingerprint(ROOT, paths, f"{VERSION}:{display_name}")
+    stamp = output / f".gannyu-cache-{region}.json"
+    cached = build_cache.load(stamp, output, key)
+    if cached is not None:
+        print(f"resource-cache [{region}] hit", flush=True)
+        return cached["counts"]
+    print(f"resource-cache [{region}] rebuild", flush=True)
+    for path in output.glob(f"gannyu_{region}.*"):
+        if path.is_file():
+            path.unlink()
+    for path in output.glob(f"gannyu_{region}_*"):
+        if path.is_file():
+            path.unlink()
+    for path in (output / "lua").glob(f"gannyu_{region}*"):
+        if path.is_file():
+            path.unlink()
+    counts = build_uncached(region, output, display_name)
+    files = [path for path in output.rglob("*") if path.is_file()
+             and (path.name.startswith(f"gannyu_{region}.")
+                  or path.name.startswith(f"gannyu_{region}_")
+                  or path.name in LUA_NAMES or path.name == "LICENSE")]
+    if build_cache.fingerprint(ROOT, paths, f"{VERSION}:{display_name}") != key:
+        raise RuntimeError(f"[{region}] source changed during generation")
+    build_cache.save(stamp, output, key, files, counts)
+    return counts
+
+
+def build_uncached(region: str, output: Path, display_name: str = "short") -> dict[str, int]:
     region_name, entries = load_entries(region)
     region_dir = ROOT / "resources" / "regions" / region
     with (region_dir / "region.toml").open("rb") as handle:

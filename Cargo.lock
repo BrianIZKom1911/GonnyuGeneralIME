@@ -316,6 +316,7 @@ dependencies = [
  "fst",
  "gannyu-input-core",
  "serde",
+ "sha2",
  "toml",
 ]
 

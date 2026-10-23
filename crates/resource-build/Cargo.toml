@@ -10,3 +10,7 @@ fst = "0.4"
 gannyu-input-core = { path = "../core" }
 serde = { version = "1", features = ["derive"] }
 toml = "0.8"
+sha2 = "0.10"
+
+[build-dependencies]
+sha2 = "0.10"

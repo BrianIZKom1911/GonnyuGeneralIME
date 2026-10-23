@@ -32,6 +32,13 @@ jobs:
           version="$(awk -F '"' '/^version[[:space:]]*=/ { print $2; exit }' Cargo.toml)"
           printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@stable
+      - name: Restore regional resource outputs
+        uses: actions/cache@v4
+        with:
+          path: build/resource-cache
+          key: regional-fcitx5-${{ runner.os }}-${{ runner.arch }}-v1-${{ github.sha }}
+          restore-keys: |
+            regional-fcitx5-${{ runner.os }}-${{ runner.arch }}-v1-
       - name: Identify Rust compiler
         id: compiler
         shell: bash
