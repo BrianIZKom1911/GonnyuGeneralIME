@@ -37,7 +37,7 @@ struct ITfMenu {
 };
 struct GannyuTextService {
     std::vector<std::string> regions{"lancong", "fenni"};
-    std::array<int, 7> options{{1, 1, 1, 1, 1, 0, 1}};
+    std::array<int, 8> options{{1, 1, 1, 1, 1, 0, 1, 1}};
     std::string selected = "lancong";
     UINT option = 0;
     const auto& RegionIds() const { return regions; }
@@ -77,18 +77,20 @@ int main() {
                 owner.options[5] = mode;
                 ITfMenu options;
                 assert(settings.InitMenu(&options) == S_OK);
-                assert(options.items.size() == 9);
+                assert(options.items.size() == 10);
                 assert(options.items[0].label == L"副标题");
-                assert(options.items[1].label == L"　赣普词语连带");
-                assert(options.items[2].label == L"　同义词连带");
-                assert(bool(options.items[1].flags & TF_LBMENUF_GRAYED) == !annotations);
-                assert(bool(options.items[2].flags & TF_LBMENUF_GRAYED) == !annotations);
+                assert(options.items[1].label == L"赣普词语连带");
+                assert(options.items[2].label == L"同义词连带");
+                assert(bool(options.items[1].flags & TF_LBMENUF_GRAYED) == false);
+                assert(bool(options.items[2].flags & TF_LBMENUF_GRAYED) == false);
                 assert(bool(options.items[4].flags & TF_LBMENUF_GRAYED) == !fuzzy);
                 assert(bool(options.items[5].flags & TF_LBMENUF_GRAYED) == !fuzzy);
+                assert(bool(options.items[6].flags & TF_LBMENUF_GRAYED) == !fuzzy);
+                assert(options.items[5].label == L"　文白匹配");
                 assert(options.items[1].flags & TF_LBMENUF_CHECKED);
                 assert(options.items[2].flags & TF_LBMENUF_CHECKED);
                 for (int selected = 0; selected < 3; ++selected)
-                    assert(bool(options.items[6 + selected].flags & TF_LBMENUF_CHECKED) == (selected == mode));
+                    assert(bool(options.items[7 + selected].flags & TF_LBMENUF_CHECKED) == (selected == mode));
             }
         }
     }
@@ -99,7 +101,7 @@ int main() {
     owner.regions.resize(1);
     ITfMenu single_region_settings;
     assert(settings.InitMenu(&single_region_settings) == S_OK);
-    assert(single_region_settings.items.size() == 9);
+    assert(single_region_settings.items.size() == 10);
     assert(settings.InitMenu(nullptr) == E_INVALIDARG);
 }
 '''

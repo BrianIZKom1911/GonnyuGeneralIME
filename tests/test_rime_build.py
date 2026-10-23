@@ -81,6 +81,20 @@ def test_synonyms_are_separate_from_gan_mandarin_relations_and_characters_surviv
             assert not before and not after
 
 
+def test_wenbai_lookup_codes_are_separate_from_subtitle_metadata() -> None:
+    _, source = load_entries("lancong")
+    entries = [entry for entry in source if entry.word in {"经", "经济", "人", "人口"}]
+    pairs = build_paired_readings(entries)
+    economy = next(entry for entry in entries if entry.word == "经济")
+    population = next(entry for entry in entries if entry.word == "人口")
+    assert "Gjin Gji" in entry_codes(economy, pairs)
+    assert "Wjiang Gji" in entry_codes(economy, pairs)
+    assert "Gnin Gkiêu" in entry_codes(population, pairs)
+    assert "Wlen Gkiêu" in entry_codes(population, pairs)
+    annotations, _, _ = build_metadata(entries)
+    assert "[文]" in annotations["经"] and "[白]" in annotations["经"]
+
+
 def test_active_regions_use_canonical_default_order() -> None:
     regions = active_regions()
     assert regions[0] == "lancong"

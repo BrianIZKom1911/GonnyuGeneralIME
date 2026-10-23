@@ -23,12 +23,13 @@ function M.names(env)
   local context = env.engine and env.engine.context
   local mode = context and context:get_option("gannyu_new") and "new"
     or context and context:get_option("gannyu_old") and "old" or "both"
-  local relations = M.enabled(env, "annotations") and M.enabled(env, "relations")
+  local relations = M.enabled(env, "relations")
   local dictionary = mode == "both" and relations and "" or "_" .. mode .. (relations and "_rel" or "_norel")
   local full = M.enabled(env, "fuzzy") and M.enabled(env, "fuzzy_rules")
   local mandarin = M.enabled(env, "fuzzy") and M.enabled(env, "mandarin")
   local prism = full and mandarin and "" or (full and "_full" or "_special") .. (mandarin and "_mix" or "_gan")
-  return env.engine.schema.schema_id .. dictionary, dictionary .. prism
+  local wenbai = M.enabled(env, "fuzzy") and M.enabled(env, "wenbai")
+  return env.engine.schema.schema_id .. dictionary, dictionary .. prism .. (wenbai and "" or "_nowenbai")
 end
 
 return M

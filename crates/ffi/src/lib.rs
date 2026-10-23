@@ -1381,18 +1381,19 @@ pub unsafe extern "C" fn gannyu_engine_set_input_options(
         2 => gannyu_input_core::ReadingMode::Old,
         _ => return invalid_argument("reading mode must be 0, 1 or 2"),
     };
-    let options = gannyu_input_core::InputOptions {
-        annotations: annotations != 0,
-        relations: relations != 0,
-        synonyms: (&*handle).pipeline.lock().input_options().synonyms,
-        fuzzy: fuzzy != 0,
-        mandarin: mandarin != 0,
-        fuzzy_rules: fuzzy_rules != 0,
-        reading_mode,
-    };
     let handle = &*handle;
     {
         let mut pipeline = handle.pipeline.lock();
+        let options = gannyu_input_core::InputOptions {
+            annotations: annotations != 0,
+            relations: relations != 0,
+            synonyms: pipeline.input_options().synonyms,
+            wenbai: pipeline.input_options().wenbai,
+            fuzzy: fuzzy != 0,
+            mandarin: mandarin != 0,
+            fuzzy_rules: fuzzy_rules != 0,
+            reading_mode,
+        };
         if pipeline.input_options() == options {
             return STATUS_OK;
         }
@@ -1421,6 +1422,31 @@ pub unsafe extern "C" fn gannyu_engine_set_synonyms_enabled(
             return STATUS_OK;
         }
         options.synonyms = enabled != 0;
+        pipeline.set_input_options(options);
+    }
+    let mut session = handle.session.lock();
+    session.page_number = 0;
+    clear_accumulated_selection(&mut session);
+    STATUS_OK
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn gannyu_engine_set_wenbai_enabled(
+    handle: *mut GannyuPipelineHandle,
+    enabled: c_int,
+) -> c_int {
+    clear_last_error();
+    if handle.is_null() {
+        return invalid_argument("engine handle is null");
+    }
+    let handle = &*handle;
+    {
+        let mut pipeline = handle.pipeline.lock();
+        let mut options = pipeline.input_options();
+        if options.wenbai == (enabled != 0) {
+            return STATUS_OK;
+        }
+        options.wenbai = enabled != 0;
         pipeline.set_input_options(options);
     }
     let mut session = handle.session.lock();

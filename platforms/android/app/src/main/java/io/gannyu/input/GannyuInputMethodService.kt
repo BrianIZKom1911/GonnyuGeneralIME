@@ -165,29 +165,28 @@ class GannyuInputMethodService : InputMethodService() {
 
         fun inputOptions(context: Context): IntArray {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            return IntArray(7) { index -> if (index == 5) prefs.getInt("input_option_5", 0).coerceIn(0, 2) else if (prefs.getBoolean("input_option_$index", true)) 1 else 0 }
+            return IntArray(8) { index -> if (index == 5) prefs.getInt("input_option_5", 0).coerceIn(0, 2) else if (prefs.getBoolean("input_option_$index", true)) 1 else 0 }
         }
 
         fun populateInputOptions(context: Context, container: LinearLayout) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val values = inputOptions(context)
-            val labels = listOf("副标题", "赣普词语连带", "模糊匹配", "普拼兼容", "其他模糊规则", "读音模式", "同义词连带")
-            val indices = listOf(0, 1, 6, 2, 3, 4)
+            val labels = listOf("副标题", "赣普词语连带", "模糊匹配", "普拼兼容", "其他模糊规则", "读音模式", "同义词连带", "文白匹配")
+            val indices = listOf(0, 1, 6, 2, 3, 7, 4)
             val switches = indices.map { index ->
                 val label = labels[index]
                 android.widget.Switch(context).apply {
                     text = label
                     isChecked = values[index] != 0
-                    val indent = if (index == 1 || index == 6 || index == 3 || index == 4) 36 else 12
+                    val indent = if (index == 3 || index == 7 || index == 4) 36 else 12
                     setPadding((indent * resources.displayMetrics.density).toInt(), 8, 12, 8)
                     container.addView(this)
                 }
             }
             fun updateEnabled() {
-                switches[1].isEnabled = switches[0].isChecked
-                switches[2].isEnabled = switches[0].isChecked
                 switches[4].isEnabled = switches[3].isChecked
                 switches[5].isEnabled = switches[3].isChecked
+                switches[6].isEnabled = switches[3].isChecked
             }
             switches.forEachIndexed { index, control -> control.setOnCheckedChangeListener { _, checked ->
                 prefs.edit().putBoolean("input_option_${indices[index]}", checked).apply()

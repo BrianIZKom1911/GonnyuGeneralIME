@@ -20,6 +20,7 @@ pub struct InputOptions {
     pub fuzzy: bool,
     pub mandarin: bool,
     pub fuzzy_rules: bool,
+    pub wenbai: bool,
     pub reading_mode: ReadingMode,
 }
 
@@ -32,6 +33,7 @@ impl Default for InputOptions {
             fuzzy: true,
             mandarin: true,
             fuzzy_rules: true,
+            wenbai: true,
             reading_mode: ReadingMode::Both,
         }
     }
@@ -39,7 +41,7 @@ impl Default for InputOptions {
 
 impl InputOptions {
     pub fn relations_enabled(self) -> bool {
-        self.annotations && self.relations
+        self.relations
     }
 
     pub fn mandarin_enabled(self) -> bool {
@@ -47,7 +49,11 @@ impl InputOptions {
     }
 
     pub fn synonyms_enabled(self) -> bool {
-        self.annotations && self.synonyms
+        self.synonyms
+    }
+
+    pub fn wenbai_enabled(self) -> bool {
+        self.fuzzy && self.wenbai
     }
 
     pub fn fuzzy_rules_enabled(self) -> bool {
@@ -148,7 +154,7 @@ impl InputOptions {
                 }
             }
         }
-        dictionary.rebuild_multi_reading_augmentation();
+        dictionary.rebuild_multi_reading_augmentation_with_wenbai(self.wenbai_enabled());
         dictionary
     }
 }

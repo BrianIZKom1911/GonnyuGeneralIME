@@ -537,11 +537,13 @@ impl InputPipeline {
         let dictionary_changed = self.input_options.relations_enabled()
             != options.relations_enabled()
             || self.input_options.synonyms_enabled() != options.synonyms_enabled()
+            || self.input_options.wenbai_enabled() != options.wenbai_enabled()
             || self.input_options.mandarin_enabled() != options.mandarin_enabled()
             || self.input_options.reading_mode != options.reading_mode;
         if dictionary_changed {
             let original = options.relations_enabled()
                 && options.synonyms_enabled()
+                && options.wenbai_enabled()
                 && options.mandarin_enabled()
                 && options.reading_mode == crate::ReadingMode::Both;
             if original {

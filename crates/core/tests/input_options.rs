@@ -1,12 +1,47 @@
 use gannyu_input_core::{load_region_from_manifest, InputOptions, InputPipeline, ReadingMode};
 use std::path::Path;
 
+fn source_pipeline() -> (tempfile::TempDir, InputPipeline) {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../resources");
+    let mut region = load_region_from_manifest(root.join("manifest.toml"), "lancong").unwrap();
+    let fixture = tempfile::tempdir().unwrap();
+    let words = [
+        "车马", "䁐牛", "放牛", "几多", "多少", "这", "义", "主义", "经", "经济", "人", "人口",
+        "系", "五", "级",
+    ];
+    let characters: std::collections::HashSet<char> =
+        words.iter().flat_map(|word| word.chars()).collect();
+    for relative in [
+        "dictionaries/chars.tsv",
+        "dictionaries/words.tsv",
+        "dictionaries/gan_chars.tsv",
+        "dictionaries/gan_words.tsv",
+    ] {
+        let contents = std::fs::read_to_string(region.root.join(relative)).unwrap();
+        let mut lines = contents.lines();
+        let mut selected = vec![lines.next().unwrap()];
+        selected.extend(lines.filter(|line| {
+            let headword = line.split('\t').next().unwrap_or("");
+            words.contains(&headword)
+                || (headword.chars().count() == 1
+                    && characters.contains(&headword.chars().next().unwrap()))
+        }));
+        let target = fixture.path().join(relative);
+        std::fs::create_dir_all(target.parent().unwrap()).unwrap();
+        std::fs::write(target, selected.join("\n") + "\n").unwrap();
+    }
+    region.config.phonology.fuzzy_map =
+        Some(root.join("fuzzy_scheme.tsv").to_string_lossy().into_owned());
+    region.root = fixture.path().to_path_buf();
+    let pipeline =
+        InputPipeline::load_with_user_data_dir(&region, Some(&fixture.path().join("user")))
+            .unwrap();
+    (fixture, pipeline)
+}
+
 #[test]
 fn hot_options_filter_before_lookup_and_restore_original_candidates() {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../resources");
-    let region = load_region_from_manifest(root.join("manifest.toml"), "lancong").unwrap();
-    let user = tempfile::tempdir().unwrap();
-    let mut pipeline = InputPipeline::load_with_user_data_dir(&region, Some(user.path())).unwrap();
+    let (_fixture, mut pipeline) = source_pipeline();
     let original = pipeline.retrieve("ca1ma1");
     assert!(original.iter().any(|candidate| candidate.text == "车马"));
     assert!(pipeline
@@ -71,7 +106,7 @@ fn hot_options_filter_before_lookup_and_restore_original_candidates() {
     });
     let candidates = pipeline.retrieve("ji3do1");
     assert!(candidates.iter().any(|candidate| candidate.text == "几多"));
-    assert!(!candidates.iter().any(|candidate| candidate.text == "多少"));
+    assert!(candidates.iter().any(|candidate| candidate.text == "多少"));
     assert!(candidates
         .iter()
         .all(|candidate| candidate.annotation.is_none()));
@@ -86,10 +121,10 @@ fn hot_options_filter_before_lookup_and_restore_original_candidates() {
         .retrieve("ca1ma1")
         .iter()
         .any(|candidate| candidate.text == "车马"));
-    assert!(!pipeline
-        .retrieve("che1ma3")
-        .iter()
-        .any(|candidate| candidate.text == "车马"));
+    assert!(pipeline
+        .dictionary()
+        .by_mandarin_pinyin("che1ma3")
+        .is_empty());
     assert!(pipeline
         .dictionary()
         .entries()
@@ -150,4 +185,75 @@ fn hot_options_filter_before_lookup_and_restore_original_candidates() {
         serde_json::to_value(pipeline.retrieve("ca1ma1")).unwrap(),
         serde_json::to_value(original).unwrap()
     );
+}
+
+#[test]
+fn wenbai_options_preserve_labels_and_independent_lookup_paths() {
+    let (_fixture, mut pipeline) = source_pipeline();
+    let mut wenbai = InputOptions {
+        mandarin: false,
+        fuzzy_rules: false,
+        ..InputOptions::default()
+    };
+    pipeline.set_input_options(wenbai);
+    assert!(pipeline
+        .retrieve("jiang1ji4")
+        .iter()
+        .any(|candidate| candidate.text == "经济"));
+    assert!(pipeline
+        .retrieve("len4kiêu3")
+        .iter()
+        .any(|candidate| candidate.text == "人口"));
+    wenbai.wenbai = false;
+    pipeline.set_input_options(wenbai);
+    assert!(!pipeline
+        .retrieve("jiang1ji4")
+        .iter()
+        .any(|candidate| candidate.text == "经济"));
+    assert!(!pipeline
+        .dictionary()
+        .by_dialect_pinyin("len4kiêu3")
+        .iter()
+        .any(|entry| entry.headword.as_ref() == "人口"));
+    assert!(pipeline
+        .retrieve("jin1ji4")
+        .iter()
+        .any(|candidate| candidate.text == "经济"));
+    let annotated = pipeline.retrieve("jin1");
+    let character = annotated
+        .iter()
+        .find(|candidate| candidate.text == "经")
+        .unwrap();
+    let annotation = character.annotation.as_deref().unwrap();
+    assert!(annotation.contains("[文]") && annotation.contains("[白]"));
+    wenbai.mandarin = true;
+    pipeline.set_input_options(wenbai);
+    assert!(pipeline
+        .dictionary()
+        .by_mandarin_pinyin("jing1ji4")
+        .iter()
+        .any(|entry| entry.headword.as_ref() == "经济"));
+    let independent = pipeline.retrieve("jing1ji4");
+    assert!(
+        independent.iter().any(|candidate| candidate.text == "经济"),
+        "{:?}",
+        independent
+            .iter()
+            .map(|candidate| &candidate.text)
+            .collect::<Vec<_>>()
+    );
+    wenbai.wenbai = true;
+    wenbai.fuzzy = false;
+    pipeline.set_input_options(wenbai);
+    assert!(!pipeline
+        .retrieve("jiang1ji4")
+        .iter()
+        .any(|candidate| candidate.text == "经济"));
+    wenbai.fuzzy = true;
+    pipeline.set_input_options(wenbai);
+    assert!(pipeline
+        .retrieve("jiang1ji4")
+        .iter()
+        .any(|candidate| candidate.text == "经济"));
+    pipeline.set_input_options(InputOptions::default());
 }

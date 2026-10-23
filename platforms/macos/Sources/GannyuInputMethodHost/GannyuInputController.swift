@@ -219,14 +219,14 @@ final class GannyuInputController: IMKInputController {
         let settings = NSMenu(title: "输入设置")
         settings.autoenablesItems = false
         let values = GannyuRegionStore.shared.inputOptions
-        for index in [0, 1, 6, 2, 3, 4] {
+        for index in [0, 1, 6, 2, 3, 7, 4] {
             let title = GannyuRegionStore.optionTitles[index]
             let item = NSMenuItem(title: title, action: #selector(selectInputOption(_:)), keyEquivalent: "")
             item.target = self
             item.tag = index
-            item.indentationLevel = [1, 6, 3, 4].contains(index) ? 1 : 0
+            item.indentationLevel = [3, 7, 4].contains(index) ? 1 : 0
             item.state = values[index] != 0 ? .on : .off
-            item.isEnabled = (index == 1 || index == 6) ? values[0] != 0 : (index == 3 || index == 4 ? values[2] != 0 : true)
+            item.isEnabled = [3, 7, 4].contains(index) ? values[2] != 0 : true
             settings.addItem(item)
         }
         settings.addItem(.separator())

@@ -323,7 +323,10 @@ fn collect_all_char_readings(entries: &[DictionaryEntry]) -> HashMap<String, Vec
 }
 
 // Only explicit 新老、本又、文白 pairs participate in alternate-reading lookup.
-fn collect_char_readings(entries: &[DictionaryEntry]) -> HashMap<String, Vec<String>> {
+fn collect_char_readings(
+    entries: &[DictionaryEntry],
+    wenbai: bool,
+) -> HashMap<String, Vec<String>> {
     let mut marks: HashMap<(String, String), u8> = HashMap::new();
     let mut registers: HashMap<String, u8> = HashMap::new();
     for entry in entries {
@@ -355,7 +358,7 @@ fn collect_char_readings(entries: &[DictionaryEntry]) -> HashMap<String, Vec<Str
     }
     let mut allowed: HashSet<String> = registers
         .into_iter()
-        .filter_map(|(ch, bits)| (bits == 3).then_some(ch))
+        .filter_map(|(ch, bits)| (wenbai && bits == 3).then_some(ch))
         .collect();
     allowed.extend(
         marks
@@ -1607,8 +1610,17 @@ impl Dictionary {
     /// discovered in later files (e.g. gan_chars.tsv) can augment entries
     /// from earlier files (e.g. words.tsv).
     pub fn rebuild_multi_reading_augmentation(&mut self) {
+        self.rebuild_multi_reading_augmentation_with_wenbai(true);
+    }
+
+    pub(crate) fn rebuild_multi_reading_augmentation_with_wenbai(&mut self, wenbai: bool) {
+        if !wenbai {
+            for pairs in self.paired_readings.values_mut() {
+                pairs.retain(|pair| pair.kind != PairKind::WenBai);
+            }
+        }
         // Collect per-character readings from ALL entries.
-        self.char_readings = collect_char_readings(&self.entries);
+        self.char_readings = collect_char_readings(&self.entries, wenbai);
         // Augment syllable_index for all multi-character entries.
         let char_readings = &self.char_readings;
         for (entry_index, entry) in self.entries.iter().enumerate() {

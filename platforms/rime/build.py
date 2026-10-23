@@ -468,14 +468,14 @@ def entry_codes(entry: Entry, paired_readings: dict[str, list[tuple[str, str, st
             stored = strip_tone(gan[index])
             match = matching_pair_for_lookup(char, stored, paired_readings)
             if match is None:
-                readings = [stored]
+                readings = [f"G{stored}"]
             else:
-                first, second, _kind = match
-                readings = [strip_tone(first)]
-                second = strip_tone(second)
-                if second not in readings:
-                    readings.append(second)
-            choices.append([f"G{reading}" for reading in readings])
+                first, second, kind = match
+                readings = list(dict.fromkeys(
+                    ("W" if kind == "wenbai" and strip_tone(reading) != stored else "G") + strip_tone(reading)
+                    for reading in (first, second)
+                ))
+            choices.append(readings)
         total = 1
         for options in choices:
             total *= len(options)
@@ -575,7 +575,7 @@ def write_lua_data(
 
 OPTION_NAMES = (
     "gannyu_no_annotations", "gannyu_no_relations", "gannyu_no_synonyms", "gannyu_no_fuzzy",
-    "gannyu_no_mandarin", "gannyu_no_fuzzy_rules", "gannyu_both", "gannyu_new", "gannyu_old",
+    "gannyu_no_mandarin", "gannyu_no_wenbai", "gannyu_no_fuzzy_rules", "gannyu_both", "gannyu_new", "gannyu_old",
 )
 
 
@@ -621,12 +621,15 @@ def write_option_resources(region: str, entries: list[Entry], output: Path,
                            build_single_character_frequencies(selected), None if relations else forbidden_words,
                            synonyms=build_synonym_relations(selected),
                            synonym_candidates=build_synonym_relations(selected, known_only=True))
-        for full, mandarin in itertools.product((True, False), repeat=2):
+        for full, mandarin, wenbai in itertools.product((True, False), repeat=3):
             prism_suffix = "" if full and mandarin else ("_full" if full else "_special") + ("_mix" if mandarin else "_gan")
+            if not wenbai:
+                prism_suffix += "_nowenbai"
             schema_id = name + prism_suffix
             if schema_id == root:
                 continue
             algebra = list(full_algebra if full else special_algebra)
+            algebra.insert(0, "    - xform/^W/G/" if wenbai else "    - erase/^W.*$/")
             if not mandarin:
                 algebra.insert(-3, "    - erase/^[^GF].*$/")
             body = (
@@ -764,7 +767,7 @@ def build(region: str, output: Path, display_name: str = "short") -> dict[str, i
         .replace("@REGION_NAME@", region_name)
         .replace("@REGION_LABEL@", label)
         .replace("@VERSION@", VERSION)
-        .replace("@FUZZY_ALGEBRA@", "\n".join(algebra))
+        .replace("@FUZZY_ALGEBRA@", "\n".join(["    - xform/^W/G/", *algebra]))
     )
     (output / f"{schema_id}.schema.yaml").write_text(schema, encoding="utf-8")
     dependencies = write_option_resources(region, entries, output, algebra, compile_algebra(canonical, essential_rules(rules)))
